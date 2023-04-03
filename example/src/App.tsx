@@ -12,7 +12,7 @@ export default function App() {
   }, []);
 
   const readFile = async () => {
-    if (await RNCloudStorage.fileExists('test.txt', StorageScope.Documents)) {
+    if (await RNCloudStorage.exists('test.txt', StorageScope.Documents)) {
       setExists(true);
       setInput(await RNCloudStorage.readFile('test.txt', StorageScope.Documents));
     } else {
@@ -22,14 +22,14 @@ export default function App() {
   };
 
   const handleCreate = async () => {
-    await RNCloudStorage.createFile('test.txt', input, StorageScope.Documents, true);
+    await RNCloudStorage.writeFile('test.txt', input, StorageScope.Documents);
     readFile();
   };
 
   const handleRead = readFile;
 
   const handleDelete = async () => {
-    await RNCloudStorage.deleteFile('test.txt', StorageScope.Documents);
+    await RNCloudStorage.unlink('test.txt', StorageScope.Documents);
     readFile();
   };
 

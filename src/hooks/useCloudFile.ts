@@ -6,7 +6,7 @@ export const useCloudFile = (path: string, scope: StorageScope) => {
   const [content, setContent] = useState<string | null>(null);
 
   const read = useCallback(async () => {
-    const exists = await RNCloudStorage.fileExists(path, scope);
+    const exists = await RNCloudStorage.exists(path, scope);
     if (!exists) {
       setContent(null);
       return;
@@ -20,14 +20,14 @@ export const useCloudFile = (path: string, scope: StorageScope) => {
 
   const update = useCallback(
     async (newContent: string) => {
-      await RNCloudStorage.createFile(path, newContent, scope, true);
+      await RNCloudStorage.writeFile(path, newContent, scope);
       read();
     },
     [path, scope, read]
   );
 
   const remove = useCallback(async () => {
-    await RNCloudStorage.deleteFile(path, scope);
+    await RNCloudStorage.unlink(path, scope);
     setContent(null);
   }, [path, scope]);
 
