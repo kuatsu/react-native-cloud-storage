@@ -1,21 +1,13 @@
 # react-native-cloud-storage
 
+## ⚠️ Work in Progress
+
 Save & read from iCloud and Google Drive using React Native
 
 ## Installation
 
 ```sh
-npm install react-native-cloud-storage
-```
-
-## Usage
-
-```js
-import { multiply } from 'react-native-cloud-storage';
-
-// ...
-
-const result = await multiply(3, 7);
+npm install react-native-cloud-storage@https://github.com/Kuatsu/react-native-cloud-storage.git
 ```
 
 ## Contributing
