@@ -3,8 +3,6 @@ import * as React from 'react';
 import { StyleSheet, View, Text, Button, TextInput } from 'react-native';
 import RNCloudStorage, { StorageScope } from 'react-native-cloud-storage';
 
-const cloudStorage = new RNCloudStorage();
-
 export default function App() {
   const [exists, setExists] = React.useState(false);
   const [input, setInput] = React.useState('');
@@ -14,9 +12,9 @@ export default function App() {
   }, []);
 
   const readFile = async () => {
-    if (await cloudStorage.fileExists('test.txt', StorageScope.Documents)) {
+    if (await RNCloudStorage.fileExists('test.txt', StorageScope.Documents)) {
       setExists(true);
-      setInput(await cloudStorage.readFile('test.txt', StorageScope.Documents));
+      setInput(await RNCloudStorage.readFile('test.txt', StorageScope.Documents));
     } else {
       setExists(false);
       setInput('');
@@ -24,14 +22,14 @@ export default function App() {
   };
 
   const handleCreate = async () => {
-    await cloudStorage.createFile('test.txt', input, StorageScope.Documents, true);
+    await RNCloudStorage.createFile('test.txt', input, StorageScope.Documents, true);
     readFile();
   };
 
   const handleRead = readFile;
 
   const handleDelete = async () => {
-    await cloudStorage.deleteFile('test.txt', StorageScope.Documents);
+    await RNCloudStorage.deleteFile('test.txt', StorageScope.Documents);
     readFile();
   };
 
