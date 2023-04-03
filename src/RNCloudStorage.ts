@@ -20,4 +20,8 @@ export default class RNCloudStorage {
   readFile(path: string, scope: StorageScope): Promise<string> {
     return this.nativeInstance.readFile(path, scope);
   }
+
+  deleteFile(path: string, scope: StorageScope): Promise<void> {
+    return this.nativeInstance.deleteFile(path, scope);
+  }
 }

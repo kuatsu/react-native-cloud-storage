@@ -1,4 +1,4 @@
 export enum StorageScope {
-  Visible = 'visible',
+  Documents = 'documents',
   Hidden = 'hidden',
 }

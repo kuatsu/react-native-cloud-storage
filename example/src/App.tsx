@@ -10,18 +10,29 @@ export default function App() {
   const [input, setInput] = React.useState('');
 
   React.useEffect(() => {
-    cloudStorage.fileExists('test.txt', StorageScope.Visible).then(setExists);
+    readFile();
   }, []);
 
-  const handleCreate = () => {
-    cloudStorage.createFile('test.txt', input, StorageScope.Visible, true).then(() => {
+  const readFile = async () => {
+    if (await cloudStorage.fileExists('test.txt', StorageScope.Documents)) {
+      setExists(true);
+      setInput(await cloudStorage.readFile('test.txt', StorageScope.Documents));
+    } else {
+      setExists(false);
       setInput('');
-      cloudStorage.fileExists('test.txt', StorageScope.Visible).then(setExists);
-    });
+    }
   };
 
-  const handleRead = () => {
-    cloudStorage.readFile('test.txt', StorageScope.Visible).then(setInput);
+  const handleCreate = async () => {
+    await cloudStorage.createFile('test.txt', input, StorageScope.Documents, true);
+    readFile();
+  };
+
+  const handleRead = readFile;
+
+  const handleDelete = async () => {
+    await cloudStorage.deleteFile('test.txt', StorageScope.Documents);
+    readFile();
   };
 
   return (
@@ -30,6 +41,7 @@ export default function App() {
       <TextInput value={input} onChangeText={setInput} style={styles.input} />
       <Button title="Create file" onPress={handleCreate} />
       <Button title="Read file" onPress={handleRead} />
+      <Button title="Delete file" onPress={handleDelete} />
     </View>
   );
 }
