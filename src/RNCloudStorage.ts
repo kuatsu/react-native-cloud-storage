@@ -6,7 +6,7 @@ const nativeInstance = createRNCloudStorage();
 const RNCloudStorage = {
   setGoogleDriveAccessToken: (accessToken: string) => (GoogleDriveApiClient.accessToken = accessToken),
   /**
-   * Tests whether or not the given path exists.
+   * Tests whether or not the file at the given path exists.
    * @param path The path to test.
    * @param scope The directory scope the path is in.
    * @returns A promise that resolves to true if the path exists, false otherwise.
