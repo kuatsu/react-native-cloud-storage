@@ -14,6 +14,10 @@ npm install react-native-cloud-storage@https://github.com/Kuatsu/react-native-cl
 
 See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
 
+## Example Project
+
+There's a demo application available within the `example` directory. To use it under Android, you'll need to provide a valid access token for the Google Drive API. You can create one using the [Google OAuth 2.0 Playground](https://developers.google.com/oauthplayground).
+
 ## License
 
 MIT

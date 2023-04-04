@@ -1,8 +1,10 @@
 import createRNCloudStorage from './createRNCloudStorage';
+import GoogleDriveApiClient from './google-drive';
 import type { StorageScope } from './types/main';
 
 const nativeInstance = createRNCloudStorage();
 const RNCloudStorage = {
+  setGoogleDriveAccessToken: (accessToken: string) => (GoogleDriveApiClient.accessToken = accessToken),
   /**
    * Tests whether or not the given path exists.
    * @param path The path to test.

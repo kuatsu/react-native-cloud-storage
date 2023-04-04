@@ -1,23 +1,32 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 
-import { StyleSheet, View, Text, Button, TextInput } from 'react-native';
+import { StyleSheet, View, Text, Button, TextInput, Dimensions } from 'react-native';
 import RNCloudStorage, { StorageScope } from 'react-native-cloud-storage';
 
-export default function App() {
-  const [exists, setExists] = React.useState(false);
-  const [input, setInput] = React.useState('');
+const App = () => {
+  const [exists, setExists] = useState(false);
+  const [input, setInput] = useState('');
+  const [accessToken, setAccessToken] = useState('');
 
-  React.useEffect(() => {
+  useEffect(() => {
     readFile();
   }, []);
 
+  useEffect(() => {
+    RNCloudStorage.setGoogleDriveAccessToken(accessToken);
+  }, [accessToken]);
+
   const readFile = async () => {
-    if (await RNCloudStorage.exists('test.txt', StorageScope.Documents)) {
-      setExists(true);
-      setInput(await RNCloudStorage.readFile('test.txt', StorageScope.Documents));
-    } else {
-      setExists(false);
-      setInput('');
+    try {
+      if (await RNCloudStorage.exists('test.txt', StorageScope.Documents)) {
+        setExists(true);
+        setInput(await RNCloudStorage.readFile('test.txt', StorageScope.Documents));
+      } else {
+        setExists(false);
+        setInput('');
+      }
+    } catch (e) {
+      console.log(e);
     }
   };
 
@@ -36,13 +45,19 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text>Test file exists: {exists ? 'yes' : 'no'}</Text>
-      <TextInput value={input} onChangeText={setInput} style={styles.input} />
+      <TextInput placeholder="File contents (read/write)" value={input} onChangeText={setInput} style={styles.input} />
       <Button title="Create file" onPress={handleCreate} />
       <Button title="Read file" onPress={handleRead} />
       <Button title="Delete file" onPress={handleDelete} />
+      <TextInput
+        placeholder="Google Drive access token"
+        value={accessToken}
+        onChangeText={setAccessToken}
+        style={styles.input}
+      />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -56,7 +71,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   input: {
-    width: 200,
+    width: Dimensions.get('window').width - 40,
     height: 40,
     borderWidth: 1,
     borderColor: 'gray',
@@ -65,3 +80,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
 });
+
+export default App;

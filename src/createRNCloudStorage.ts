@@ -1,5 +1,6 @@
 import { NativeModules, Platform } from 'react-native';
 import type NativeRNCloudStorage from './types/native';
+import GoogleDriveApiClient from './google-drive';
 
 const LINKING_ERROR =
   `The package 'react-native-cloud-storage' doesn't seem to be linked. Make sure: \n\n` +
@@ -8,27 +9,23 @@ const LINKING_ERROR =
   '- You are not using Expo Go\n';
 
 export default function createRNCloudStorage(): NativeRNCloudStorage {
-  const CloudStorage =
-    (NativeModules.CloudStorage as NativeRNCloudStorage) ??
-    new Proxy(
-      {},
-      {
-        get() {
-          throw new Error(LINKING_ERROR);
-        },
-      }
+  if (Platform.OS === 'ios') {
+    return (
+      (NativeModules.CloudStorage as NativeRNCloudStorage) ??
+      new Proxy(
+        {},
+        {
+          get() {
+            throw new Error(LINKING_ERROR);
+          },
+        }
+      )
     );
-
-  if (Platform.OS !== 'ios') {
-    return new Proxy(
-      {},
-      {
-        get() {
-          throw new Error("'react-native-cloud-storage' only supports iOS at the moment.");
-        },
-      }
-    ) as NativeRNCloudStorage;
   }
 
-  return CloudStorage;
+  if (Platform.OS === 'android') {
+    return new GoogleDriveApiClient();
+  }
+
+  throw new Error('Unsupported platform');
 }
