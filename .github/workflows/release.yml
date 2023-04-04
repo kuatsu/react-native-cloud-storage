@@ -17,9 +17,8 @@ jobs:
       - name: Lint files
         run: yarn lint
 
-      # TODO: Re-enable once type errors in @robinbobin/react-native-google-drive-api-wrapper were fixed (also in test.yml)
-      #- name: Typecheck files
-      #  run: yarn typecheck
+      - name: Typecheck files
+        run: yarn typecheck
 
   test:
     runs-on: ubuntu-latest

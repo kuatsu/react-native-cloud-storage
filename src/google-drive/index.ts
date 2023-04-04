@@ -1,4 +1,4 @@
-import { GDrive, MimeTypes } from '@robinbobin/react-native-google-drive-api-wrapper';
+import { GDrive, MimeTypes } from 'react-native-google-drive-api-wrapper-js';
 import type NativeRNCloudStorage from '../types/native';
 import type { NativeRNCloudStorageScope } from '../types/native';
 import type { GoogleDriveFile, GoogleDriveListOperationResponse } from './types';
