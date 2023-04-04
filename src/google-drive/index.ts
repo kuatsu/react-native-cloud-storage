@@ -99,7 +99,15 @@ class GoogleDriveApiClient implements NativeRNCloudStorage {
     const files = await this.listFiles(scope);
     const { directories, filename } = this.resolvePathToDirectories(path);
     const parentDirectoryId = this.findParentDirectoryId(files, directories);
-    const file = files.find((f) => f.name === filename && f.parents![0] === parentDirectoryId);
+    let file: GoogleDriveFile | undefined;
+    if (parentDirectoryId === null) {
+      /* when the file is supposes to be in the root directory, we need to get the file where the name is the filename
+      and the first parent has an id which does not exist in the files array */
+      // TODO: does this work with scopes?
+      file = files.find((f) => f.name === filename && !files.find((f2) => f2.id === f.parents![0]));
+    } else {
+      file = files.find((f) => f.name === filename && f.parents![0] === parentDirectoryId);
+    }
     if (!file) throw new Error(`File not found`);
     return file.id;
   }
@@ -131,7 +139,11 @@ class GoogleDriveApiClient implements NativeRNCloudStorage {
       const parentDirectoryId = this.findParentDirectoryId(files, directories);
       uploader.setRequestBody({
         name: filename,
-        parents: [parentDirectoryId ?? (scope === 'hidden' ? this.getRootDirectory(scope) : undefined)],
+        parents: parentDirectoryId
+          ? [parentDirectoryId]
+          : scope === 'hidden'
+          ? [this.getRootDirectory(scope)]
+          : undefined,
       });
     }
     await uploader.execute();
