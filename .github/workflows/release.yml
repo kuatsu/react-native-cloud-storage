@@ -45,10 +45,15 @@ jobs:
       - name: Build package
         run: yarn prepack
 
-      - name: Set NPM token
-        run: npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
+      - name: Set NPM token & GitHub config
+        run: |
+          npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
+          git config user.name "Kuatsu CI/CD"
+          git config user.email "null@kuatsu.de"
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Release
         run: yarn release
+        env:
+          GITHUB_TOKEN: ${{ secrets.CICD_PAT }}
