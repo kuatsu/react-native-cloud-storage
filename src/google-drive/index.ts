@@ -1,12 +1,13 @@
 import { GDrive, MimeTypes } from '@robinbobin/react-native-google-drive-api-wrapper';
 import type NativeRNCloudStorage from '../types/native';
 import type { NativeRNCloudStorageScope } from '../types/native';
-import type { GoogleDriveListOperationResponse } from './types';
+import type { GoogleDriveFile, GoogleDriveListOperationResponse } from './types';
 
 class GoogleDriveApiClient implements NativeRNCloudStorage {
   private static drive: GDrive = new GDrive();
 
   constructor() {
+    GoogleDriveApiClient.drive.fetchTimeout = 3000;
     return new Proxy(this, {
       // before calling any function, check if the access token is set
       get(target: GoogleDriveApiClient, prop: keyof GoogleDriveApiClient) {
@@ -30,7 +31,7 @@ class GoogleDriveApiClient implements NativeRNCloudStorage {
     return GoogleDriveApiClient.drive.accessToken;
   }
 
-  private getParentFolder(scope: NativeRNCloudStorageScope): string {
+  private getRootDirectory(scope: NativeRNCloudStorageScope): 'drive' | 'appDataFolder' {
     switch (scope) {
       case 'documents':
         return 'drive';
@@ -39,11 +40,66 @@ class GoogleDriveApiClient implements NativeRNCloudStorage {
     }
   }
 
-  private async getFileId(path: string, scope: NativeRNCloudStorageScope): Promise<string> {
+  private resolvePathToDirectories(path: string): { directories: string[]; filename: string } {
+    if (path.startsWith('/')) path = path.slice(1);
+    if (path.endsWith('/')) path = path.slice(0, -1);
+    const directories = path.split('/');
+    const actualFilename = directories.pop() ?? '';
+    return { directories, filename: actualFilename };
+  }
+
+  private findParentDirectoryId(files: GoogleDriveFile[], directoryTree: string[]): string | null {
+    const possibleTopDirectories = files
+      .filter((f) => f.mimeType === MimeTypes.FOLDER)
+      .filter((f) => f.name === directoryTree[0]);
+
+    let topDirectoryId: string | undefined;
+    if (possibleTopDirectories.length === 0) return null;
+    else if (possibleTopDirectories.length === 1) {
+      topDirectoryId = possibleTopDirectories[0]!.id;
+    } else {
+      /* when multiple directories carry the same name, we need to check every one of them if their parent id exists in
+      the files array - if it does not, it means that the directory is a child of the root directory and the one we're
+      looking for */
+      for (const possibleTopDirectory of possibleTopDirectories) {
+        if (!files.find((f) => f.id === possibleTopDirectory!.parents![0] && f.mimeType === MimeTypes.FOLDER)) {
+          topDirectoryId = possibleTopDirectory!.id;
+          break;
+        }
+      }
+    }
+
+    if (!topDirectoryId) {
+      throw new Error(`Could not find top directory with name ${directoryTree[0]}`);
+    }
+
+    // now, we traverse the directories array and get the id of the last directory from the files array
+    let currentDirectoryId = topDirectoryId;
+    for (let i = 1; i < directoryTree.length; i++) {
+      const currentDirectory = files.find((f) => f.id === currentDirectoryId);
+      if (!currentDirectory) throw new Error(`Could not find directory with id ${currentDirectoryId}`);
+      const nextDirectory = files.find((f) => f.name === directoryTree[i] && f.parents![0] === currentDirectoryId);
+      if (!nextDirectory) throw new Error(`Could not find directory with name ${directoryTree[i]}`);
+      currentDirectoryId = nextDirectory.id;
+    }
+
+    return currentDirectoryId;
+  }
+
+  private async listFiles(scope: NativeRNCloudStorageScope): Promise<GoogleDriveFile[]> {
     const files: GoogleDriveListOperationResponse = await GoogleDriveApiClient.drive.files.list({
-      spaces: [this.getParentFolder(scope)],
+      spaces: [this.getRootDirectory(scope)],
+      fields: 'files(id,kind,mimeType,name,parents,spaces)',
     });
-    const file = files.files.find((f) => f.name === path);
+
+    return files.files;
+  }
+
+  private async getFileId(path: string, scope: NativeRNCloudStorageScope): Promise<string> {
+    const files = await this.listFiles(scope);
+    const { directories, filename } = this.resolvePathToDirectories(path);
+    const parentDirectoryId = this.findParentDirectoryId(files, directories);
+    const file = files.find((f) => f.name === filename && f.parents![0] === parentDirectoryId);
     if (!file) throw new Error(`File not found`);
     return file.id;
   }
@@ -69,11 +125,15 @@ class GoogleDriveApiClient implements NativeRNCloudStorage {
     }
     const uploader = GoogleDriveApiClient.drive.files.newMultipartUploader().setData(data, MimeTypes.TEXT);
     if (fileId) uploader.setIdOfFileToUpdate(fileId);
-    else
+    else {
+      const files = await this.listFiles(scope);
+      const { directories, filename } = this.resolvePathToDirectories(path);
+      const parentDirectoryId = this.findParentDirectoryId(files, directories);
       uploader.setRequestBody({
-        name: path,
-        parents: scope === 'hidden' ? this.getParentFolder(scope) : undefined,
+        name: filename,
+        parents: [parentDirectoryId ?? (scope === 'hidden' ? this.getRootDirectory(scope) : undefined)],
       });
+    }
     await uploader.execute();
   }
 

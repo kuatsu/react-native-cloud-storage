@@ -3,6 +3,8 @@ export interface GoogleDriveFile {
   kind: 'drive#file';
   mimeType: string;
   name: string;
+  parents: string[];
+  spaces: ('appDataFolder' | 'drive')[];
 }
 
 export interface GoogleDriveListOperationQueryParameters {

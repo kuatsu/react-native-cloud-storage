@@ -1,52 +1,66 @@
 import React, { useState, useEffect } from 'react';
 
-import { StyleSheet, View, Text, Button, TextInput, Dimensions } from 'react-native';
+import { StyleSheet, View, Text, Button, TextInput, Dimensions, ActivityIndicator } from 'react-native';
 import RNCloudStorage, { StorageScope } from 'react-native-cloud-storage';
 
 const App = () => {
+  const [filename, setFilename] = useState('test.txt');
   const [exists, setExists] = useState(false);
   const [input, setInput] = useState('');
   const [accessToken, setAccessToken] = useState('');
-
-  useEffect(() => {
-    readFile();
-  }, []);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     RNCloudStorage.setGoogleDriveAccessToken(accessToken);
   }, [accessToken]);
 
+  useEffect(() => {
+    setExists(false);
+    setInput('');
+  }, [filename]);
+
   const readFile = async () => {
+    setLoading(true);
     try {
-      if (await RNCloudStorage.exists('test.txt', StorageScope.Documents)) {
+      if (await RNCloudStorage.exists(filename, StorageScope.Documents)) {
         setExists(true);
-        setInput(await RNCloudStorage.readFile('test.txt', StorageScope.Documents));
+        setInput(await RNCloudStorage.readFile(filename, StorageScope.Documents));
       } else {
         setExists(false);
         setInput('');
       }
     } catch (e) {
-      console.log(e);
+      console.warn(e);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleCreate = async () => {
-    await RNCloudStorage.writeFile('test.txt', input, StorageScope.Documents);
+    setLoading(true);
+    await RNCloudStorage.writeFile(filename, input, StorageScope.Documents).catch(() => setLoading(false));
     readFile();
   };
 
   const handleRead = readFile;
 
   const handleDelete = async () => {
-    await RNCloudStorage.unlink('test.txt', StorageScope.Documents);
+    setLoading(true);
+    await RNCloudStorage.unlink(filename, StorageScope.Documents).catch(() => setLoading(false));
     readFile();
   };
 
   return (
     <View style={styles.container}>
+      {loading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator />
+        </View>
+      )}
+      <TextInput placeholder="Filename" value={filename} onChangeText={setFilename} style={styles.input} />
       <Text>Test file exists: {exists ? 'yes' : 'no'}</Text>
       <TextInput placeholder="File contents (read/write)" value={input} onChangeText={setInput} style={styles.input} />
-      <Button title="Create file" onPress={handleCreate} />
+      <Button title="Write file" onPress={handleCreate} />
       <Button title="Read file" onPress={handleRead} />
       <Button title="Delete file" onPress={handleDelete} />
       <TextInput
@@ -60,6 +74,17 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    zIndex: 10,
+  },
   container: {
     flex: 1,
     alignItems: 'center',
