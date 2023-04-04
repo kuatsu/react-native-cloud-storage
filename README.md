@@ -2,7 +2,9 @@
 
 Save & read from iCloud and Google Drive using React Native
 
-**⚠️ WARNING**: This project is still considered unstable. Please proceed with caution and report any issues you're encountering.
+![npm bundle size](https://img.shields.io/bundlephobia/min/react-native-cloud-storage?style=flat-square) ![GitHub](https://img.shields.io/github/license/kuatsu/react-native-cloud-storage?style=flat-square) ![GitHub last commit](https://img.shields.io/github/last-commit/kuatsu/react-native-cloud-storage)
+
+**⚠️ WARNING**: This project is still considered unstable. The API might change drastically in new versions. Please proceed with caution and report any issues you're encountering.
 
 ## Installation
 
