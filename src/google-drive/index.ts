@@ -1,6 +1,7 @@
 import { GDrive, MimeTypes } from '@robinbobin/react-native-google-drive-api-wrapper';
 import type NativeRNCloudStorage from '../types/native';
 import type { NativeRNCloudStorageScope } from '../types/native';
+import type { GoogleDriveListOperationResponse } from './types';
 
 class GoogleDriveApiClient implements NativeRNCloudStorage {
   private static drive: GDrive = new GDrive();
@@ -39,8 +40,10 @@ class GoogleDriveApiClient implements NativeRNCloudStorage {
   }
 
   private async getFileId(path: string, scope: NativeRNCloudStorageScope): Promise<string> {
-    const files = await GoogleDriveApiClient.drive.files.list({ spaces: [this.getParentFolder(scope)] });
-    const file = files.files.find((file: any) => file.name === path);
+    const files: GoogleDriveListOperationResponse = await GoogleDriveApiClient.drive.files.list({
+      spaces: [this.getParentFolder(scope)],
+    });
+    const file = files.files.find((f) => f.name === path);
     if (!file) throw new Error(`File not found`);
     return file.id;
   }
@@ -56,17 +59,22 @@ class GoogleDriveApiClient implements NativeRNCloudStorage {
   }
 
   async createFile(path: string, data: string, scope: NativeRNCloudStorageScope, overwrite: boolean): Promise<void> {
-    if (overwrite && (await this.fileExists(path, scope))) {
-      await this.deleteFile(path, scope);
+    let fileId: string | undefined;
+    if (overwrite) {
+      try {
+        fileId = await this.getFileId(path, scope);
+      } catch (e: any) {
+        /* do nothing, simply create the file */
+      }
     }
-    await GoogleDriveApiClient.drive.files
-      .newMultipartUploader()
-      .setData(data, MimeTypes.TEXT)
-      .setRequestBody({
+    const uploader = GoogleDriveApiClient.drive.files.newMultipartUploader().setData(data, MimeTypes.TEXT);
+    if (fileId) uploader.setIdOfFileToUpdate(fileId);
+    else
+      uploader.setRequestBody({
         name: path,
         parents: scope === 'hidden' ? this.getParentFolder(scope) : undefined,
-      })
-      .execute();
+      });
+    await uploader.execute();
   }
 
   async readFile(path: string, scope: NativeRNCloudStorageScope): Promise<string> {
