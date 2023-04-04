@@ -5,6 +5,7 @@ import RNCloudStorage, { StorageScope } from 'react-native-cloud-storage';
 
 const App = () => {
   const [filename, setFilename] = useState('test.txt');
+  const [scope, setScope] = useState(StorageScope.Documents);
   const [exists, setExists] = useState(false);
   const [input, setInput] = useState('');
   const [accessToken, setAccessToken] = useState('');
@@ -17,14 +18,14 @@ const App = () => {
   useEffect(() => {
     setExists(false);
     setInput('');
-  }, [filename]);
+  }, [filename, scope]);
 
   const readFile = async () => {
     setLoading(true);
     try {
-      if (await RNCloudStorage.exists(filename, StorageScope.Documents)) {
+      if (await RNCloudStorage.exists(filename, scope)) {
         setExists(true);
-        setInput(await RNCloudStorage.readFile(filename, StorageScope.Documents));
+        setInput(await RNCloudStorage.readFile(filename, scope));
       } else {
         setExists(false);
         setInput('');
@@ -38,7 +39,7 @@ const App = () => {
 
   const handleCreate = async () => {
     setLoading(true);
-    await RNCloudStorage.writeFile(filename, input, StorageScope.Documents).catch(() => setLoading(false));
+    await RNCloudStorage.writeFile(filename, input, scope).catch(() => setLoading(false));
     readFile();
   };
 
@@ -46,7 +47,7 @@ const App = () => {
 
   const handleDelete = async () => {
     setLoading(true);
-    await RNCloudStorage.unlink(filename, StorageScope.Documents).catch(() => setLoading(false));
+    await RNCloudStorage.unlink(filename, scope).catch(() => setLoading(false));
     readFile();
   };
 
@@ -58,6 +59,10 @@ const App = () => {
         </View>
       )}
       <TextInput placeholder="Filename" value={filename} onChangeText={setFilename} style={styles.input} />
+      <Button
+        title={`Switch to ${scope === StorageScope.Documents ? 'App Data' : 'Documents'}`}
+        onPress={() => setScope(scope === StorageScope.Documents ? StorageScope.Hidden : StorageScope.Documents)}
+      />
       <Text>Test file exists: {exists ? 'yes' : 'no'}</Text>
       <TextInput placeholder="File contents (read/write)" value={input} onChangeText={setInput} style={styles.input} />
       <Button title="Write file" onPress={handleCreate} />

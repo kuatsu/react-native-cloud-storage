@@ -103,7 +103,6 @@ class GoogleDriveApiClient implements NativeRNCloudStorage {
     if (parentDirectoryId === null) {
       /* when the file is supposes to be in the root directory, we need to get the file where the name is the filename
       and the first parent has an id which does not exist in the files array */
-      // TODO: does this work with scopes?
       file = files.find((f) => f.name === filename && !files.find((f2) => f2.id === f.parents![0]));
     } else {
       file = files.find((f) => f.name === filename && f.parents![0] === parentDirectoryId);
