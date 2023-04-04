@@ -23,5 +23,6 @@ runs:
       if: steps.yarn-cache.outputs.cache-hit != 'true'
       run: |
         yarn install --cwd example --frozen-lockfile
+        yarn install --cwd docs --frozen-lockfile
         yarn install --frozen-lockfile
       shell: bash

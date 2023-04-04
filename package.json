@@ -35,7 +35,7 @@
     "release": "release-it",
     "example": "yarn --cwd example",
     "docs": "yarn --cwd docs",
-    "bootstrap": "yarn example && yarn install && yarn example pods",
+    "bootstrap": "yarn example && yarn docs && yarn install && yarn example pods",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build"
   },
   "keywords": [
