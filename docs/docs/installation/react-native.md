@@ -12,6 +12,14 @@ npm install react-native-cloud-storage
 yarn add react-native-cloud-storage
 ```
 
-Afterwards, you will need to configure iCloud within the native iOS files. To do so, follow these steps:
+After installing the library itself, you will need to install the native iOS module (linking is done by React Native's autolinking) and configure iCloud within the native iOS files. First, install the pods:
 
-// TODO: Add native iOS configuration docs
+```sh
+cd ios && pod install && cd ..
+```
+
+Then, open your Xcode workspace. From there, find the main project target and open the section "Signing & Capabilities". Click on the "+ Capability" button to add a new capability. From there, add the "iCloud" capability. Once added, scroll down to the newly created capability and enable "iCloud Documents" from the "Services" section. Finally, add a new container called `iCloud.{bundle_identifier}` where `{bundle_identifier}` should be replaced with your project's bundle identifier.
+
+Once complete, it should look like this:
+
+![Example of correct iOS configuration](/img/ios_installation.jpg)

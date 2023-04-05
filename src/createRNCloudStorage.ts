@@ -49,9 +49,5 @@ export default function createRNCloudStorage(): NativeRNCloudStorage {
     );
   }
 
-  if (Platform.OS === 'android') {
-    return new GoogleDriveApiClient();
-  }
-
-  throw new Error('Unsupported platform');
+  return new GoogleDriveApiClient();
 }

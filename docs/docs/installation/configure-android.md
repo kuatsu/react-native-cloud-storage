@@ -24,7 +24,7 @@ Below is a more practical example of how this could look in action using the Exp
 
 ```tsx
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, Button, Platform } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import RNCloudStorage, { StorageScope } from 'react-native-cloud-storage';
@@ -33,7 +33,6 @@ WebBrowser.maybeCompleteAuthSession();
 
 const App: React.FC = () => {
   const [accessToken, setAccessToken] = useState('');
-  const [userInfo, setUserInfo] = useState(null);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     androidClientId: 'GOOGLE_GUID.apps.googleusercontent.com',
@@ -42,7 +41,6 @@ const App: React.FC = () => {
   useEffect(() => {
     if (response?.type === 'success') {
       setAccessToken(response.authentication.accessToken);
-      getUserInfo();
     }
 
     RNCloudStorage.setGoogleDriveAccessToken(accessToken);
@@ -54,7 +52,7 @@ const App: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {userInfo === null ? (
+      {Platform.OS === 'android' && accessToken === null ? (
         <Button
           title="Sign in with Google"
           disabled={!request}
@@ -88,4 +86,4 @@ const styles = StyleSheet.create({
 });
 ```
 
-In the end, you are responsible for acquiring and potentially refreshing the access token.
+In the end, you are responsible for acquiring and potentially refreshing the access token. Do note however, that this process only needs to be done for Android as iOS will not use the Google Drive REST API and instead fully rely on CloudKit / iCloud.
