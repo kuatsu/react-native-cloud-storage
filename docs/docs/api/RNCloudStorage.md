@@ -23,9 +23,11 @@ Tests whether or not the file at the given path exists.
 
 **Returns**: A `Promise` that resolves to a `boolean`. `true` if the file exists, `false` otherwise.
 
-### `googleDriveAccessToken`
+### `getGoogleDriveAccessToken()`
 
-A `string` value corresponding to the currently set Google Drive access token (see [`setGoogleDriveAccessToken()`](#setgoogledriveaccesstokenaccesstoken)).
+Gets the currently stored Google Drive access token (see [`setGoogleDriveAccessToken()`](#setgoogledriveaccesstokenaccesstoken)).
+
+**Returns**: A `Promise` that resolves to the `string` value of the access token, or `undefined` if it hasn't been set so far.
 
 ### `isCloudAvailable()`
 
