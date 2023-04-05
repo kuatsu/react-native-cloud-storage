@@ -1,10 +1,10 @@
 ---
-sidebar_position: 2
+sidebar_position: 1
 ---
 
 # StorageFileStat
 
-A `StorageFileStat` is returned by the [`RNCloudStorage.stat()`](./RNCloudStorage.md#statpath-scope) method and contains several statistics about the file.
+A `StorageFileStat` is returned by the [`RNCloudStorage.stat()`](../RNCloudStorage#statpath-scope) method and contains several statistics about the file.
 
 ## API
 

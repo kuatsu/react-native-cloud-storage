@@ -67,7 +67,7 @@ Gets several file statistics of the file at the given path.
 - `path` (`string`): Required. The full pathname of the file to stat.
 - `scope` ([`StorageScope`](./enums/StorageScope)): Required. The storage scope (documents/app data) to use.
 
-**Returns**: A `Promise` that resolves to [`StorageFileStat`](./StorageFileStat) object containing the statistics.
+**Returns**: A `Promise` that resolves to [`StorageFileStat`](./interfaces/StorageFileStat) object containing the statistics.
 
 ### `unlink(path, scope)`
 
