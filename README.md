@@ -1,6 +1,6 @@
 # ☁️ react-native-cloud-storage
 
-Save & read from iCloud and Google Drive using React Native
+Save to & read from iCloud and Google Drive using React Native
 
 ![npm bundle size](https://img.shields.io/bundlephobia/min/react-native-cloud-storage?style=flat-square) ![GitHub](https://img.shields.io/github/license/kuatsu/react-native-cloud-storage?style=flat-square) ![GitHub last commit](https://img.shields.io/github/last-commit/kuatsu/react-native-cloud-storage?style=flat-square)
 
