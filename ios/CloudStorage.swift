@@ -124,7 +124,7 @@ class CloudStorage: NSObject {
 
   /// Returns the iCloud directory URL for the given scope.
   ///
-  /// - Parameter scope: The scope of the directory. Can be either "documents" or "hidden".
+  /// - Parameter scope: The scope of the directory. Can be either "documents" or "app_data".
   /// - Returns: The URL of the iCloud directory.
   private func getDirectory(_ scope: String) -> URL? {
     let fileManager = FileManager.default

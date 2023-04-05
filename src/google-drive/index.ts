@@ -43,7 +43,7 @@ class GoogleDriveApiClient implements NativeRNCloudStorage {
     switch (scope) {
       case 'documents':
         return 'drive';
-      case 'hidden':
+      case 'app_data':
         return 'appDataFolder';
     }
   }
@@ -159,7 +159,7 @@ class GoogleDriveApiClient implements NativeRNCloudStorage {
         name: filename,
         parents: parentDirectoryId
           ? [parentDirectoryId]
-          : scope === 'hidden'
+          : scope === 'app_data'
           ? [this.getRootDirectory(scope)]
           : undefined,
       });

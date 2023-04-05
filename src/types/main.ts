@@ -1,6 +1,6 @@
 export enum StorageScope {
   Documents = 'documents',
-  Hidden = 'hidden',
+  AppData = 'app_data',
 }
 
 export interface StorageFileStat {

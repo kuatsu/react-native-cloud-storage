@@ -1,4 +1,4 @@
-export type NativeRNCloudStorageScope = 'documents' | 'hidden';
+export type NativeRNCloudStorageScope = 'documents' | 'app_data';
 
 export interface NativeRNCloudStorageFileStat {
   size: number;

@@ -47,7 +47,7 @@ const App: React.FC = () => {
   }, [response, accessToken]);
 
   const writeFileAsync = () => {
-    return RNCloudStorage.writeFile('test.txt', 'Hello World', RNCloudStorage.Hidden);
+    return RNCloudStorage.writeFile('test.txt', 'Hello World', RNCloudStorage.AppData);
   };
 
   return (
