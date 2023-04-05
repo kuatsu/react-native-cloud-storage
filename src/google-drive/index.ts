@@ -6,7 +6,7 @@ import {
   type NativeRNCloudStorageScope,
 } from '../types/native';
 import type { GoogleDriveDetailedFile, GoogleDriveFile, GoogleDriveListOperationResponse } from './types';
-import NativeStorageError from './utils/NativeStorageError';
+import NativeStorageError from '../utils/NativeStorageError';
 
 class GoogleDriveApiClient implements NativeRNCloudStorage {
   private static drive: GDrive = new GDrive();
