@@ -24,7 +24,7 @@ See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the 
 
 ## Example Project
 
-There's a demo application available within the `example` directory. To use it under Android, you'll need to provide a valid access token for the Google Drive API. You can create one using the [Google OAuth 2.0 Playground](https://developers.google.com/oauthplayground). If you're using an Android emulator, you can make your life easier by feeding the token into the emulator using `adb shell input text '{some_token}'`.
+There's a demo application available within the `example` directory. To use the Google Drive implementation for Android (and any other platforms except iOS), you'll need to provide a valid access token for the Google Drive API. You can create one using the [Google OAuth 2.0 Playground](https://developers.google.com/oauthplayground). If you're using an Android emulator, you can make your life easier by feeding the token into the emulator using `adb shell input text '{some_token}'`.
 
 ## License
 

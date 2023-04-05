@@ -23,3 +23,5 @@ Then, open your Xcode workspace. From there, find the main project target and op
 Once complete, it should look like this:
 
 ![Example of correct iOS configuration](/img/ios_installation.jpg)
+
+Finally, proceed with [the Google Drive configuration](./configure-google-drive).

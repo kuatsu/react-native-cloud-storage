@@ -6,7 +6,7 @@ sidebar_position: 1
 
 :::caution
 
-This library is not compatible with Expo Go. You need to use a [development client](https://docs.expo.dev/development/create-development-builds/).
+This library is not compatible with Expo Go for iOS. You need to use a [development client](https://docs.expo.dev/development/create-development-builds/).
 
 :::
 
@@ -40,4 +40,6 @@ Optionally, you can also configure the `iCloudContainerEnvironment` option using
 
 [Learn more about this option.](https://developer.apple.com/documentation/bundleresources/entitlements/com_apple_developer_icloud-container-environment)
 
-Finally, rebuild your development client and proceed with [the Android configuration](./configure-android).
+While this library does not contain any native Android code, it's best practice to also use development clients on Android from this point forward if you're not already doing so anyways.
+
+Finally, rebuild your development client and proceed with [the Google Drive configuration](./configure-google-drive).

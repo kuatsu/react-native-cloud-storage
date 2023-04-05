@@ -12,6 +12,28 @@ import RNCloudStorage from { react-native-cloud-storage };
 
 ## Methods
 
+### `exists(path, scope)`
+
+Tests whether or not the file at the given path exists.
+
+**Parameters**:
+
+- `path` (`string`): Required. The path to test.
+- `scope` ([`StorageScope`](./enums/StorageScope)): Required. The storage scope (documents/app data) to use.
+
+**Returns**: A `Promise` that resolves to a `boolean`. `true` if the file exists, `false` otherwise.
+
+### `readFile(path, scope)`
+
+Reads the file at the given path into a `string`.
+
+**Parameters**:
+
+- `path` (`string`): Required. The full pathname of the file to read.
+- `scope` ([`StorageScope`](./enums/StorageScope)): Required. The storage scope (documents/app data) to use.
+
+**Returns**: A `Promise` that resolves to a `string` containing the file's content.
+
 ### `setGoogleDriveAccessToken(accessToken)`
 
 This is the only additional property which does not follow `fs` conventions. It is used to provide a valid Google Drive access token to the library which is used for calls to the Google Drive API.
@@ -24,28 +46,6 @@ The access token is stored statically and therefore only needs to be provided on
 
 **Returns**: `void`
 
-### `exists(path, scope)`
-
-Tests whether or not the file at the given path exists.
-
-**Parameters**:
-
-- `path` (`string`): Required. The path to test.
-- `scope` ([`StorageScope`](./StorageScope)): Required. The storage scope (documents/app data) to use.
-
-**Returns**: A `Promise` that resolves to a `boolean`. `true` if the file exists, `false` otherwise.
-
-### `readFile(path, scope)`
-
-Reads the file at the given path into a `string`.
-
-**Parameters**:
-
-- `path` (`string`): Required. The full pathname of the file to read.
-- `scope` ([`StorageScope`](./StorageScope)): Required. The storage scope (documents/app data) to use.
-
-**Returns**: A `Promise` that resolves to a `string` containing the file's content.
-
 ### `stat(path, scope)`
 
 Gets several file statistics of the file at the given path.
@@ -53,7 +53,7 @@ Gets several file statistics of the file at the given path.
 **Parameters**:
 
 - `path` (`string`): Required. The full pathname of the file to stat.
-- `scope` ([`StorageScope`](./StorageScope)): Required. The storage scope (documents/app data) to use.
+- `scope` ([`StorageScope`](./enums/StorageScope)): Required. The storage scope (documents/app data) to use.
 
 **Returns**: A `Promise` that resolves to [`StorageFileStat`](./StorageFileStat) object containing the statistics.
 
@@ -64,7 +64,7 @@ Deletes the file at the given path.
 **Parameters**:
 
 - `path` (`string`): Required. The full pathname of the file to delete.
-- `scope` ([`StorageScope`](./StorageScope)): Required. The storage scope (documents/app data) to use.
+- `scope` ([`StorageScope`](./enums/StorageScope)): Required. The storage scope (documents/app data) to use.
 
 **Returns**: A `Promise` that resolves to `void` once the file has been deleted.
 
@@ -76,6 +76,6 @@ Writes the data to the given path. Creates the file if it doesn't exist yet and 
 
 - `path` (`string`): Required. The path including the filename to write to.
 - `content` (`string`): Required. The content to write.
-- `scope` ([`StorageScope`](./StorageScope)): Required. The storage scope (documents/app data) to use.
+- `scope` ([`StorageScope`](./enums/StorageScope)): Required. The storage scope (documents/app data) to use.
 
 **Returns**: A `Promise` that resolves to `void` once the file has been written.

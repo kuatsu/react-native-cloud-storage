@@ -15,7 +15,7 @@ import { NativeStorageError } from 'react-native-cloud-storage';
 The class provides three properties:
 
 - `message` (`string`): The error message.
-- `code` ([`NativeStorageErrorCode`](./NativeStorageErrorCode)): The error code which can be used to determine the type of the error.
+- `code` ([`NativeStorageErrorCode`](./enums/NativeStorageErrorCode)): The error code which can be used to determine the type of the error.
 - `details` (`any`): Optionally, any details like raw errors.
 
 ## Example
