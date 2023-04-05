@@ -1,6 +1,6 @@
 import createRNCloudStorage from './createRNCloudStorage';
 import GoogleDriveApiClient from './google-drive';
-import type { StorageScope } from './types/main';
+import type { StorageFileStat, StorageScope } from './types/main';
 
 const nativeInstance = createRNCloudStorage();
 const RNCloudStorage = {
@@ -44,6 +44,24 @@ const RNCloudStorage = {
    */
   unlink: (path: string, scope: StorageScope): Promise<void> => {
     return nativeInstance.deleteFile(path, scope);
+  },
+
+  /**
+   * Gets the size, creation time, and modification time of the file at the given path.
+   * @param path The file to stat.
+   * @param scope The directory scope the path is in.
+   * @returns A promise that resolves to the StorageFileStat object.
+   */
+  stat: async (path: string, scope: StorageScope): Promise<StorageFileStat> => {
+    const native = await nativeInstance.statFile(path, scope);
+
+    return {
+      ...native,
+      birthtime: new Date(native.birthtimeMs),
+      mtime: new Date(native.mtimeMs),
+      isDirectory: () => native.isDirectory,
+      isFile: () => native.isFile,
+    };
   },
 };
 

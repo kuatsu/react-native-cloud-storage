@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { StyleSheet, View, Text, Button, TextInput, Dimensions, ActivityIndicator } from 'react-native';
-import RNCloudStorage, { StorageScope } from 'react-native-cloud-storage';
+import RNCloudStorage, { NativeStorageError, NativeStorageErrorCode, StorageScope } from 'react-native-cloud-storage';
 
 const App = () => {
   const [filename, setFilename] = useState('test.txt');
@@ -23,15 +23,19 @@ const App = () => {
   const readFile = async () => {
     setLoading(true);
     try {
-      if (await RNCloudStorage.exists(filename, scope)) {
-        setExists(true);
-        setInput(await RNCloudStorage.readFile(filename, scope));
-      } else {
-        setExists(false);
-        setInput('');
-      }
+      let stats = await RNCloudStorage.stat(filename, scope);
+      setExists(true);
+      setInput(await RNCloudStorage.readFile(filename, scope));
+      console.log('File stats', stats);
     } catch (e) {
-      console.warn(e);
+      if (e instanceof NativeStorageError) {
+        if (e.code === NativeStorageErrorCode.FILE_NOT_FOUND) {
+          setExists(false);
+          setInput('');
+        } else {
+          console.warn('Native storage error', e.code, e.message);
+        }
+      } else console.warn('Unknown error', e);
     } finally {
       setLoading(false);
     }

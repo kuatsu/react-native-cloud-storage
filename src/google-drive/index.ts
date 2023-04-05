@@ -1,7 +1,7 @@
 import { GDrive, MimeTypes } from 'react-native-google-drive-api-wrapper-js';
 import type NativeRNCloudStorage from '../types/native';
-import type { NativeRNCloudStorageScope } from '../types/native';
-import type { GoogleDriveFile, GoogleDriveListOperationResponse } from './types';
+import type { NativeRNCloudStorageFileStat, NativeRNCloudStorageScope } from '../types/native';
+import type { GoogleDriveDetailedFile, GoogleDriveFile, GoogleDriveListOperationResponse } from './types';
 
 class GoogleDriveApiClient implements NativeRNCloudStorage {
   private static drive: GDrive = new GDrive();
@@ -157,6 +157,20 @@ class GoogleDriveApiClient implements NativeRNCloudStorage {
   async deleteFile(path: string, scope: NativeRNCloudStorageScope): Promise<void> {
     const fileId = await this.getFileId(path, scope);
     await GoogleDriveApiClient.drive.files.delete(fileId);
+  }
+
+  async statFile(path: string, scope: NativeRNCloudStorageScope): Promise<NativeRNCloudStorageFileStat> {
+    const fileId = await this.getFileId(path, scope);
+    const file: GoogleDriveDetailedFile = await GoogleDriveApiClient.drive.files.get(fileId, {
+      fields: 'id,kind,mimeType,name,parents,spaces,size,createdTime,modifiedTime',
+    });
+    return {
+      size: file.size ?? 0,
+      birthtimeMs: new Date(file.createdTime!).getTime(),
+      mtimeMs: new Date(file.modifiedTime!).getTime(),
+      isDirectory: file.mimeType === MimeTypes.FOLDER,
+      isFile: file.mimeType !== MimeTypes.FOLDER,
+    };
   }
 }
 

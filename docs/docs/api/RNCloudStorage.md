@@ -46,6 +46,17 @@ Reads the file at the given path into a `string`.
 
 **Returns**: A `Promise` that resolves to a `string` containing the file's content.
 
+### `stat(path, scope)`
+
+Gets several file statistics of the file at the given path.
+
+**Parameters**:
+
+- `path` (`string`): Required. The full pathname of the file to stat.
+- `scope` ([`StorageScope`](./StorageScope)): Required. The storage scope (documents/app data) to use.
+
+**Returns**: A `Promise` that resolves to [`StorageFileStat`](./StorageFileStat) object containing the statistics.
+
 ### `unlink(path, scope)`
 
 Deletes the file at the given path.
