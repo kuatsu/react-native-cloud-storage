@@ -39,6 +39,8 @@ class GoogleDriveApiClient implements NativeRNCloudStorage {
     return GoogleDriveApiClient.drive.accessToken;
   }
 
+  public isCloudAvailable: () => Promise<boolean> = async () => true;
+
   private getRootDirectory(scope: NativeRNCloudStorageScope): 'drive' | 'appDataFolder' {
     switch (scope) {
       case 'documents':

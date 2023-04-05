@@ -12,6 +12,13 @@ const App = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    (async () => {
+      const available = await RNCloudStorage.isCloudAvailable();
+      console.log('Cloud available at startup time', available);
+    })();
+  }, []);
+
+  useEffect(() => {
     RNCloudStorage.setGoogleDriveAccessToken(accessToken);
   }, [accessToken]);
 

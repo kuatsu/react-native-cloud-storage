@@ -23,6 +23,12 @@ Tests whether or not the file at the given path exists.
 
 **Returns**: A `Promise` that resolves to a `boolean`. `true` if the file exists, `false` otherwise.
 
+### `isCloudAvailable()`
+
+Tests whether or not the cloud storage is available. Testing is only done on iOS. On all other platforms, this will always resolve to `true` since Google Drive is implemented using the REST API.
+
+**Returns**: A `Promise` that resolves to a `boolean`. `true` if the cloud storage is available, `false` otherwise.
+
 ### `readFile(path, scope)`
 
 Reads the file at the given path into a `string`.
