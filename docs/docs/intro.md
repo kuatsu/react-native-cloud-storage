@@ -6,7 +6,7 @@ sidebar_position: 1
 
 :::caution
 
-This library is not yet stable. Documentation is subject to rapid change. Please proceed with caution.
+This project is still considered unstable. The API might change drastically in new versions. Please proceed with caution and report any issues you're encountering.
 
 :::
 

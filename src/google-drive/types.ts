@@ -7,6 +7,12 @@ export interface GoogleDriveFile {
   spaces: ('appDataFolder' | 'drive')[];
 }
 
+export interface GoogleDriveDetailedFile extends GoogleDriveFile {
+  createdTime: string;
+  modifiedTime: string;
+  size?: number;
+}
+
 export interface GoogleDriveListOperationQueryParameters {
   corpora?: 'user' | 'drive' | 'domain' | 'allDrives';
   driveId?: string;
