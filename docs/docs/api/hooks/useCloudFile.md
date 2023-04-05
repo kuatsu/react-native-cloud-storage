@@ -15,7 +15,7 @@ import { useCloudFile } from { react-native-cloud-storage };
 **Parameters**:
 
 - `path` (`string`): Required. The full pathname of the file to use.
-- `scope` ([`StorageScope`](./enums/StorageScope)): Required. The storage scope (documents/app data) to use.
+- `scope` ([`StorageScope`](../enums/StorageScope)): Required. The storage scope (documents/app data) to use.
 
 **Returns**: An object containing the following properties:
 
