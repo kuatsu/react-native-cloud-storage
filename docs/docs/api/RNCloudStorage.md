@@ -23,9 +23,15 @@ Tests whether or not the file at the given path exists.
 
 **Returns**: A `Promise` that resolves to a `boolean`. `true` if the file exists, `false` otherwise.
 
+### `googleDriveAccessToken`
+
+A `string` value corresponding to the currently set Google Drive access token (see [`setGoogleDriveAccessToken()`](#setgoogledriveaccesstokenaccesstoken)).
+
 ### `isCloudAvailable()`
 
-Tests whether or not the cloud storage is available. Testing is only done on iOS. On all other platforms, this will always resolve to `true` since Google Drive is implemented using the REST API.
+Tests whether or not the cloud storage is available.
+On iOS, this actually verifies with the system whether or not iCloud is available. This might not be the case right at app launch or when the user is not logged into iCloud.
+On Android, this simply checks whether or not a Google Drive API access token has been set using [setGoogleDriveAccessToken](#setgoogledriveaccesstokenaccesstoken).
 
 **Returns**: A `Promise` that resolves to a `boolean`. `true` if the cloud storage is available, `false` otherwise.
 

@@ -4,6 +4,7 @@ import type { StorageFileStat, StorageScope } from './types/main';
 
 const nativeInstance = createRNCloudStorage();
 const RNCloudStorage = {
+  googleDriveAccessToken: GoogleDriveApiClient.accessToken,
   setGoogleDriveAccessToken: (accessToken: string) => (GoogleDriveApiClient.accessToken = accessToken),
 
   /**
