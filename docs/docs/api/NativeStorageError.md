@@ -26,7 +26,7 @@ import RNCloudStorage, { NativeStorageError, NativeStorageErrorCode } from 'reac
 try {
   await RNCloudStorage.stat('test.txt');
 } catch (e: unknown) {
-  if (e instanceof NativeStorageError && e.code === NativeStorageErrorCode.NOT_FOUND) {
+  if (e instanceof NativeStorageError && e.code === NativeStorageErrorCode.FILE_NOT_FOUND) {
     console.log('File not found');
   } else {
     console.warn(e);
