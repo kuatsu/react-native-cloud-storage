@@ -1,7 +1,12 @@
 import { GDrive, MimeTypes } from 'react-native-google-drive-api-wrapper-js';
 import type NativeRNCloudStorage from '../types/native';
-import type { NativeRNCloudStorageFileStat, NativeRNCloudStorageScope } from '../types/native';
+import {
+  NativeStorageErrorCode,
+  type NativeRNCloudStorageFileStat,
+  type NativeRNCloudStorageScope,
+} from '../types/native';
 import type { GoogleDriveDetailedFile, GoogleDriveFile, GoogleDriveListOperationResponse } from './types';
+import NativeStorageError from 'src/utils/NativeStorageError';
 
 class GoogleDriveApiClient implements NativeRNCloudStorage {
   private static drive: GDrive = new GDrive();
@@ -13,7 +18,10 @@ class GoogleDriveApiClient implements NativeRNCloudStorage {
       get(target: GoogleDriveApiClient, prop: keyof GoogleDriveApiClient) {
         if (typeof target[prop] === 'function') {
           if (!GoogleDriveApiClient.drive.accessToken) {
-            throw new Error(`Google Drive access token is not set, cannot call function ${prop.toString()}`);
+            throw new NativeStorageError(
+              `Google Drive access token is not set, cannot call function ${prop.toString()}`,
+              NativeStorageErrorCode.GOOGLE_DRIVE_ACCESS_TOKEN_MISSING
+            );
           }
         }
 
@@ -70,16 +78,27 @@ class GoogleDriveApiClient implements NativeRNCloudStorage {
     }
 
     if (!topDirectoryId) {
-      throw new Error(`Could not find top directory with name ${directoryTree[0]}`);
+      throw new NativeStorageError(
+        `Could not find top directory with name ${directoryTree[0]}`,
+        NativeStorageErrorCode.DIRECTORY_NOT_FOUND
+      );
     }
 
     // now, we traverse the directories array and get the id of the last directory from the files array
     let currentDirectoryId = topDirectoryId;
     for (let i = 1; i < directoryTree.length; i++) {
       const currentDirectory = files.find((f) => f.id === currentDirectoryId);
-      if (!currentDirectory) throw new Error(`Could not find directory with id ${currentDirectoryId}`);
+      if (!currentDirectory)
+        throw new NativeStorageError(
+          `Could not find directory with id ${currentDirectoryId}`,
+          NativeStorageErrorCode.DIRECTORY_NOT_FOUND
+        );
       const nextDirectory = files.find((f) => f.name === directoryTree[i] && f.parents![0] === currentDirectoryId);
-      if (!nextDirectory) throw new Error(`Could not find directory with name ${directoryTree[i]}`);
+      if (!nextDirectory)
+        throw new NativeStorageError(
+          `Could not find directory with name ${directoryTree[i]}`,
+          NativeStorageErrorCode.DIRECTORY_NOT_FOUND
+        );
       currentDirectoryId = nextDirectory.id;
     }
 
@@ -107,7 +126,7 @@ class GoogleDriveApiClient implements NativeRNCloudStorage {
     } else {
       file = files.find((f) => f.name === filename && f.parents![0] === parentDirectoryId);
     }
-    if (!file) throw new Error(`File not found`);
+    if (!file) throw new NativeStorageError(`File not found`, NativeStorageErrorCode.FILE_NOT_FOUND);
     return file.id;
   }
 
@@ -116,7 +135,7 @@ class GoogleDriveApiClient implements NativeRNCloudStorage {
       await this.getFileId(path, scope);
       return true;
     } catch (e: any) {
-      if (e.message === 'File not found') return false;
+      if (e instanceof NativeStorageError && e.code === NativeStorageErrorCode.FILE_NOT_FOUND) return false;
       else throw e;
     }
   }
