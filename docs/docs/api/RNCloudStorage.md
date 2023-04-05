@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # RNCloudStorage
 
-The `RNCloudStorage` is the default export of the library and provides the core functionality. API conventions loosely follow the conventions of Node's `fs`.
+The `RNCloudStorage` is the default export of the library and provides the core functionality. File operations loosely follow the conventions of Node's `fs`.
 
 ```ts
 import RNCloudStorage from { react-native-cloud-storage };
@@ -42,7 +42,7 @@ Reads the file at the given path into a `string`.
 
 ### `setGoogleDriveAccessToken(accessToken)`
 
-This is the only additional property which does not follow `fs` conventions. It is used to provide a valid Google Drive access token to the library which is used for calls to the Google Drive API.
+Provide a valid Google Drive access token to the library which in order to make calls to the Google Drive API.
 
 The access token is stored statically and therefore only needs to be provided once (until the token expires!) but is available throughout the whole project.
 
