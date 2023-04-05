@@ -16,7 +16,7 @@ class GoogleDriveApiClient implements NativeRNCloudStorage {
     return new Proxy(this, {
       // before calling any function, check if the access token is set
       get(target: GoogleDriveApiClient, prop: keyof GoogleDriveApiClient) {
-        if (typeof target[prop] === 'function') {
+        if (typeof target[prop] === 'function' && prop !== 'isCloudAvailable') {
           if (!GoogleDriveApiClient.drive.accessToken) {
             throw new NativeStorageError(
               `Google Drive access token is not set, cannot call function ${prop.toString()}`,
@@ -39,7 +39,7 @@ class GoogleDriveApiClient implements NativeRNCloudStorage {
     return GoogleDriveApiClient.drive.accessToken;
   }
 
-  public isCloudAvailable: () => Promise<boolean> = async () => true;
+  public isCloudAvailable: () => Promise<boolean> = async () => !!GoogleDriveApiClient.accessToken?.length;
 
   private getRootDirectory(scope: NativeRNCloudStorageScope): 'drive' | 'appDataFolder' {
     switch (scope) {

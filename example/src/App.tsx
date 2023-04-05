@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
 import { StyleSheet, View, Text, Button, TextInput, Dimensions, ActivityIndicator } from 'react-native';
-import RNCloudStorage, { NativeStorageError, NativeStorageErrorCode, StorageScope } from 'react-native-cloud-storage';
+import RNCloudStorage, {
+  NativeStorageError,
+  NativeStorageErrorCode,
+  StorageScope,
+  useIsCloudAvailable,
+} from 'react-native-cloud-storage';
 
 const App = () => {
   const [filename, setFilename] = useState('test.txt');
@@ -11,12 +16,9 @@ const App = () => {
   const [accessToken, setAccessToken] = useState('');
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      const available = await RNCloudStorage.isCloudAvailable();
-      console.log('Cloud available at startup time', available);
-    })();
-  }, []);
+  const cloudAvailable = useIsCloudAvailable();
+
+  console.log({ cloudAvailable });
 
   useEffect(() => {
     RNCloudStorage.setGoogleDriveAccessToken(accessToken);
