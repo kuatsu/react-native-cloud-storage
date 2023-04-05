@@ -1,9 +1,9 @@
-export enum StorageScope {
+export enum CloudStorageScope {
   Documents = 'documents',
   AppData = 'app_data',
 }
 
-export interface StorageFileStat {
+export interface CloudStorageFileStat {
   size: number;
   birthtimeMs: number;
   mtimeMs: number;

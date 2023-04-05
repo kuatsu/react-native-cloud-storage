@@ -2,18 +2,18 @@
 sidebar_position: 2
 ---
 
-# NativeStorageErrorCode
+# CloudStorageErrorCode
 
-`NativeStorageErrorCode` is a TypeScript enum containing the possible error codes of a [`NativeStorageError`](../NativeStorageError).
+`CloudStorageErrorCode` is a TypeScript enum containing the possible error codes of a [`CloudStorageError`](../CloudStorageError).
 
 ```ts
-import { NativeStorageErrorCode } from 'react-native-cloud-storage';
+import { CloudStorageErrorCode } from 'react-native-cloud-storage';
 ```
 
 ## Definition
 
 ```ts
-enum NativeStorageErrorCode {
+enum CloudStorageErrorCode {
   FILE_NOT_FOUND = 'ERR_FILE_NOT_FOUND',
   DIRECTORY_NOT_FOUND = 'ERR_NO_DIRECTORY_FOUND',
   FILE_ALREADY_EXISTS = 'ERR_FILE_EXISTS',
@@ -28,7 +28,7 @@ enum NativeStorageErrorCode {
 When using pure JavaScript, simply use the appropriate values:
 
 ```js
-if (e.instanceof NativeStorageError && e.code === 'FILE_NOT_FOUND') {
+if (e.instanceof CloudStorageError && e.code === 'FILE_NOT_FOUND') {
   /* do something */
 }
 ```

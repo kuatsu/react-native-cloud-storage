@@ -1,6 +1,6 @@
 import createRNCloudStorage from './createRNCloudStorage';
 import GoogleDriveApiClient from './google-drive';
-import type { StorageFileStat, StorageScope } from './types/main';
+import type { CloudStorageFileStat, CloudStorageScope } from './types/main';
 
 const nativeInstance = createRNCloudStorage();
 const RNCloudStorage = {
@@ -22,7 +22,7 @@ const RNCloudStorage = {
    * @param scope The directory scope the path is in.
    * @returns A promise that resolves to true if the path exists, false otherwise.
    */
-  exists: (path: string, scope: StorageScope): Promise<boolean> => {
+  exists: (path: string, scope: CloudStorageScope): Promise<boolean> => {
     return nativeInstance.fileExists(path, scope);
   },
 
@@ -33,7 +33,7 @@ const RNCloudStorage = {
    * @param scope The directory scope the path is in.
    * @returns A promise that resolves when the file has been written.
    */
-  writeFile: (path: string, data: string, scope: StorageScope): Promise<void> => {
+  writeFile: (path: string, data: string, scope: CloudStorageScope): Promise<void> => {
     return nativeInstance.createFile(path, data, scope, true);
   },
 
@@ -43,7 +43,7 @@ const RNCloudStorage = {
    * @param scope The directory scope the path is in.
    * @returns A promise that resolves to the contents of the file.
    */
-  readFile: (path: string, scope: StorageScope): Promise<string> => {
+  readFile: (path: string, scope: CloudStorageScope): Promise<string> => {
     return nativeInstance.readFile(path, scope);
   },
 
@@ -53,7 +53,7 @@ const RNCloudStorage = {
    * @param scope The directory scope the path is in.
    * @returns A promise that resolves when the file has been deleted.
    */
-  unlink: (path: string, scope: StorageScope): Promise<void> => {
+  unlink: (path: string, scope: CloudStorageScope): Promise<void> => {
     return nativeInstance.deleteFile(path, scope);
   },
 
@@ -61,9 +61,9 @@ const RNCloudStorage = {
    * Gets the size, creation time, and modification time of the file at the given path.
    * @param path The file to stat.
    * @param scope The directory scope the path is in.
-   * @returns A promise that resolves to the StorageFileStat object.
+   * @returns A promise that resolves to the CloudStorageFileStat object.
    */
-  stat: async (path: string, scope: StorageScope): Promise<StorageFileStat> => {
+  stat: async (path: string, scope: CloudStorageScope): Promise<CloudStorageFileStat> => {
     const native = await nativeInstance.statFile(path, scope);
 
     return {

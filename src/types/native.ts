@@ -1,6 +1,6 @@
-export type NativeRNCloudStorageScope = 'documents' | 'app_data';
+export type NativeRNCloudCloudStorageScope = 'documents' | 'app_data';
 
-export interface NativeRNCloudStorageFileStat {
+export interface NativeRNCloudCloudStorageFileStat {
   size: number;
   birthtimeMs: number;
   mtimeMs: number;
@@ -8,7 +8,7 @@ export interface NativeRNCloudStorageFileStat {
   isFile: boolean;
 }
 
-export enum NativeStorageErrorCode {
+export enum CloudStorageErrorCode {
   FILE_NOT_FOUND = 'ERR_FILE_NOT_FOUND',
   DIRECTORY_NOT_FOUND = 'ERR_NO_DIRECTORY_FOUND',
   FILE_ALREADY_EXISTS = 'ERR_FILE_EXISTS',
@@ -21,10 +21,10 @@ export enum NativeStorageErrorCode {
 }
 
 export default interface NativeRNCloudStorage {
-  fileExists: (path: string, scope: NativeRNCloudStorageScope) => Promise<boolean>;
-  createFile: (path: string, data: string, scope: NativeRNCloudStorageScope, overwrite: boolean) => Promise<void>;
-  readFile: (path: string, scope: NativeRNCloudStorageScope) => Promise<string>;
-  deleteFile: (path: string, scope: NativeRNCloudStorageScope) => Promise<void>;
-  statFile: (path: string, scope: NativeRNCloudStorageScope) => Promise<NativeRNCloudStorageFileStat>;
+  fileExists: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<boolean>;
+  createFile: (path: string, data: string, scope: NativeRNCloudCloudStorageScope, overwrite: boolean) => Promise<void>;
+  readFile: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<string>;
+  deleteFile: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<void>;
+  statFile: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<NativeRNCloudCloudStorageFileStat>;
   isCloudAvailable: () => Promise<boolean>;
 }
