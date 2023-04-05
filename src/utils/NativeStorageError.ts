@@ -1,4 +1,4 @@
-import type { NativeStorageErrorCode } from 'src/types/native';
+import type { NativeStorageErrorCode } from '../types/native';
 
 class NativeStorageError extends Error {
   code: NativeStorageErrorCode;
