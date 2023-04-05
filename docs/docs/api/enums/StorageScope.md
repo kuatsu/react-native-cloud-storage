@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 1
 ---
 
 # StorageScope
@@ -10,12 +10,14 @@ sidebar_position: 3
 import { StorageScope } from 'react-native-cloud-storage';
 ```
 
+Available scopes are `documents` and `app_data`. When using `documents`, data will be stored in the user-visible root directory of the cloud storage. When using `app_data`, the directory for app-specific data, usually hidden from the user, will be used.
+
 ## Definition
 
 ```ts
 enum StorageScope {
   Documents = 'documents',
-  Hidden = 'hidden',
+  AppData = 'app_data',
 }
 ```
 

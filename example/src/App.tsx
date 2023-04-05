@@ -12,6 +12,13 @@ const App = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    (async () => {
+      const available = await RNCloudStorage.isCloudAvailable();
+      console.log('Cloud available at startup time', available);
+    })();
+  }, []);
+
+  useEffect(() => {
     RNCloudStorage.setGoogleDriveAccessToken(accessToken);
   }, [accessToken]);
 
@@ -65,7 +72,7 @@ const App = () => {
       <TextInput placeholder="Filename" value={filename} onChangeText={setFilename} style={styles.input} />
       <Button
         title={`Switch to ${scope === StorageScope.Documents ? 'App Data' : 'Documents'}`}
-        onPress={() => setScope(scope === StorageScope.Documents ? StorageScope.Hidden : StorageScope.Documents)}
+        onPress={() => setScope(scope === StorageScope.Documents ? StorageScope.AppData : StorageScope.Documents)}
       />
       <Text>Test file exists: {exists ? 'yes' : 'no'}</Text>
       <TextInput placeholder="File contents (read/write)" value={input} onChangeText={setInput} style={styles.input} />

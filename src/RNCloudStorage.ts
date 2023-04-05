@@ -5,6 +5,16 @@ import type { StorageFileStat, StorageScope } from './types/main';
 const nativeInstance = createRNCloudStorage();
 const RNCloudStorage = {
   setGoogleDriveAccessToken: (accessToken: string) => (GoogleDriveApiClient.accessToken = accessToken),
+
+  /**
+   * Tests whether or not the cloud storage is available. Always returns true for Google Drive. iCloud may be
+   * unavailable right after app launch or if the user is not logged in.
+   * @returns A promise that resolves to true if the cloud storage is available, false otherwise.
+   */
+  isCloudAvailable: async (): Promise<boolean> => {
+    return nativeInstance.isCloudAvailable();
+  },
+
   /**
    * Tests whether or not the file at the given path exists.
    * @param path The path to test.

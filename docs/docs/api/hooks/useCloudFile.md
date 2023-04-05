@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 1
 ---
 
 # useCloudFile
@@ -15,7 +15,7 @@ import { useCloudFile } from { react-native-cloud-storage };
 **Parameters**:
 
 - `path` (`string`): Required. The full pathname of the file to use.
-- `scope` ([`StorageScope`](./StorageScope)): Required. The storage scope (documents/app data) to use.
+- `scope` ([`StorageScope`](../enums/StorageScope)): Required. The storage scope (documents/app data) to use.
 
 **Returns**: An object containing the following properties:
 

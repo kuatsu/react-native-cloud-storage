@@ -81,13 +81,6 @@ class CloudStorage: NSObject {
     }
   }
 
-  /* return an object with the following properties:
-    * size: filesize in bytes
-    * birthtimeMs: creation time in milliseconds
-    * mtimeMs: modification time in milliseconds
-    * isDirectory: true if the path is a directory
-    * isFile: true if the path is a file
-    */
   @objc(statFile:withScope:withResolver:withRejecter:)
   func statFile(path: String, scope: String, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
     let fileManager = FileManager.default
@@ -122,9 +115,15 @@ class CloudStorage: NSObject {
     }
   }
 
+  @objc(isCloudAvailable:withRejecter:)
+  func isCloudAvailable(resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
+    let token = FileManager.default.ubiquityIdentityToken
+    resolve(token != nil)
+  }
+
   /// Returns the iCloud directory URL for the given scope.
   ///
-  /// - Parameter scope: The scope of the directory. Can be either "documents" or "hidden".
+  /// - Parameter scope: The scope of the directory. Can be either "documents" or "app_data".
   /// - Returns: The URL of the iCloud directory.
   private func getDirectory(_ scope: String) -> URL? {
     let fileManager = FileManager.default

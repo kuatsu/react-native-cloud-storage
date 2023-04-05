@@ -1,10 +1,10 @@
 ---
-sidebar_position: 5
+sidebar_position: 2
 ---
 
 # NativeStorageErrorCode
 
-`NativeStorageErrorCode` is a TypeScript enum containing the possible error codes of a [`NativeStorageError`](./NativeStorageError).
+`NativeStorageErrorCode` is a TypeScript enum containing the possible error codes of a [`NativeStorageError`](../NativeStorageError).
 
 ```ts
 import { NativeStorageErrorCode } from 'react-native-cloud-storage';

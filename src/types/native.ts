@@ -1,4 +1,4 @@
-export type NativeRNCloudStorageScope = 'documents' | 'hidden';
+export type NativeRNCloudStorageScope = 'documents' | 'app_data';
 
 export interface NativeRNCloudStorageFileStat {
   size: number;
@@ -26,4 +26,5 @@ export default interface NativeRNCloudStorage {
   readFile: (path: string, scope: NativeRNCloudStorageScope) => Promise<string>;
   deleteFile: (path: string, scope: NativeRNCloudStorageScope) => Promise<void>;
   statFile: (path: string, scope: NativeRNCloudStorageScope) => Promise<NativeRNCloudStorageFileStat>;
+  isCloudAvailable: () => Promise<boolean>;
 }

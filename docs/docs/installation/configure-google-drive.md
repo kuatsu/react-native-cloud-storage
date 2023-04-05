@@ -47,7 +47,7 @@ const App: React.FC = () => {
   }, [response, accessToken]);
 
   const writeFileAsync = () => {
-    return RNCloudStorage.writeFile('test.txt', 'Hello World', RNCloudStorage.Hidden);
+    return RNCloudStorage.writeFile('test.txt', 'Hello World', RNCloudStorage.AppData);
   };
 
   return (
@@ -86,4 +86,4 @@ const styles = StyleSheet.create({
 });
 ```
 
-In the end, you are responsible for acquiring and potentially refreshing the access token. Do note however, that this process only needs to be done for Android as iOS will not use the Google Drive REST API and instead fully rely on CloudKit / iCloud.
+In the end, you are responsible for acquiring and potentially refreshing the access token. Do note however, that this process does not need to be done for iOS as iOS will not use the Google Drive REST API but instead fully rely on CloudKit / iCloud.
