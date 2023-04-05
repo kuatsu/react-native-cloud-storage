@@ -29,7 +29,7 @@ import RNCloudStorage, { CloudStorageScope } from 'react-native-cloud-storage';
 WebBrowser.maybeCompleteAuthSession();
 
 const App: React.FC = () => {
-  const [accessToken, setAccessToken] = useState('');
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     androidClientId: 'GOOGLE_GUID.apps.googleusercontent.com',
@@ -39,9 +39,8 @@ const App: React.FC = () => {
   useEffect(() => {
     if (response?.type === 'success') {
       setAccessToken(response.authentication.accessToken);
+      RNCloudStorage.setGoogleDriveAccessToken(accessToken);
     }
-
-    RNCloudStorage.setGoogleDriveAccessToken(accessToken);
   }, [response, accessToken]);
 
   const writeFileAsync = () => {
