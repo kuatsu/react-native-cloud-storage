@@ -40,4 +40,4 @@ Optionally, you can also configure the `iCloudContainerEnvironment` option using
 
 [Learn more about this option.](https://developer.apple.com/documentation/bundleresources/entitlements/com_apple_developer_icloud-container-environment)
 
-Finally, rebuild your development client and proceed with the Android configuration.
+Finally, rebuild your development client and proceed with [the Android configuration](./configure-android).
