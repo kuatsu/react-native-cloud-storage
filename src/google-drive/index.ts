@@ -31,7 +31,7 @@ class GoogleDriveApiClient implements NativeRNCloudStorage {
   }
 
   // when setting accessToken, set it on the GDrive instance
-  public static set accessToken(accessToken: string) {
+  public static set accessToken(accessToken: string | undefined) {
     GoogleDriveApiClient.drive.accessToken = accessToken;
   }
 
