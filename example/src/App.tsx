@@ -18,7 +18,17 @@ const App = () => {
 
   const cloudAvailable = useIsCloudAvailable();
 
-  console.log({ cloudAvailable });
+  useEffect(() => {
+    console.log(cloudAvailable ? 'Cloud storage available' : 'Cloud storage not available');
+  }, [cloudAvailable]);
+
+  useEffect(() => {
+    const subscription = RNCloudStorage.subscribeToFilesWithSameName(({ path, fileIds }) =>
+      console.warn('Multiple files with same name', { path, fileIds })
+    );
+
+    return () => subscription.remove();
+  }, []);
 
   useEffect(() => {
     RNCloudStorage.setGoogleDriveAccessToken(accessToken);
