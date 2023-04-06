@@ -25,7 +25,7 @@ When a method takes a `path` parameter, you should provide a full path without l
 
 :::caution
 
-When creating files or directories, always make sure that all directories in the tree already exist. Otherwise the library will throw a [`CloudStorageErrorCode.ERR_NO_DIRECTORY_FOUND`](./enums/CloudStorageErrorCode).
+When creating files or directories, always make sure that all directories in the tree already exist. Otherwise the library will throw a [`CloudStorageErrorCode.DIRECTORY_NOT_FOUND`](./enums/CloudStorageErrorCode).
 
 :::
 
