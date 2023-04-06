@@ -10,6 +10,25 @@ The `RNCloudStorage` is the default export of the library and provides the core 
 import RNCloudStorage from { react-native-cloud-storage };
 ```
 
+## Definitions
+
+### `path`
+
+When a method takes a `path` parameter, you should provide a full path without leading or trailing slashes:
+
+- ❌ `/some/file`
+- ❌ `file:///some/file`
+- ❌ `some/file/`
+- ❌ `some/directory/`
+- ✅ `some/file`
+- ✅ `some/directory`
+
+:::caution
+
+When creating files or directories, always make sure that all directories in the tree already exist. Otherwise the library will throw a [`CloudStorageErrorCode.ERR_NO_DIRECTORY_FOUND`](./enums/CloudStorageErrorCode).
+
+:::
+
 ## Methods
 
 ### `exists(path, scope)`
