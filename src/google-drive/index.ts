@@ -196,7 +196,11 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
       try {
         fileId = await this.getFileId(path, scope);
       } catch (e: any) {
-        /* do nothing, simply create the file */
+        if (e instanceof CloudStorageError && e.code === CloudStorageErrorCode.FILE_NOT_FOUND) {
+          /* do nothing, simply create the file */
+        } else {
+          throw e;
+        }
       }
     } else {
       try {
