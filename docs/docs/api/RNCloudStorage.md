@@ -77,7 +77,7 @@ Gets several file statistics of the file at the given path.
 
 ### `subscribeToFilesWithSameName(subscriber)`
 
-Creates a subscriber that receives events when files with the same filename in the same parent directory are detected. Does not fire anything on iOS. For more information, [see here](../guides/google-drive-files-same-name).
+Creates a subscription that receives events when files with the same filename in the same parent directory are detected. Does not fire anything on iOS. For more information, [see here](../guides/google-drive-files-same-name).
 
 **Parameters**:
 

@@ -45,6 +45,9 @@ const App: React.FC = () => {
   useEffect(() => {
     if (response?.type === 'success') {
       setAccessToken(response.authentication.accessToken);
+    }
+
+    if (accessToken) {
       RNCloudStorage.setGoogleDriveAccessToken(accessToken);
     }
   }, [response, accessToken]);
