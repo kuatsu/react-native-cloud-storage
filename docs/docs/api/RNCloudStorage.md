@@ -19,13 +19,15 @@ Tests whether or not the file at the given path exists.
 **Parameters**:
 
 - `path` (`string`): Required. The path to test.
-- `scope` ([`StorageScope`](./enums/StorageScope)): Required. The storage scope (documents/app data) to use.
+- `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Required. The storage scope (documents/app data) to use.
 
 **Returns**: A `Promise` that resolves to a `boolean`. `true` if the file exists, `false` otherwise.
 
-### `googleDriveAccessToken`
+### `getGoogleDriveAccessToken()`
 
-A `string` value corresponding to the currently set Google Drive access token (see [`setGoogleDriveAccessToken()`](#setgoogledriveaccesstokenaccesstoken)).
+Gets the currently stored Google Drive access token (see [`setGoogleDriveAccessToken()`](#setgoogledriveaccesstokenaccesstoken)).
+
+**Returns**: A `Promise` that resolves to the `string` value of the access token, or `undefined` if it hasn't been set so far.
 
 ### `isCloudAvailable()`
 
@@ -42,7 +44,7 @@ Reads the file at the given path into a `string`.
 **Parameters**:
 
 - `path` (`string`): Required. The full pathname of the file to read.
-- `scope` ([`StorageScope`](./enums/StorageScope)): Required. The storage scope (documents/app data) to use.
+- `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Required. The storage scope (documents/app data) to use.
 
 **Returns**: A `Promise` that resolves to a `string` containing the file's content.
 
@@ -65,9 +67,9 @@ Gets several file statistics of the file at the given path.
 **Parameters**:
 
 - `path` (`string`): Required. The full pathname of the file to stat.
-- `scope` ([`StorageScope`](./enums/StorageScope)): Required. The storage scope (documents/app data) to use.
+- `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Required. The storage scope (documents/app data) to use.
 
-**Returns**: A `Promise` that resolves to [`StorageFileStat`](./StorageFileStat) object containing the statistics.
+**Returns**: A `Promise` that resolves to [`CloudStorageFileStat`](./interfaces/CloudStorageFileStat) object containing the statistics.
 
 ### `unlink(path, scope)`
 
@@ -76,7 +78,7 @@ Deletes the file at the given path.
 **Parameters**:
 
 - `path` (`string`): Required. The full pathname of the file to delete.
-- `scope` ([`StorageScope`](./enums/StorageScope)): Required. The storage scope (documents/app data) to use.
+- `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Required. The storage scope (documents/app data) to use.
 
 **Returns**: A `Promise` that resolves to `void` once the file has been deleted.
 
@@ -88,6 +90,6 @@ Writes the data to the given path. Creates the file if it doesn't exist yet and 
 
 - `path` (`string`): Required. The path including the filename to write to.
 - `content` (`string`): Required. The content to write.
-- `scope` ([`StorageScope`](./enums/StorageScope)): Required. The storage scope (documents/app data) to use.
+- `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Required. The storage scope (documents/app data) to use.
 
 **Returns**: A `Promise` that resolves to `void` once the file has been written.

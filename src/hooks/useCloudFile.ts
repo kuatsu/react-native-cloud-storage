@@ -1,8 +1,8 @@
-import type { StorageScope } from '../types/main';
+import type { CloudStorageScope } from '../types/main';
 import RNCloudStorage from '../RNCloudStorage';
 import { useCallback, useEffect, useState } from 'react';
 
-export const useCloudFile = (path: string, scope: StorageScope) => {
+export const useCloudFile = (path: string, scope: CloudStorageScope) => {
   const [content, setContent] = useState<string | null>(null);
 
   const read = useCallback(async () => {

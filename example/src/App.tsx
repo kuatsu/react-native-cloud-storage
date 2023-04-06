@@ -2,15 +2,15 @@ import React, { useState, useEffect } from 'react';
 
 import { StyleSheet, View, Text, Button, TextInput, Dimensions, ActivityIndicator } from 'react-native';
 import RNCloudStorage, {
-  NativeStorageError,
-  NativeStorageErrorCode,
-  StorageScope,
+  CloudStorageError,
+  CloudStorageErrorCode,
+  CloudStorageScope,
   useIsCloudAvailable,
 } from 'react-native-cloud-storage';
 
 const App = () => {
   const [filename, setFilename] = useState('test.txt');
-  const [scope, setScope] = useState(StorageScope.Documents);
+  const [scope, setScope] = useState(CloudStorageScope.Documents);
   const [exists, setExists] = useState(false);
   const [input, setInput] = useState('');
   const [accessToken, setAccessToken] = useState('');
@@ -37,8 +37,8 @@ const App = () => {
       setInput(await RNCloudStorage.readFile(filename, scope));
       console.log('File stats', stats);
     } catch (e) {
-      if (e instanceof NativeStorageError) {
-        if (e.code === NativeStorageErrorCode.FILE_NOT_FOUND) {
+      if (e instanceof CloudStorageError) {
+        if (e.code === CloudStorageErrorCode.FILE_NOT_FOUND) {
           setExists(false);
           setInput('');
         } else {
@@ -73,8 +73,10 @@ const App = () => {
       )}
       <TextInput placeholder="Filename" value={filename} onChangeText={setFilename} style={styles.input} />
       <Button
-        title={`Switch to ${scope === StorageScope.Documents ? 'App Data' : 'Documents'}`}
-        onPress={() => setScope(scope === StorageScope.Documents ? StorageScope.AppData : StorageScope.Documents)}
+        title={`Switch to ${scope === CloudStorageScope.Documents ? 'App Data' : 'Documents'}`}
+        onPress={() =>
+          setScope(scope === CloudStorageScope.Documents ? CloudStorageScope.AppData : CloudStorageScope.Documents)
+        }
       />
       <Text>Test file exists: {exists ? 'yes' : 'no'}</Text>
       <TextInput placeholder="File contents (read/write)" value={input} onChangeText={setInput} style={styles.input} />

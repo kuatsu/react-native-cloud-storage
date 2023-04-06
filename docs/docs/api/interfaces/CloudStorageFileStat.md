@@ -1,14 +1,14 @@
 ---
-sidebar_position: 2
+sidebar_position: 1
 ---
 
-# StorageFileStat
+# CloudStorageFileStat
 
-A `StorageFileStat` is returned by the [`RNCloudStorage.stat()`](./RNCloudStorage.md#statpath-scope) method and contains several statistics about the file.
+A `CloudStorageFileStat` is returned by the [`RNCloudStorage.stat()`](../RNCloudStorage#statpath-scope) method and contains several statistics about the file.
 
 ## API
 
-The `StorageFileStat` object has the following properties:
+The `CloudStorageFileStat` object has the following properties:
 
 - `size` (`number`): The filesize in bytes. If no size could be determined, this is `0`.
 - `birthtimeMs` (`number`): The timestamp in milliseconds indicating the creation time of the file.

@@ -15,7 +15,7 @@ import { useCloudFile } from { react-native-cloud-storage };
 **Parameters**:
 
 - `path` (`string`): Required. The full pathname of the file to use.
-- `scope` ([`StorageScope`](../enums/StorageScope)): Required. The storage scope (documents/app data) to use.
+- `scope` ([`CloudStorageScope`](../enums/CloudStorageScope)): Required. The storage scope (documents/app data) to use.
 
 **Returns**: An object containing the following properties:
 
@@ -28,10 +28,10 @@ import { useCloudFile } from { react-native-cloud-storage };
 
 ```tsx
 import React, { useState, useEffect } from 'react';
-import { useCloudFile, StorageScope } from { react-native-cloud-storage };
+import { useCloudFile, CloudStorageScope } from { react-native-cloud-storage };
 
 const App: React.FC = () => {
-  const { content, read, update, remove } = useCloudFile('test.txt', StorageScope.Documents);
+  const { content, read, update, remove } = useCloudFile('test.txt', CloudStorageScope.Documents);
 
   const [counter, setCounter] = useState(0);
 

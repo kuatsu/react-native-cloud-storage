@@ -1,10 +1,10 @@
 import RNCloudStorage from './RNCloudStorage';
-import { NativeStorageErrorCode } from './types/native';
+import { CloudStorageErrorCode } from './types/native';
 export * from './types/main';
 export * from './hooks/useCloudFile';
 export * from './hooks/useIsCloudAvailable';
-import NativeStorageError from './utils/NativeStorageError';
+import CloudStorageError from './utils/CloudStorageError';
 
-export { NativeStorageError };
-export { NativeStorageErrorCode };
+export { CloudStorageError };
+export { CloudStorageErrorCode };
 export default RNCloudStorage;
