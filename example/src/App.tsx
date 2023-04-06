@@ -4,6 +4,7 @@ import { StyleSheet, View, Text, Button, TextInput, Dimensions, ActivityIndicato
 import RNCloudStorage, {
   CloudStorageError,
   CloudStorageErrorCode,
+  CloudStorageFileStat,
   CloudStorageScope,
   useIsCloudAvailable,
 } from 'react-native-cloud-storage';
@@ -11,7 +12,7 @@ import RNCloudStorage, {
 const App = () => {
   const [filename, setFilename] = useState('test.txt');
   const [scope, setScope] = useState(CloudStorageScope.Documents);
-  const [exists, setExists] = useState(false);
+  const [stats, setStats] = useState<CloudStorageFileStat | null>(null);
   const [input, setInput] = useState('');
   const [accessToken, setAccessToken] = useState('');
   const [loading, setLoading] = useState(false);
@@ -35,21 +36,22 @@ const App = () => {
   }, [accessToken]);
 
   useEffect(() => {
-    setExists(false);
+    setStats(null);
     setInput('');
   }, [filename, scope]);
 
   const readFile = async () => {
     setLoading(true);
     try {
-      let stats = await RNCloudStorage.stat(filename, scope);
-      setExists(true);
-      setInput(await RNCloudStorage.readFile(filename, scope));
+      const newStats = await RNCloudStorage.stat(filename, scope);
+      setStats(newStats);
       console.log('File stats', stats);
+      if (newStats.isDirectory()) return;
+      setInput(await RNCloudStorage.readFile(filename, scope));
     } catch (e) {
       if (e instanceof CloudStorageError) {
         if (e.code === CloudStorageErrorCode.FILE_NOT_FOUND) {
-          setExists(false);
+          setStats(null);
           setInput('');
         } else {
           console.warn('Native storage error', e.code, e.message);
@@ -88,7 +90,7 @@ const App = () => {
           setScope(scope === CloudStorageScope.Documents ? CloudStorageScope.AppData : CloudStorageScope.Documents)
         }
       />
-      <Text>Test file exists: {exists ? 'yes' : 'no'}</Text>
+      <Text>Test file exists: {stats ? `yes${stats.isDirectory() ? ' (directory)' : ''}` : 'no'}</Text>
       <TextInput placeholder="File contents (read/write)" value={input} onChangeText={setInput} style={styles.input} />
       <Button title="Write file" onPress={handleCreate} />
       <Button title="Read file" onPress={handleRead} />
