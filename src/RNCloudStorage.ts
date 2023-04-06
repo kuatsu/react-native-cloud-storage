@@ -1,11 +1,21 @@
 import createRNCloudStorage from './createRNCloudStorage';
 import GoogleDriveApiClient from './google-drive';
 import type { CloudStorageFileStat, CloudStorageScope } from './types/main';
+import { Platform } from 'react-native';
 
 const nativeInstance = createRNCloudStorage();
+
 const RNCloudStorage = {
   getGoogleDriveAccessToken: () => GoogleDriveApiClient.accessToken,
   setGoogleDriveAccessToken: (accessToken: string) => (GoogleDriveApiClient.accessToken = accessToken),
+  setThrowOnFilesWithSameName: (enable: boolean) => (GoogleDriveApiClient.throwOnFilesWithSameName = enable),
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  subscribeToFilesWithSameName:
+    Platform.OS === 'ios'
+      ? // @ts-expect-error - subscriber is undefined; just a mock
+        (subscriber: ({ path, fileIds }: { path: string; fileIds: string[] }) => void) => ({ remove: () => {} })
+      : (nativeInstance as GoogleDriveApiClient).subscribeToFilesWithSameName.bind(nativeInstance),
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   /**
    * Tests whether or not the cloud storage is available. Always returns true for Google Drive. iCloud may be

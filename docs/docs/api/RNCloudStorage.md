@@ -60,6 +60,10 @@ The access token is stored statically and therefore only needs to be provided on
 
 **Returns**: `void`
 
+### `setThrowOnFilesWithSameName(enable)`
+
+If enabled, the library will throw **before** a file operation if there are multiple files with the given path found. Does not have any effect on iOS. Enabling this will disable any subscribers created via [`subscribeToFilesWithSameName()`](#subscribetofileswithsamenamesubscriber). For more information, [see here](../guides/google-drive-files-same-name).
+
 ### `stat(path, scope)`
 
 Gets several file statistics of the file at the given path.
@@ -70,6 +74,16 @@ Gets several file statistics of the file at the given path.
 - `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Required. The storage scope (documents/app data) to use.
 
 **Returns**: A `Promise` that resolves to [`CloudStorageFileStat`](./interfaces/CloudStorageFileStat) object containing the statistics.
+
+### `subscribeToFilesWithSameName(subscriber)`
+
+Creates a subscriber that receives events when files with the same filename in the same parent directory are detected. Does not fire anything on iOS. For more information, [see here](../guides/google-drive-files-same-name).
+
+**Parameters**:
+
+- `subscriber` (`({ path: string, fileIds: string[] }) => void`): A callback which is fired when files with the same filenames were detected during a file operation. The callback will include an object which includes the `path` of the files and an array of `fileIds` from the Google Drive API.
+
+**Returns**: An object which contains a `remove()` method to unsubscribe again.
 
 ### `unlink(path, scope)`
 

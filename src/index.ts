@@ -5,6 +5,5 @@ export * from './hooks/useCloudFile';
 export * from './hooks/useIsCloudAvailable';
 import CloudStorageError from './utils/CloudStorageError';
 
-export { CloudStorageError };
-export { CloudStorageErrorCode };
+export { CloudStorageError, CloudStorageErrorCode };
 export default RNCloudStorage;
