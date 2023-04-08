@@ -33,14 +33,14 @@ When creating files or directories, always make sure that all directories in the
 
 ### `exists(path, scope)`
 
-Tests whether or not the file at the given path exists.
+Tests whether or not the file or directory at the given path exists.
 
 **Parameters**:
 
 - `path` (`string`): Required. The path to test.
 - `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Required. The storage scope (documents/app data) to use.
 
-**Returns**: A `Promise` that resolves to a `boolean`. `true` if the file exists, `false` otherwise.
+**Returns**: A `Promise` that resolves to a `boolean`. `true` if a file or directory exists at the given path, `false` otherwise.
 
 ### `getGoogleDriveAccessToken()`
 
