@@ -253,6 +253,36 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
     await uploader.execute();
   }
 
+  async createDirectory(path: string, scope: NativeRNCloudCloudStorageScope): Promise<void> {
+    try {
+      await this.getFileId(path, scope);
+      throw new CloudStorageError(`File ${path} already exists`, CloudStorageErrorCode.FILE_ALREADY_EXISTS);
+    } catch (e: any) {
+      if (e instanceof CloudStorageError && e.code === CloudStorageErrorCode.FILE_NOT_FOUND) {
+        /* do nothing, simply create the file */
+      } else if (e instanceof CloudStorageError && e.code === CloudStorageErrorCode.PATH_IS_DIRECTORY) {
+        throw new CloudStorageError(`Directory ${path} already exists`, CloudStorageErrorCode.FILE_ALREADY_EXISTS);
+      } else {
+        throw e;
+      }
+    }
+
+    const uploader = GoogleDriveApiClient.drive.files.newMetadataOnlyUploader();
+    const files = await this.listFiles(scope);
+    const { directories, filename } = this.resolvePathToDirectories(path);
+    const parentDirectoryId = this.findParentDirectoryId(files, directories);
+    uploader.setRequestBody({
+      name: filename,
+      mimeType: MimeTypes.FOLDER,
+      parents: parentDirectoryId
+        ? [parentDirectoryId]
+        : scope === 'app_data'
+        ? [this.getRootDirectory(scope)]
+        : undefined,
+    });
+    await uploader.execute();
+  }
+
   async readFile(path: string, scope: NativeRNCloudCloudStorageScope): Promise<string> {
     const fileId = await this.getFileId(path, scope);
     const content = await GoogleDriveApiClient.drive.files.getText(fileId);

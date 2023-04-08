@@ -48,6 +48,16 @@ const RNCloudStorage = {
   },
 
   /**
+   * Creates a new directory at the given path.
+   * @param path The directory to create.
+   * @param scope The directory scope the path is in.
+   * @returns A promise that resolves when the directory has been created.
+   */
+  mkdir: (path: string, scope: CloudStorageScope): Promise<void> => {
+    return nativeInstance.createDirectory(path, scope);
+  },
+
+  /**
    * Reads the contents of the file at the given path.
    * @param path The file to read.
    * @param scope The directory scope the path is in.

@@ -56,6 +56,17 @@ On Android, this simply checks whether or not a Google Drive API access token ha
 
 **Returns**: A `Promise` that resolves to a `boolean`. `true` if the cloud storage is available, `false` otherwise.
 
+### `mkdir(path, scope)`
+
+Creates a new directory at the given path.
+
+**Parameters**:
+
+- `path` (`string`): Required. The path of the new directory to create. All parent directories must already exist.
+- `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Required. The storage scope (documents/app data) to use.
+
+**Returns**: A `Promise` that resolves once the directory has been created.
+
 ### `readFile(path, scope)`
 
 Reads the file at the given path into a `string`.
