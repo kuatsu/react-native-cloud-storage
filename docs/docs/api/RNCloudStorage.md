@@ -25,7 +25,7 @@ When a method takes a `path` parameter, you should provide a full path without l
 
 :::caution
 
-When creating files or directories, always make sure that all directories in the tree already exist. Otherwise the library will throw a [`CloudStorageErrorCode.ERR_NO_DIRECTORY_FOUND`](./enums/CloudStorageErrorCode).
+When creating files or directories, always make sure that all directories in the tree already exist. Otherwise the library will throw a [`CloudStorageErrorCode.DIRECTORY_NOT_FOUND`](./enums/CloudStorageErrorCode).
 
 :::
 
@@ -33,14 +33,14 @@ When creating files or directories, always make sure that all directories in the
 
 ### `exists(path, scope)`
 
-Tests whether or not the file at the given path exists.
+Tests whether or not the file or directory at the given path exists.
 
 **Parameters**:
 
 - `path` (`string`): Required. The path to test.
 - `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Required. The storage scope (documents/app data) to use.
 
-**Returns**: A `Promise` that resolves to a `boolean`. `true` if the file exists, `false` otherwise.
+**Returns**: A `Promise` that resolves to a `boolean`. `true` if a file or directory exists at the given path, `false` otherwise.
 
 ### `getGoogleDriveAccessToken()`
 
@@ -55,6 +55,17 @@ On iOS, this actually verifies with the system whether or not iCloud is availabl
 On Android, this simply checks whether or not a Google Drive API access token has been set using [setGoogleDriveAccessToken](#setgoogledriveaccesstokenaccesstoken).
 
 **Returns**: A `Promise` that resolves to a `boolean`. `true` if the cloud storage is available, `false` otherwise.
+
+### `mkdir(path, scope)`
+
+Creates a new directory at the given path.
+
+**Parameters**:
+
+- `path` (`string`): Required. The path of the new directory to create. All parent directories must already exist.
+- `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Required. The storage scope (documents/app data) to use.
+
+**Returns**: A `Promise` that resolves once the directory has been created.
 
 ### `readFile(path, scope)`
 

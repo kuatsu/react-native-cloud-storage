@@ -4,9 +4,15 @@ sidebar_position: 1
 
 # Handling multiple files with the same name in Google Drive
 
-Google Drive has a little peculiarity as in that there can be multiple files (or even directories) with the same name in the same parent directory. Under the hood, files are uniquely identified by a file ID instead of their name and directories are actually simply files with a custom MIME type. As iCloud does not behave in such a way, this library will default to the first file found in order to ensure best compatibility between the two cloud storages.
+Google Drive has a little peculiarity as in that there can be multiple files (or even directories) with the same name in the same parent directory. Under the hood, files are uniquely identified by a file ID instead of their name and directories are actually simply files with a custom MIME type. As iCloud does not behave in such a way, this library will default to the first file found to ensure best compatibility between the two cloud storages.
 
-However, this might not always be desired by the user, especially when working in the [`CloudStorageScope.Documents` scope](../api/enums/CloudStorageScope). When only working in the `CloudStorage.AppData` scope, which should be the case for most apps, this isn't as important as long as you're not accessing the same app data container from outside `react-native-cloud-storage` and create multiple files with the same name yourself.
+However, this might not always be desired by the user, especially when working in the [`CloudStorageScope.Documents` scope](../api/enums/CloudStorageScope).
+
+:::tip
+
+When only working in the `CloudStorage.AppData` scope, which should be the case for most apps, you don't really need to pay attention to this issue as `react-native-cloud-storage` will never create multiple files with the same filename in the same directory. Therefore, this only becomes an issue within this scope if you're accessing the same app data container from outside `react-native-cloud-storage` and create multiple files with the same filename yourself.
+
+:::
 
 This library accounts for this behavior by providing two ways of dealing with this:
 

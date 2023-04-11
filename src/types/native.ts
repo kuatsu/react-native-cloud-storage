@@ -10,6 +10,7 @@ export interface NativeRNCloudCloudStorageFileStat {
 
 export enum CloudStorageErrorCode {
   FILE_NOT_FOUND = 'ERR_FILE_NOT_FOUND',
+  PATH_IS_DIRECTORY = 'ERR_PATH_IS_DIRECTORY',
   DIRECTORY_NOT_FOUND = 'ERR_NO_DIRECTORY_FOUND',
   FILE_ALREADY_EXISTS = 'ERR_FILE_EXISTS',
   MULTIPLE_FILES_SAME_NAME = 'ERR_MULTIPLE_FILES_SAME_NAME',
@@ -25,6 +26,7 @@ export enum CloudStorageErrorCode {
 export default interface NativeRNCloudStorage {
   fileExists: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<boolean>;
   createFile: (path: string, data: string, scope: NativeRNCloudCloudStorageScope, overwrite: boolean) => Promise<void>;
+  createDirectory: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<void>;
   readFile: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<string>;
   deleteFile: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<void>;
   statFile: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<NativeRNCloudCloudStorageFileStat>;

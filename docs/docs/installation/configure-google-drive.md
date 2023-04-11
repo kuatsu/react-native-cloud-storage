@@ -10,6 +10,12 @@ Please note that filenames are not unique in Google Drive. There can be multiple
 
 :::
 
+:::info
+
+Be aware that all file operations on Google Drive will take severely more time than on iCloud. This is because iCloud is implemented using a direct native API (CloudKit) while Google Drive is implemented using the HTTP REST API. A file read operation that might only take a split second on iCloud might take several seconds on Google Drive.
+
+:::
+
 While iCloud for iOS devices works out of the box, Google Drive support requires some additional setup. Specifically, you will need to get and provide an access token for the Google Drive API. This module does **not** provide any way of acquiring such a token from the user, as it is out of scope.
 
 You therefore need to acquire the token with another library. Popular choices are [`@react-native-google-signin/google-signin`](https://github.com/react-native-google-signin/google-signin) and [`expo-auth-session`](https://docs.expo.dev/guides/google-authentication/). Whatever you do, you will also need a Google OAuth client ID in order to make authentication requests. The linked Expo module has good documentation on this topic. When creating this client ID, make sure to request at least the `https://www.googleapis.com/auth/drive.appdata` scope. This will allow you to use the [`CloudStorageScope.AppData`](../api/enums/CloudStorageScope) scope of this library. If you also want to access `CloudStorageScope.Documents`, you will also require the `https://www.googleapis.com/auth/drive` scope, which is a restricted Google API scope. This means your app needs to be audited in order to use it. For more documentation on this matter, consult the [Google documentation](https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification).

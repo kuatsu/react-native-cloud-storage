@@ -157,7 +157,11 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
     }
   }
 
-  private async getFileId(path: string, scope: NativeRNCloudCloudStorageScope): Promise<string> {
+  private async getFileId(
+    path: string,
+    scope: NativeRNCloudCloudStorageScope,
+    throwIfDirectory = true
+  ): Promise<string> {
     try {
       const files = await this.listFiles(scope);
       const { directories, filename } = this.resolvePathToDirectories(path);
@@ -173,8 +177,8 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
         file = files.find((f) => f.name === filename && f.parents![0] === parentDirectoryId);
       }
       if (!file) throw new CloudStorageError(`File not found`, CloudStorageErrorCode.FILE_NOT_FOUND);
-      if (file.mimeType === MimeTypes.FOLDER) {
-        throw new CloudStorageError(`Path ${path} is a directory`, CloudStorageErrorCode.FILE_NOT_FOUND);
+      if (file.mimeType === MimeTypes.FOLDER && throwIfDirectory) {
+        throw new CloudStorageError(`Path ${path} is a directory`, CloudStorageErrorCode.PATH_IS_DIRECTORY);
       }
       return file.id;
     } catch (e: unknown) {
@@ -193,7 +197,7 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
 
   async fileExists(path: string, scope: NativeRNCloudCloudStorageScope): Promise<boolean> {
     try {
-      await this.getFileId(path, scope);
+      await this.getFileId(path, scope, false);
       return true;
     } catch (e: any) {
       if (e instanceof CloudStorageError && e.code === CloudStorageErrorCode.FILE_NOT_FOUND) return false;
@@ -249,6 +253,36 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
     await uploader.execute();
   }
 
+  async createDirectory(path: string, scope: NativeRNCloudCloudStorageScope): Promise<void> {
+    try {
+      await this.getFileId(path, scope);
+      throw new CloudStorageError(`File ${path} already exists`, CloudStorageErrorCode.FILE_ALREADY_EXISTS);
+    } catch (e: any) {
+      if (e instanceof CloudStorageError && e.code === CloudStorageErrorCode.FILE_NOT_FOUND) {
+        /* do nothing, simply create the file */
+      } else if (e instanceof CloudStorageError && e.code === CloudStorageErrorCode.PATH_IS_DIRECTORY) {
+        throw new CloudStorageError(`Directory ${path} already exists`, CloudStorageErrorCode.FILE_ALREADY_EXISTS);
+      } else {
+        throw e;
+      }
+    }
+
+    const uploader = GoogleDriveApiClient.drive.files.newMetadataOnlyUploader();
+    const files = await this.listFiles(scope);
+    const { directories, filename } = this.resolvePathToDirectories(path);
+    const parentDirectoryId = this.findParentDirectoryId(files, directories);
+    uploader.setRequestBody({
+      name: filename,
+      mimeType: MimeTypes.FOLDER,
+      parents: parentDirectoryId
+        ? [parentDirectoryId]
+        : scope === 'app_data'
+        ? [this.getRootDirectory(scope)]
+        : undefined,
+    });
+    await uploader.execute();
+  }
+
   async readFile(path: string, scope: NativeRNCloudCloudStorageScope): Promise<string> {
     const fileId = await this.getFileId(path, scope);
     const content = await GoogleDriveApiClient.drive.files.getText(fileId);
@@ -261,10 +295,13 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
   }
 
   async statFile(path: string, scope: NativeRNCloudCloudStorageScope): Promise<NativeRNCloudCloudStorageFileStat> {
-    const fileId = await this.getFileId(path, scope);
-    const file: GoogleDriveDetailedFile = await GoogleDriveApiClient.drive.files.get(fileId, {
-      fields: 'id,kind,mimeType,name,parents,spaces,size,createdTime,modifiedTime',
-    });
+    const fileId = await this.getFileId(path, scope, false);
+    const file: GoogleDriveDetailedFile = await (
+      await GoogleDriveApiClient.drive.files.get(fileId!, {
+        fields: 'id,kind,mimeType,name,parents,spaces,size,createdTime,modifiedTime',
+      })
+    ).json();
+
     return {
       size: file.size ?? 0,
       birthtimeMs: new Date(file.createdTime!).getTime(),
