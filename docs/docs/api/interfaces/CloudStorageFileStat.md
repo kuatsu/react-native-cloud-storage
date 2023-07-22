@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # CloudStorageFileStat
 
-A `CloudStorageFileStat` is returned by the [`RNCloudStorage.stat()`](../RNCloudStorage#statpath-scope) method and contains several statistics about the file.
+A `CloudStorageFileStat` is returned by the [`CloudStorage.stat()`](../CloudStorage#statpath-scope) method and contains several statistics about the file.
 
 ## API
 

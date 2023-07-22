@@ -58,6 +58,16 @@ const RNCloudStorage = {
   },
 
   /**
+   * Lists the contents of the directory at the given path.
+   * @param path The directory to list.
+   * @param scope The directory scope the path is in.
+   * @returns A promise that resolves to an array of file names, excluding '.' and '..'.
+   */
+  readdir: (path: string, scope: CloudStorageScope): Promise<string[]> => {
+    return nativeInstance.listFiles(path, scope);
+  },
+
+  /**
    * Reads the contents of the file at the given path.
    * @param path The file to read.
    * @param scope The directory scope the path is in.

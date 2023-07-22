@@ -11,14 +11,12 @@ export const useIsCloudAvailable = (iCloudTimeout = 10) => {
       const newIsAvailable = await RNCloudStorage.isCloudAvailable();
       setIsAvailable(newIsAvailable);
       if (Platform.OS === 'ios' && newIsAvailable) {
-        console.log('Stopped because iCloud became available');
         clearInterval(interval);
       }
     }, 500);
 
     if (Platform.OS === 'ios') {
       setTimeout(() => {
-        console.log('Stopped because of timeout');
         clearInterval(interval);
       }, iCloudTimeout * 1000);
     }

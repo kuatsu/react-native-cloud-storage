@@ -20,7 +20,7 @@ This library accounts for this behavior by providing two ways of dealing with th
 
 By default, the library will not throw when there are multiple files with the same name detected but instead default to the first one returned by the Google Drive API. You can however opt into throwing. Please note however that this will render the library completely useless for such cases until the user manually "fixed" this by renaming the files in his Google Drive, as the library will throw before performing any actions such as writing or reading. Behind the scenes, the library will always list all files first to get the file id of the given pathname in order to perform actual actions on this file. Throwing an error will already occur when there are multiple files with the same name detected on this step.
 
-If you do wish to enable throwing, simply call [`RNCloudStorage.setThrowOnFilesWithSameName(true)`](../api/RNCloudStorage#setthrowonfileswithsamenameenable). The library will then throw a [`CloudStorageError`](../api/CloudStorageError) with the code [`CloudStorageErrorCode.MULTIPLE_FILES_SAME_NAME`](../api/enums/CloudStorageErrorCode). Again, this will only affect Google Drive and not have any effect on iOS devices as iCloud does not allow same filenames on different files within the same directory.
+If you do wish to enable throwing, simply call [`CloudStorage.setThrowOnFilesWithSameName(true)`](../api/CloudStorage#setthrowonfileswithsamenameenable). The library will then throw a [`CloudStorageError`](../api/CloudStorageError) with the code [`CloudStorageErrorCode.MULTIPLE_FILES_SAME_NAME`](../api/enums/CloudStorageErrorCode). Again, this will only affect Google Drive and not have any effect on iOS devices as iCloud does not allow same filenames on different files within the same directory.
 
 ## Subscribe to an event
 
@@ -35,7 +35,7 @@ Events are only published when the throwing option is disabled.
 To subscribe, simply add a listener like this:
 
 ```ts
-const subscription = RNCloudStorage.subscribeToFilesWithSameName(({ path, fileIds }) => {
+const subscription = CloudStorage.subscribeToFilesWithSameName(({ path, fileIds }) => {
   console.log(`There are multiple files with the path ${path}!`, { fileIds });
 });
 
@@ -43,4 +43,4 @@ const subscription = RNCloudStorage.subscribeToFilesWithSameName(({ path, fileId
 subscription.remove();
 ```
 
-See also the [API documentation](../api/RNCloudStorage#subscribetofileswithsamenamesubscriber).
+See also the [API documentation](../api/CloudStorage#subscribetofileswithsamenamesubscriber).

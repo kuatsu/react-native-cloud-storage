@@ -123,7 +123,21 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
     return currentDirectoryId;
   }
 
-  private async listFiles(scope: NativeRNCloudCloudStorageScope): Promise<GoogleDriveFile[]> {
+  /**
+   * Gets the Google Drive ID of the root directory for the given scope.
+   * @param scope The scope to get the root directory for.
+   * @returns A promise that resolves to the ID of the root directory or null if it could not be found.
+   */
+  private async getRootDirectoryId(scope: NativeRNCloudCloudStorageScope): Promise<string | null> {
+    const files = await this.listInternalFiles(scope);
+    for (const file of files) {
+      if (!files.find((f) => f.id === file.parents![0])) return file.parents![0] ?? null;
+    }
+
+    return null;
+  }
+
+  private async listInternalFiles(scope: NativeRNCloudCloudStorageScope): Promise<GoogleDriveFile[]> {
     const files: GoogleDriveListOperationResponse = await GoogleDriveApiClient.drive.files.list({
       spaces: [this.getRootDirectory(scope)],
       fields: 'files(id,kind,mimeType,name,parents,spaces)',
@@ -163,7 +177,7 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
     throwIfDirectory = true
   ): Promise<string> {
     try {
-      const files = await this.listFiles(scope);
+      const files = await this.listInternalFiles(scope);
       const { directories, filename } = this.resolvePathToDirectories(path);
       const parentDirectoryId = this.findParentDirectoryId(files, directories);
       let file: GoogleDriveFile | undefined;
@@ -238,7 +252,7 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
     const uploader = GoogleDriveApiClient.drive.files.newMultipartUploader().setData(data, MimeTypes.TEXT);
     if (fileId) uploader.setIdOfFileToUpdate(fileId);
     else {
-      const files = await this.listFiles(scope);
+      const files = await this.listInternalFiles(scope);
       const { directories, filename } = this.resolvePathToDirectories(path);
       const parentDirectoryId = this.findParentDirectoryId(files, directories);
       uploader.setRequestBody({
@@ -251,6 +265,19 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
       });
     }
     await uploader.execute();
+  }
+
+  async listFiles(path: string, scope: NativeRNCloudCloudStorageScope): Promise<string[]> {
+    const allFiles = await this.listInternalFiles(scope);
+    if (path !== '') {
+      const fileId = await this.getFileId(path, scope, false);
+      const files = allFiles.filter((f) => (f.parents ?? [])[0] === fileId);
+
+      return Array.from(new Set(files.map((f) => f.name)));
+    } else {
+      const rootDirectoryId = await this.getRootDirectoryId(scope);
+      return Array.from(new Set(allFiles.filter((f) => (f.parents ?? [])[0] === rootDirectoryId).map((f) => f.name)));
+    }
   }
 
   async createDirectory(path: string, scope: NativeRNCloudCloudStorageScope): Promise<void> {
@@ -268,7 +295,7 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
     }
 
     const uploader = GoogleDriveApiClient.drive.files.newMetadataOnlyUploader();
-    const files = await this.listFiles(scope);
+    const files = await this.listInternalFiles(scope);
     const { directories, filename } = this.resolvePathToDirectories(path);
     const parentDirectoryId = this.findParentDirectoryId(files, directories);
     uploader.setRequestBody({

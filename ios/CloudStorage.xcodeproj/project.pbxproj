@@ -7,8 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5E555C0D2413F4C50049A1A2 /* CloudStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* CloudStorage.m */; };
-		F4FF95D7245B92E800C19C63 /*  CloudStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FF95D6245B92E800C19C63 /*  CloudStorage.swift */; };
+		F4FF95D7245B92E800C19C63 /* CloudStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FF95D6245B92E800C19C63 /* CloudStorage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -117,7 +116,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F4FF95D7245B92E800C19C63 /* CloudStorage.swift in Sources */,
-				B3E7B58A1CC2AC0600A0062D /* CloudStorage.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

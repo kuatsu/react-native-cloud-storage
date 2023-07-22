@@ -2,12 +2,12 @@
 sidebar_position: 1
 ---
 
-# RNCloudStorage
+# CloudStorage
 
-The `RNCloudStorage` is the default export of the library and provides the core functionality. File operations loosely follow the conventions of Node's `fs`.
+The `CloudStorage` provides the core functionality of the library. File operations loosely follow the conventions of Node's `fs`.
 
 ```ts
-import RNCloudStorage from { react-native-cloud-storage };
+import { CloudStorage } from 'react-native-cloud-storage';
 ```
 
 ## Definitions
@@ -66,6 +66,17 @@ Creates a new directory at the given path.
 - `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Required. The storage scope (documents/app data) to use.
 
 **Returns**: A `Promise` that resolves once the directory has been created.
+
+### `readdir(path, scope)`
+
+Reads the files and directories contained in the directory at the given path. Does not include `.` and `..` entries.
+
+**Parameters**:
+
+- `path` (`string`): Required. The full pathname of the directory to read.
+- `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Required. The storage scope (documents/app data) to use.
+
+**Returns**: A `Promise` that resolves to an array of `string`s containing the names of the files and directories in the given directory.
 
 ### `readFile(path, scope)`
 
