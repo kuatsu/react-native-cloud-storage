@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, ActivityIndicator, ScrollView, Platform, Alert } from 'react-native';
-import RNCloudStorage, {
+import {
+  CloudStorage,
   CloudStorageError,
   CloudStorageErrorCode,
   CloudStorageFileStat,
@@ -28,7 +29,7 @@ const HomeView = () => {
   }, [cloudAvailable]);
 
   useEffect(() => {
-    const subscription = RNCloudStorage.subscribeToFilesWithSameName(({ path, fileIds }) =>
+    const subscription = CloudStorage.subscribeToFilesWithSameName(({ path, fileIds }) =>
       console.warn('Multiple files with same name', { path, fileIds })
     );
 
@@ -36,7 +37,7 @@ const HomeView = () => {
   }, []);
 
   useEffect(() => {
-    RNCloudStorage.setGoogleDriveAccessToken(accessToken);
+    CloudStorage.setGoogleDriveAccessToken(accessToken);
   }, [accessToken]);
 
   useEffect(() => {
@@ -47,7 +48,7 @@ const HomeView = () => {
   const handleCheckDirectoryExists = async () => {
     setLoading(true);
     try {
-      const exists = await RNCloudStorage.exists(parentDirectory, scope);
+      const exists = await CloudStorage.exists(parentDirectory, scope);
       Alert.alert(
         parentDirectory.length ? `Directory ${parentDirectory} exists?` : 'Root Directory exists?',
         exists ? '✅ Yes' : '❌ No'
@@ -62,7 +63,7 @@ const HomeView = () => {
   const handleCreateDirectory = async () => {
     setLoading(true);
     try {
-      await RNCloudStorage.mkdir(parentDirectory, scope).catch(() => setLoading(false));
+      await CloudStorage.mkdir(parentDirectory, scope).catch(() => setLoading(false));
       readFile();
     } catch (e) {
       console.warn(e);
@@ -72,11 +73,11 @@ const HomeView = () => {
   const readFile = async () => {
     setLoading(true);
     try {
-      const newStats = await RNCloudStorage.stat(parentDirectory + '/' + filename, scope);
+      const newStats = await CloudStorage.stat(parentDirectory + '/' + filename, scope);
       setStats(newStats);
       console.log('File stats', stats);
       if (newStats.isDirectory()) return;
-      setInput(await RNCloudStorage.readFile(parentDirectory + '/' + filename, scope));
+      setInput(await CloudStorage.readFile(parentDirectory + '/' + filename, scope));
     } catch (e) {
       if (e instanceof CloudStorageError) {
         if (e.code === CloudStorageErrorCode.FILE_NOT_FOUND) {
@@ -94,7 +95,7 @@ const HomeView = () => {
   const handleCreateFile = async () => {
     setLoading(true);
     try {
-      await RNCloudStorage.writeFile(parentDirectory + '/' + filename, input, scope).catch(() => setLoading(false));
+      await CloudStorage.writeFile(parentDirectory + '/' + filename, input, scope).catch(() => setLoading(false));
       readFile();
     } catch (e) {
       console.warn(e);
@@ -106,7 +107,7 @@ const HomeView = () => {
   const handleDelete = async () => {
     setLoading(true);
     try {
-      await RNCloudStorage.unlink(parentDirectory + '/' + filename, scope).catch(() => setLoading(false));
+      await CloudStorage.unlink(parentDirectory + '/' + filename, scope).catch(() => setLoading(false));
       readFile();
     } catch (e) {
       console.warn(e);

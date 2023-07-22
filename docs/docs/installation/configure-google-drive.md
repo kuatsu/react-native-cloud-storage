@@ -23,8 +23,8 @@ You therefore need to acquire the token with another library. Popular choices ar
 Once you have acquired an access token from the user, you will need to provide it to the library:
 
 ```ts
-import RNCloudStorage from 'react-native-cloud-storage';
-RNCloudStorage.setGoogleDriveAccessToken(accessToken);
+import { CloudStorage } from 'react-native-cloud-storage';
+CloudStorage.setGoogleDriveAccessToken(accessToken);
 ```
 
 The access token is stored globally / statically so that it is valid across the project.
@@ -36,7 +36,7 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Button, Platform } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
-import RNCloudStorage, { CloudStorageScope } from 'react-native-cloud-storage';
+import { CloudStorage, CloudStorageScope } from 'react-native-cloud-storage';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -54,12 +54,12 @@ const App: React.FC = () => {
     }
 
     if (accessToken) {
-      RNCloudStorage.setGoogleDriveAccessToken(accessToken);
+      CloudStorage.setGoogleDriveAccessToken(accessToken);
     }
   }, [response, accessToken]);
 
   const writeFileAsync = () => {
-    return RNCloudStorage.writeFile('test.txt', 'Hello World', CloudStorageScope.AppData);
+    return CloudStorage.writeFile('test.txt', 'Hello World', CloudStorageScope.AppData);
   };
 
   return (

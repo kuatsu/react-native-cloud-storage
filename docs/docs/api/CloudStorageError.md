@@ -21,10 +21,10 @@ The class provides three properties:
 ## Example
 
 ```ts
-import RNCloudStorage, { CloudStorageError, CloudStorageErrorCode } from 'react-native-cloud-storage';
+import { CloudStorage, CloudStorageError, CloudStorageErrorCode } from 'react-native-cloud-storage';
 
 try {
-  await RNCloudStorage.stat('test.txt');
+  await CloudStorage.stat('test.txt');
 } catch (e: unknown) {
   if (e instanceof CloudStorageError && e.code === CloudStorageErrorCode.FILE_NOT_FOUND) {
     console.log('File not found');

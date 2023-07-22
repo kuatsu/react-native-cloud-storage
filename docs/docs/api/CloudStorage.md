@@ -2,12 +2,12 @@
 sidebar_position: 1
 ---
 
-# RNCloudStorage
+# CloudStorage
 
-The `RNCloudStorage` is the default export of the library and provides the core functionality. File operations loosely follow the conventions of Node's `fs`.
+The `CloudStorage` provides the core functionality of the library. File operations loosely follow the conventions of Node's `fs`.
 
 ```ts
-import RNCloudStorage from { react-native-cloud-storage };
+import { CloudStorage } from 'react-native-cloud-storage';
 ```
 
 ## Definitions
