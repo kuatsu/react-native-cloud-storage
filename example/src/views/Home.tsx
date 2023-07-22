@@ -70,6 +70,18 @@ const HomeView = () => {
     }
   };
 
+  const handleListContents = async () => {
+    setLoading(true);
+    try {
+      const contents = await CloudStorage.readdir(parentDirectory, scope);
+      Alert.alert('Directory contents', contents.map((c) => `• ${c}`).join('\n'));
+    } catch (e) {
+      console.warn(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const readFile = async () => {
     setLoading(true);
     try {
@@ -146,6 +158,7 @@ const HomeView = () => {
         <Button title="Check if exists" onPress={handleCheckDirectoryExists} />
         <Button title="Create this directory" onPress={handleCreateDirectory} />
         <Text style={styles.smallText}>Before performing any file operations, the parent directory must exist.</Text>
+        <Button title="List contents of directory" onPress={handleListContents} />
       </Card>
       <Card title="File Operations">
         <Text style={{ fontWeight: 'bold' }}>Filename of working file</Text>

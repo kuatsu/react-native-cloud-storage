@@ -59,6 +59,28 @@ class CloudStorage: NSObject {
     }
   }
 
+  @objc(listFiles:withScope:withResolver:withRejecter:)
+  func listFiles(path: String, scope: String, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
+    let fileManager = FileManager.default
+    let directory = getDirectory(scope)
+    if (directory == nil) {
+      reject("ERR_NO_DIRECTORY_FOUND", "No directory found for scope \(scope)", nil)
+      return
+    }
+    let dirPath = directory?.appendingPathComponent(path)
+    let dirExists = fileManager.fileExists(atPath: dirPath!.path)
+    if (!dirExists) {
+      reject("ERR_DIRECTORY_NOT_FOUND", "Directory \(path) not found", nil)
+      return
+    }
+    do {
+      let files = try fileManager.contentsOfDirectory(atPath: dirPath!.path)
+      resolve(files)
+    } catch {
+      reject("ERR_READ_ERROR", "Error reading directory \(path)", error)
+    }
+  }
+
   @objc(readFile:withScope:withResolver:withRejecter:)
   func readFile(path: String, scope: String, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
     let fileManager = FileManager.default

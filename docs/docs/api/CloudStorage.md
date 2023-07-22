@@ -67,6 +67,17 @@ Creates a new directory at the given path.
 
 **Returns**: A `Promise` that resolves once the directory has been created.
 
+### `readdir(path, scope)`
+
+Reads the files and directories contained in the directory at the given path. Does not include `.` and `..` entries.
+
+**Parameters**:
+
+- `path` (`string`): Required. The full pathname of the directory to read.
+- `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Required. The storage scope (documents/app data) to use.
+
+**Returns**: A `Promise` that resolves to an array of `string`s containing the names of the files and directories in the given directory.
+
 ### `readFile(path, scope)`
 
 Reads the file at the given path into a `string`.
