@@ -13,7 +13,7 @@ import Card from '../components/Card';
 import Button from '../components/Button';
 
 const HomeView = () => {
-  const [scope, setScope] = useState(CloudStorageScope.Documents);
+  const [scope, setScope] = useState(CloudStorage.getDefaultScope());
   const [parentDirectory, setParentDirectory] = useState('/');
   const [filename, setFilename] = useState('test.txt');
   const [stats, setStats] = useState<CloudStorageFileStat | null>(null);
