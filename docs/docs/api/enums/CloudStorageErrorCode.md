@@ -16,7 +16,7 @@ import { CloudStorageErrorCode } from 'react-native-cloud-storage';
 enum CloudStorageErrorCode {
   FILE_NOT_FOUND = 'ERR_FILE_NOT_FOUND',
   PATH_IS_DIRECTORY = 'ERR_PATH_IS_DIRECTORY',
-  DIRECTORY_NOT_FOUND = 'ERR_NO_DIRECTORY_FOUND',
+  DIRECTORY_NOT_FOUND = 'ERR_DIRECTORY_NOT_FOUND',
   FILE_ALREADY_EXISTS = 'ERR_FILE_EXISTS',
   MULTIPLE_FILES_SAME_NAME = 'ERR_MULTIPLE_FILES_SAME_NAME', // google drive only, see /docs/guides/google-drive-files-same-name
   AUTHENTICATION_FAILED = 'ERR_AUTHENTICATION_FAILED', // google drive only

@@ -6,7 +6,6 @@ import {
   CloudStorageErrorCode,
   CloudStorageFileStat,
   CloudStorageScope,
-  useCloudFile,
   useIsCloudAvailable,
 } from 'react-native-cloud-storage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,14 +14,12 @@ import Button from '../components/Button';
 
 const HomeView = () => {
   const [scope, setScope] = useState(CloudStorageScope.Documents);
-  const [parentDirectory, setParentDirectory] = useState('');
-  const [filename, setFilename] = useState('test.txt');
+  const [parentDirectory, setParentDirectory] = useState('/');
+  const [filename, setFilename] = useState('/test.txt');
   const [stats, setStats] = useState<CloudStorageFileStat | null>(null);
   const [input, setInput] = useState('');
   const [accessToken, setAccessToken] = useState('');
   const [loading, setLoading] = useState(false);
-  const cloudFile = useCloudFile('abc', CloudStorageScope.AppData);
-  cloudFile.update('abc');
 
   const cloudAvailable = useIsCloudAvailable();
   const insets = useSafeAreaInsets();
@@ -53,7 +50,9 @@ const HomeView = () => {
     try {
       const exists = await CloudStorage.exists(parentDirectory, scope);
       Alert.alert(
-        parentDirectory.length ? `Directory ${parentDirectory} exists?` : 'Root Directory exists?',
+        parentDirectory === '/' || !parentDirectory.length
+          ? 'Root Directory exists?'
+          : `Directory ${parentDirectory} exists?`,
         exists ? '✅ Yes' : '❌ No'
       );
     } catch (e) {
@@ -153,7 +152,7 @@ const HomeView = () => {
         />
         <Text style={{ fontWeight: 'bold', marginTop: 10 }}>Parent directory</Text>
         <TextInput
-          placeholder="Parent directory (root if empty)"
+          placeholder="Parent directory"
           value={parentDirectory}
           onChangeText={setParentDirectory}
           style={styles.input}
