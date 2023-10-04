@@ -10,7 +10,7 @@ However, this might not always be desired by the user, especially when working i
 
 :::tip
 
-When only working in the `CloudStorage.AppData` scope, which should be the case for most apps (and which is also the default behavior of this library), you don't really need to pay attention to this issue as `react-native-cloud-storage` will never create multiple files with the same filename in the same directory. Therefore, this only becomes an issue within this scope if you're accessing the same app data container from outside `react-native-cloud-storage` and create multiple files with the same filename yourself.
+When only working in the `CloudStorageScope.AppData` scope, which should be the case for most apps (and which is also the default behavior of this library), you don't really need to pay attention to this issue as `react-native-cloud-storage` will never create multiple files with the same filename in the same directory. Therefore, this only becomes an issue within this scope if you're accessing the same app data container from outside `react-native-cloud-storage` and create multiple files with the same filename yourself.
 
 :::
 
