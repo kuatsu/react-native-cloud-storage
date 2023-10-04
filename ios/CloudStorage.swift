@@ -5,32 +5,22 @@ class CloudStorage: NSObject {
   @objc(fileExists:withScope:withResolver:withRejecter:)
   func fileExists(path: String, scope: String, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
     let fileManager = FileManager.default
-    let directory = getDirectory(scope)
-    if (directory == nil) {
-      reject("ERR_NO_DIRECTORY_FOUND", "No directory found for scope \(scope)", nil)
-      return
-    }
-    let filePath = directory?.appendingPathComponent(path)
-    let fileExists = fileManager.fileExists(atPath: filePath!.path)
+    let fileUrl: URL? = getFileURL(path, scope)
+    let fileExists = fileManager.fileExists(atPath: fileUrl!.path)
     resolve(fileExists)
   }
 
   @objc(createFile:withData:withScope:withOverwrite:withResolver:withRejecter:)
   func createFile(path: String, data: String, scope: String, overwrite: Bool, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
     let fileManager = FileManager.default
-    let directory = getDirectory(scope)
-    if (directory == nil) {
-      reject("ERR_NO_DIRECTORY_FOUND", "No directory found for scope \(scope)", nil)
-      return
-    }
-    let filePath = directory?.appendingPathComponent(path)
-    let fileExists = fileManager.fileExists(atPath: filePath!.path)
+    let fileUrl: URL? = getFileURL(path, scope)
+    let fileExists = fileManager.fileExists(atPath: fileUrl!.path)
     if (fileExists && !overwrite) {
       reject("ERR_FILE_EXISTS", "File \(path) already exists", nil)
       return
     }
     do {
-      try data.write(to: filePath!, atomically: true, encoding: .utf8)
+      try data.write(to: fileUrl!, atomically: true, encoding: .utf8)
       resolve(true)
     } catch {
       reject("ERR_WRITE_ERROR", "Error writing file \(path)", error)
@@ -40,19 +30,14 @@ class CloudStorage: NSObject {
   @objc(createDirectory:withScope:withResolver:withRejecter:)
   func createDirectory(path: String, scope: String, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
     let fileManager = FileManager.default
-    let directory = getDirectory(scope)
-    if (directory == nil) {
-      reject("ERR_NO_DIRECTORY_FOUND", "No directory found for scope \(scope)", nil)
-      return
-    }
-    let dirPath = directory?.appendingPathComponent(path)
-    let dirExists = fileManager.fileExists(atPath: dirPath!.path)
+    let directoryUrl: URL? = getFileURL(path, scope)
+    let dirExists = fileManager.fileExists(atPath: directoryUrl!.path)
     if (dirExists) {
       reject("ERR_FILE_EXISTS", "Directory \(path) already exists", nil)
       return
     }
     do {
-      try fileManager.createDirectory(at: dirPath!, withIntermediateDirectories: true, attributes: nil)
+      try fileManager.createDirectory(at: directoryUrl!, withIntermediateDirectories: true, attributes: nil)
       resolve(true)
     } catch {
       reject("ERR_WRITE_ERROR", "Error creating directory \(path)", error)
@@ -62,19 +47,14 @@ class CloudStorage: NSObject {
   @objc(listFiles:withScope:withResolver:withRejecter:)
   func listFiles(path: String, scope: String, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
     let fileManager = FileManager.default
-    let directory = getDirectory(scope)
-    if (directory == nil) {
-      reject("ERR_NO_DIRECTORY_FOUND", "No directory found for scope \(scope)", nil)
-      return
-    }
-    let dirPath = directory?.appendingPathComponent(path)
-    let dirExists = fileManager.fileExists(atPath: dirPath!.path)
+    let directoryUrl: URL? = getFileURL(path, scope)
+    let dirExists = fileManager.fileExists(atPath: directoryUrl!.path)
     if (!dirExists) {
       reject("ERR_DIRECTORY_NOT_FOUND", "Directory \(path) not found", nil)
       return
     }
     do {
-      let files = try fileManager.contentsOfDirectory(atPath: dirPath!.path)
+      let files = try fileManager.contentsOfDirectory(atPath: directoryUrl!.path)
       resolve(files)
     } catch {
       reject("ERR_READ_ERROR", "Error reading directory \(path)", error)
@@ -84,19 +64,14 @@ class CloudStorage: NSObject {
   @objc(readFile:withScope:withResolver:withRejecter:)
   func readFile(path: String, scope: String, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
     let fileManager = FileManager.default
-    let directory = getDirectory(scope)
-    if (directory == nil) {
-      reject("ERR_NO_DIRECTORY_FOUND", "No directory found for scope \(scope)", nil)
-      return
-    }
-    let filePath = directory?.appendingPathComponent(path)
-    let fileExists = fileManager.fileExists(atPath: filePath!.path)
+    let fileUrl: URL? = getFileURL(path, scope)
+    let fileExists = fileManager.fileExists(atPath: fileUrl!.path)
     if (!fileExists) {
       reject("ERR_FILE_NOT_FOUND", "File \(path) not found", nil)
       return
     }
     do {
-      let fileContents = try String(contentsOf: filePath!, encoding: .utf8)
+      let fileContents = try String(contentsOf: fileUrl!, encoding: .utf8)
       resolve(fileContents)
     } catch {
       reject("ERR_READ_ERROR", "Error reading file \(path)", error)
@@ -106,19 +81,14 @@ class CloudStorage: NSObject {
   @objc(deleteFile:withScope:withResolver:withRejecter:)
   func deleteFile(path: String, scope: String, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
     let fileManager = FileManager.default
-    let directory = getDirectory(scope)
-    if (directory == nil) {
-      reject("ERR_NO_DIRECTORY_FOUND", "No directory found for scope \(scope)", nil)
-      return
-    }
-    let filePath = directory?.appendingPathComponent(path)
-    let fileExists = fileManager.fileExists(atPath: filePath!.path)
+    let fileUrl: URL? = getFileURL(path, scope)
+    let fileExists = fileManager.fileExists(atPath: fileUrl!.path)
     if (!fileExists) {
       reject("ERR_FILE_NOT_FOUND", "File \(path) not found", nil)
       return
     }
     do {
-      try fileManager.removeItem(at: filePath!)
+      try fileManager.removeItem(at: fileUrl!)
       resolve(true)
     } catch {
       reject("ERR_DELETE_ERROR", "Error deleting file \(path)", error)
@@ -128,19 +98,14 @@ class CloudStorage: NSObject {
   @objc(statFile:withScope:withResolver:withRejecter:)
   func statFile(path: String, scope: String, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
     let fileManager = FileManager.default
-    let directory = getDirectory(scope)
-    if (directory == nil) {
-      reject("ERR_NO_DIRECTORY_FOUND", "No directory found for scope \(scope)", nil)
-      return
-    }
-    let filePath = directory?.appendingPathComponent(path)
-    let fileExists = fileManager.fileExists(atPath: filePath!.path)
+    let fileUrl: URL? = getFileURL(path, scope)
+    let fileExists = fileManager.fileExists(atPath: fileUrl!.path)
     if (!fileExists) {
       reject("ERR_FILE_NOT_FOUND", "File \(path) not found", nil)
       return
     }
     do {
-      let attributes = try fileManager.attributesOfItem(atPath: filePath!.path)
+      let attributes = try fileManager.attributesOfItem(atPath: fileUrl!.path)
       let size = attributes[FileAttributeKey.size] as! UInt64
       let birthtime = attributes[FileAttributeKey.creationDate] as! Date
       let mtime = attributes[FileAttributeKey.modificationDate] as! Date
@@ -165,10 +130,12 @@ class CloudStorage: NSObject {
     resolve(token != nil)
   }
 
-  /// Returns the iCloud directory URL for the given scope.
-  ///
-  /// - Parameter scope: The scope of the directory. Can be either "documents" or "app_data".
-  /// - Returns: The URL of the iCloud directory.
+  /**
+    Returns the iCloud directory URL for the given scope.
+
+    - Parameter scope: The scope of the directory. Can be either "documents" or "app_data".
+    - Returns: The URL of the iCloud directory.
+  */
   private func getDirectory(_ scope: String) -> URL? {
     let fileManager = FileManager.default
     let isDocumentDirectory = scope.caseInsensitiveCompare("documents") == .orderedSame
@@ -178,5 +145,30 @@ class CloudStorage: NSObject {
     } else {
       return ubiquityURL
     }
+  }
+
+  /**
+    Parses a given path and directory scope to a full file URL. Does not check if the file exists.
+
+    - Parameter path: The path of the file.
+    - Parameter scope: The scope of the directory. Can be either "documents" or "app_data".
+    - Returns: The full URL of the file.
+  */
+  private func getFileURL(_ path: String, _ scope: String) -> URL? {
+    let fileManager = FileManager.default
+
+    // get directory for scope and check if it exists
+    let directory = getDirectory(scope)
+    if (directory == nil) {
+      reject("ERR_NO_DIRECTORY_FOUND", "No directory found for scope \(scope)", nil)
+      return
+    }
+
+    // remove leading slashes
+    let path = path.replacingOccurrences(of: "^/+", with: "", options: .regularExpression)
+
+    // append path to scope directory and return URL
+    let filePath = directory?.appendingPathComponent(path)
+    return filePath
   }
 }

@@ -2,6 +2,7 @@ import createRNCloudStorage from './createRNCloudStorage';
 import GoogleDriveApiClient from './google-drive';
 import type { CloudStorageFileStat, CloudStorageScope } from './types/main';
 import { Platform } from 'react-native';
+import { verifyLeadingSlash } from './utils/helpers';
 
 const nativeInstance = createRNCloudStorage();
 
@@ -33,7 +34,7 @@ const RNCloudStorage = {
    * @returns A promise that resolves to true if the path exists, false otherwise.
    */
   exists: (path: string, scope: CloudStorageScope): Promise<boolean> => {
-    return nativeInstance.fileExists(path, scope);
+    return nativeInstance.fileExists(verifyLeadingSlash(path), scope);
   },
 
   /**
@@ -44,7 +45,7 @@ const RNCloudStorage = {
    * @returns A promise that resolves when the file has been written.
    */
   writeFile: (path: string, data: string, scope: CloudStorageScope): Promise<void> => {
-    return nativeInstance.createFile(path, data, scope, true);
+    return nativeInstance.createFile(verifyLeadingSlash(path), data, scope, true);
   },
 
   /**
@@ -54,7 +55,7 @@ const RNCloudStorage = {
    * @returns A promise that resolves when the directory has been created.
    */
   mkdir: (path: string, scope: CloudStorageScope): Promise<void> => {
-    return nativeInstance.createDirectory(path, scope);
+    return nativeInstance.createDirectory(verifyLeadingSlash(path), scope);
   },
 
   /**
@@ -64,7 +65,7 @@ const RNCloudStorage = {
    * @returns A promise that resolves to an array of file names, excluding '.' and '..'.
    */
   readdir: (path: string, scope: CloudStorageScope): Promise<string[]> => {
-    return nativeInstance.listFiles(path, scope);
+    return nativeInstance.listFiles(verifyLeadingSlash(path), scope);
   },
 
   /**
@@ -74,7 +75,7 @@ const RNCloudStorage = {
    * @returns A promise that resolves to the contents of the file.
    */
   readFile: (path: string, scope: CloudStorageScope): Promise<string> => {
-    return nativeInstance.readFile(path, scope);
+    return nativeInstance.readFile(verifyLeadingSlash(path), scope);
   },
 
   /**
@@ -84,7 +85,7 @@ const RNCloudStorage = {
    * @returns A promise that resolves when the file has been deleted.
    */
   unlink: (path: string, scope: CloudStorageScope): Promise<void> => {
-    return nativeInstance.deleteFile(path, scope);
+    return nativeInstance.deleteFile(verifyLeadingSlash(path), scope);
   },
 
   /**
@@ -94,7 +95,7 @@ const RNCloudStorage = {
    * @returns A promise that resolves to the CloudStorageFileStat object.
    */
   stat: async (path: string, scope: CloudStorageScope): Promise<CloudStorageFileStat> => {
-    const native = await nativeInstance.statFile(path, scope);
+    const native = await nativeInstance.statFile(verifyLeadingSlash(path), scope);
 
     return {
       ...native,

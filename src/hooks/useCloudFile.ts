@@ -18,7 +18,7 @@ export const useCloudFile = (path: string, scope: CloudStorageScope) => {
     read();
   }, [read]);
 
-  const update = useCallback(
+  const write = useCallback(
     async (newContent: string) => {
       await RNCloudStorage.writeFile(path, newContent, scope);
       read();
@@ -34,7 +34,12 @@ export const useCloudFile = (path: string, scope: CloudStorageScope) => {
   return {
     content,
     read,
-    update,
+    write,
     remove,
+    /**
+     * @deprecated Use `write` instead.
+     * @alias write
+     */
+    update: write,
   };
 };

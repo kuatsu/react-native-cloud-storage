@@ -14,14 +14,15 @@ import { CloudStorage } from 'react-native-cloud-storage';
 
 ### `path`
 
-When a method takes a `path` parameter, you should provide a full path without leading or trailing slashes:
+When a method takes a `path` parameter, you should provide a full path with a leading slash, but no trailing slashes:
 
-- ❌ `/some/file`
-- ❌ `file:///some/file`
-- ❌ `some/file/`
-- ❌ `some/directory/`
-- ✅ `some/file`
-- ✅ `some/directory`
+- ❌ `some/file.txt`
+- ❌ `file:///some/file.txt`
+- ❌ `/some/directory/`
+- ✅ `/some/file.txt`
+- ✅ `/some/directory`
+
+Because of legacy reasons, the library will also accept paths without a leading slash and will automatically prefix it with one. However, this will generate a warning and may be removed in a future version.
 
 :::caution
 

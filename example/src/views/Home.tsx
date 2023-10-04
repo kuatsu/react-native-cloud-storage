@@ -6,6 +6,7 @@ import {
   CloudStorageErrorCode,
   CloudStorageFileStat,
   CloudStorageScope,
+  useCloudFile,
   useIsCloudAvailable,
 } from 'react-native-cloud-storage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -20,6 +21,8 @@ const HomeView = () => {
   const [input, setInput] = useState('');
   const [accessToken, setAccessToken] = useState('');
   const [loading, setLoading] = useState(false);
+  const cloudFile = useCloudFile('abc', CloudStorageScope.AppData);
+  cloudFile.update('abc');
 
   const cloudAvailable = useIsCloudAvailable();
   const insets = useSafeAreaInsets();

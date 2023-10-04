@@ -14,14 +14,14 @@ import { useCloudFile } from { react-native-cloud-storage };
 
 **Parameters**:
 
-- `path` (`string`): Required. The full pathname of the file to use.
+- `path` (`string`): Required. The full pathname of the file to use. See [the definition of this parameter in `CloudStorage`](../CloudStorage#path).
 - `scope` ([`CloudStorageScope`](../enums/CloudStorageScope)): Required. The storage scope (documents/app data) to use.
 
 **Returns**: An object containing the following properties:
 
 - `content`: The content of the file (`string`).
-- `read()`: Function to re-read the file (automatically called on every `update` call and change of `path` or `scope`).
-- `update(newContent)`: Function to update the contents of the file with the first parameter (`string`).
+- `read()`: Function to re-read the file (automatically called on every `write` call and change of `path` or `scope`).
+- `write(newContent)`: Function to write the content of the first parameter (`string`) to the file. **Note**: This will overwrite the file's current content. Automatically calls `read()` afterwards.
 - `remove()`: Function to delete the file.
 
 ## Example
@@ -31,16 +31,16 @@ import React, { useState, useEffect } from 'react';
 import { useCloudFile, CloudStorageScope } from { react-native-cloud-storage };
 
 const App: React.FC = () => {
-  const { content, read, update, remove } = useCloudFile('test.txt', CloudStorageScope.Documents);
+  const { content, read, write, remove } = useCloudFile('/test.txt', CloudStorageScope.AppData);
 
   const [counter, setCounter] = useState(0);
 
   useEffect(() => {
-    update(counter);
+    write(counter);
   }, [counter]);
 
   const increase = () => {
-    setCounter(counter => counter + 1);
+    setCounter(prevCounter => prevCounter + 1);
   };
 
   return (

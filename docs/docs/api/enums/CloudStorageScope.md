@@ -24,5 +24,5 @@ enum CloudStorageScope {
 When using pure JavaScript, simply use the appropriate values:
 
 ```js
-CloudStorage.exists('test.txt', 'documents');
+CloudStorage.exists('/test.txt', 'documents');
 ```
