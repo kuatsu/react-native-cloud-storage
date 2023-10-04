@@ -1,11 +1,15 @@
 import createRNCloudStorage from './createRNCloudStorage';
 import GoogleDriveApiClient from './google-drive';
-import type { CloudStorageFileStat, CloudStorageScope } from './types/main';
+import { CloudStorageFileStat, CloudStorageScope } from './types/main';
 import { Platform } from 'react-native';
+import { verifyLeadingSlash } from './utils/helpers';
 
 const nativeInstance = createRNCloudStorage();
+let defaultScope = CloudStorageScope.AppData;
 
 const RNCloudStorage = {
+  getDefaultScope: () => defaultScope,
+  setDefaultScope: (scope: CloudStorageScope) => (defaultScope = scope),
   getGoogleDriveAccessToken: () => GoogleDriveApiClient.accessToken,
   setGoogleDriveAccessToken: (accessToken: string) => (GoogleDriveApiClient.accessToken = accessToken),
   setThrowOnFilesWithSameName: (enable: boolean) => (GoogleDriveApiClient.throwOnFilesWithSameName = enable),
@@ -29,72 +33,72 @@ const RNCloudStorage = {
   /**
    * Tests whether or not the file at the given path exists.
    * @param path The path to test.
-   * @param scope The directory scope the path is in.
+   * @param scope The directory scope the path is in. Defaults to the set default scope.
    * @returns A promise that resolves to true if the path exists, false otherwise.
    */
-  exists: (path: string, scope: CloudStorageScope): Promise<boolean> => {
-    return nativeInstance.fileExists(path, scope);
+  exists: (path: string, scope?: CloudStorageScope): Promise<boolean> => {
+    return nativeInstance.fileExists(verifyLeadingSlash(path), scope ?? defaultScope);
   },
 
   /**
    * Writes to the file at the given path, creating it if it doesn't exist or overwriting it if it does.
    * @param path The file to write to.
    * @param data The data to write.
-   * @param scope The directory scope the path is in.
+   * @param scope The directory scope the path is in. Defaults to the set default scope.
    * @returns A promise that resolves when the file has been written.
    */
-  writeFile: (path: string, data: string, scope: CloudStorageScope): Promise<void> => {
-    return nativeInstance.createFile(path, data, scope, true);
+  writeFile: (path: string, data: string, scope?: CloudStorageScope): Promise<void> => {
+    return nativeInstance.createFile(verifyLeadingSlash(path), data, scope ?? defaultScope, true);
   },
 
   /**
    * Creates a new directory at the given path.
    * @param path The directory to create.
-   * @param scope The directory scope the path is in.
+   * @param scope The directory scope the path is in. Defaults to the set default scope.
    * @returns A promise that resolves when the directory has been created.
    */
-  mkdir: (path: string, scope: CloudStorageScope): Promise<void> => {
-    return nativeInstance.createDirectory(path, scope);
+  mkdir: (path: string, scope?: CloudStorageScope): Promise<void> => {
+    return nativeInstance.createDirectory(verifyLeadingSlash(path), scope ?? defaultScope);
   },
 
   /**
    * Lists the contents of the directory at the given path.
    * @param path The directory to list.
-   * @param scope The directory scope the path is in.
+   * @param scope The directory scope the path is in. Defaults to the set default scope.
    * @returns A promise that resolves to an array of file names, excluding '.' and '..'.
    */
-  readdir: (path: string, scope: CloudStorageScope): Promise<string[]> => {
-    return nativeInstance.listFiles(path, scope);
+  readdir: (path: string, scope?: CloudStorageScope): Promise<string[]> => {
+    return nativeInstance.listFiles(verifyLeadingSlash(path), scope ?? defaultScope);
   },
 
   /**
    * Reads the contents of the file at the given path.
    * @param path The file to read.
-   * @param scope The directory scope the path is in.
+   * @param scope The directory scope the path is in. Defaults to the set default scope.
    * @returns A promise that resolves to the contents of the file.
    */
-  readFile: (path: string, scope: CloudStorageScope): Promise<string> => {
-    return nativeInstance.readFile(path, scope);
+  readFile: (path: string, scope?: CloudStorageScope): Promise<string> => {
+    return nativeInstance.readFile(verifyLeadingSlash(path), scope ?? defaultScope);
   },
 
   /**
    * Deletes the file at the given path.
    * @param path The file to delete.
-   * @param scope The directory scope the path is in.
+   * @param scope The directory scope the path is in. Defaults to the set default scope.
    * @returns A promise that resolves when the file has been deleted.
    */
-  unlink: (path: string, scope: CloudStorageScope): Promise<void> => {
-    return nativeInstance.deleteFile(path, scope);
+  unlink: (path: string, scope?: CloudStorageScope): Promise<void> => {
+    return nativeInstance.deleteFile(verifyLeadingSlash(path), scope ?? defaultScope);
   },
 
   /**
    * Gets the size, creation time, and modification time of the file at the given path.
    * @param path The file to stat.
-   * @param scope The directory scope the path is in.
+   * @param scope The directory scope the path is in. Defaults to the set default scope.
    * @returns A promise that resolves to the CloudStorageFileStat object.
    */
-  stat: async (path: string, scope: CloudStorageScope): Promise<CloudStorageFileStat> => {
-    const native = await nativeInstance.statFile(path, scope);
+  stat: async (path: string, scope?: CloudStorageScope): Promise<CloudStorageFileStat> => {
+    const native = await nativeInstance.statFile(verifyLeadingSlash(path), scope ?? defaultScope);
 
     return {
       ...native,

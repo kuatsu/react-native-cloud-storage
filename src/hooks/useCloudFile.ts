@@ -2,7 +2,13 @@ import type { CloudStorageScope } from '../types/main';
 import RNCloudStorage from '../RNCloudStorage';
 import { useCallback, useEffect, useState } from 'react';
 
-export const useCloudFile = (path: string, scope: CloudStorageScope) => {
+/**
+ * A utility hook for reading and writing to a single file in the cloud.
+ * @param path The path to the file.
+ * @param scope The directory scope the path is in. If not provided, defaults to the default scope set in the library.
+ * @returns An object containing the file's contents and functions for reading, writing, and removing the file.
+ */
+export const useCloudFile = (path: string, scope?: CloudStorageScope) => {
   const [content, setContent] = useState<string | null>(null);
 
   const read = useCallback(async () => {
@@ -18,7 +24,7 @@ export const useCloudFile = (path: string, scope: CloudStorageScope) => {
     read();
   }, [read]);
 
-  const update = useCallback(
+  const write = useCallback(
     async (newContent: string) => {
       await RNCloudStorage.writeFile(path, newContent, scope);
       read();
@@ -34,7 +40,12 @@ export const useCloudFile = (path: string, scope: CloudStorageScope) => {
   return {
     content,
     read,
-    update,
+    write,
     remove,
+    /**
+     * @deprecated Use `write` instead.
+     * @alias write
+     */
+    update: write,
   };
 };
