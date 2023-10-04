@@ -4,7 +4,7 @@ import {
   CloudStorage,
   CloudStorageError,
   CloudStorageErrorCode,
-  CloudStorageFileStat,
+  type CloudStorageFileStat,
   CloudStorageScope,
   useIsCloudAvailable,
 } from 'react-native-cloud-storage';
