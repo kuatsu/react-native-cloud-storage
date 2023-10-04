@@ -70,7 +70,7 @@ const config = {
             label: 'Documentation',
           },
           {
-            href: 'https://github.com/facebook/docusaurus',
+            href: 'https://github.com/Kuatsu/react-native-cloud-storage',
             label: 'GitHub',
             position: 'right',
           },
@@ -89,7 +89,9 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${currentYear === 2023 ? currentYear : `2023-${currentYear}`} Kuatsu Digital Agency.`,
+        copyright: `Copyright © ${
+          currentYear === 2023 ? currentYear : `2023-${currentYear}`
+        } <a href="https://kuatsu.de" target="_blank">Kuatsu App Agency</a>. Built with Docusaurus.`,
       },
       prism: {
         theme: lightCodeTheme,

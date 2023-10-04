@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# Install in pure React Native project (CRNA)
+# Install in bare React Native project
 
 First, install the library using your favorite package manager:
 
