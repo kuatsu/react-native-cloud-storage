@@ -15,7 +15,7 @@ import Button from '../components/Button';
 const HomeView = () => {
   const [scope, setScope] = useState(CloudStorageScope.Documents);
   const [parentDirectory, setParentDirectory] = useState('/');
-  const [filename, setFilename] = useState('/test.txt');
+  const [filename, setFilename] = useState('test.txt');
   const [stats, setStats] = useState<CloudStorageFileStat | null>(null);
   const [input, setInput] = useState('');
   const [accessToken, setAccessToken] = useState('');
