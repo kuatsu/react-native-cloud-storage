@@ -43,6 +43,10 @@ Tests whether or not the file or directory at the given path exists.
 
 **Returns**: A `Promise` that resolves to a `boolean`. `true` if a file or directory exists at the given path, `false` otherwise.
 
+### `getDefaultScope()`
+
+Gets the currently stored default [`CloudStorageScope`](./enums/CloudStorageScope) (see [`setDefaultScope()`](#setdefaultscopescope)).
+
 ### `getGoogleDriveAccessToken()`
 
 Gets the currently stored Google Drive access token (see [`setGoogleDriveAccessToken()`](#setgoogledriveaccesstokenaccesstoken)).
