@@ -41,6 +41,10 @@ const HomeView = () => {
   }, [accessToken]);
 
   useEffect(() => {
+    CloudStorage.setDefaultScope(scope);
+  }, [scope]);
+
+  useEffect(() => {
     setStats(null);
     setInput('');
   }, [parentDirectory, filename, scope]);
@@ -48,7 +52,7 @@ const HomeView = () => {
   const handleCheckDirectoryExists = async () => {
     setLoading(true);
     try {
-      const exists = await CloudStorage.exists(parentDirectory, scope);
+      const exists = await CloudStorage.exists(parentDirectory);
       Alert.alert(
         parentDirectory === '/' || !parentDirectory.length
           ? 'Root Directory exists?'
@@ -65,7 +69,7 @@ const HomeView = () => {
   const handleCreateDirectory = async () => {
     setLoading(true);
     try {
-      await CloudStorage.mkdir(parentDirectory, scope).catch(() => setLoading(false));
+      await CloudStorage.mkdir(parentDirectory).catch(() => setLoading(false));
       readFile();
     } catch (e) {
       console.warn(e);
@@ -75,7 +79,7 @@ const HomeView = () => {
   const handleListContents = async () => {
     setLoading(true);
     try {
-      const contents = await CloudStorage.readdir(parentDirectory, scope);
+      const contents = await CloudStorage.readdir(parentDirectory);
       Alert.alert('Directory contents', contents.map((c) => `• ${c}`).join('\n'));
     } catch (e) {
       console.warn(e);
@@ -87,11 +91,11 @@ const HomeView = () => {
   const readFile = async () => {
     setLoading(true);
     try {
-      const newStats = await CloudStorage.stat(parentDirectory + '/' + filename, scope);
+      const newStats = await CloudStorage.stat(parentDirectory + '/' + filename);
       setStats(newStats);
       console.log('File stats', stats);
       if (newStats.isDirectory()) return;
-      setInput(await CloudStorage.readFile(parentDirectory + '/' + filename, scope));
+      setInput(await CloudStorage.readFile(parentDirectory + '/' + filename));
     } catch (e) {
       if (e instanceof CloudStorageError) {
         if (e.code === CloudStorageErrorCode.FILE_NOT_FOUND) {
@@ -109,7 +113,7 @@ const HomeView = () => {
   const handleCreateFile = async () => {
     setLoading(true);
     try {
-      await CloudStorage.writeFile(parentDirectory + '/' + filename, input, scope).catch(() => setLoading(false));
+      await CloudStorage.writeFile(parentDirectory + '/' + filename, input).catch(() => setLoading(false));
       readFile();
     } catch (e) {
       console.warn(e);
@@ -121,7 +125,7 @@ const HomeView = () => {
   const handleDelete = async () => {
     setLoading(true);
     try {
-      await CloudStorage.unlink(parentDirectory + '/' + filename, scope).catch(() => setLoading(false));
+      await CloudStorage.unlink(parentDirectory + '/' + filename).catch(() => setLoading(false));
       readFile();
     } catch (e) {
       console.warn(e);
