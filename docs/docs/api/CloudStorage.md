@@ -43,6 +43,12 @@ Tests whether or not the file or directory at the given path exists.
 
 **Returns**: A `Promise` that resolves to a `boolean`. `true` if a file or directory exists at the given path, `false` otherwise.
 
+:::caution
+
+On Google Drive (Android), this may return `false` if you're checking if the root directory of the [`CloudStorageScope.AppData`](./enums/CloudStorageScope) exists, but haven't written any files to it yet. This is because the Google Drive API doesn't create the root directory until the first file is written to it.
+
+:::
+
 ### `getGoogleDriveAccessToken()`
 
 Gets the currently stored Google Drive access token (see [`setGoogleDriveAccessToken()`](#setgoogledriveaccesstokenaccesstoken)).
