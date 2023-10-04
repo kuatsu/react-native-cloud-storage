@@ -1,6 +1,6 @@
 import createRNCloudStorage from './createRNCloudStorage';
 import GoogleDriveApiClient from './google-drive';
-import { CloudStorageFileStat, CloudStorageScope } from './types/main';
+import { type CloudStorageFileStat, CloudStorageScope } from './types/main';
 import { Platform } from 'react-native';
 import { verifyLeadingSlash } from './utils/helpers';
 
