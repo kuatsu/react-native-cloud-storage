@@ -178,6 +178,17 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
   ): Promise<string> {
     try {
       const files = await this.listInternalFiles(scope);
+
+      if (path === '' || path === '/') {
+        const rootDirectoryId = await this.getRootDirectoryId(scope);
+        if (!rootDirectoryId)
+          throw new CloudStorageError(
+            `Root directory in scope ${scope} not found`,
+            CloudStorageErrorCode.DIRECTORY_NOT_FOUND
+          );
+        return rootDirectoryId;
+      }
+
       const { directories, filename } = this.resolvePathToDirectories(path);
       const parentDirectoryId = this.findParentDirectoryId(files, directories);
       let file: GoogleDriveFile | undefined;

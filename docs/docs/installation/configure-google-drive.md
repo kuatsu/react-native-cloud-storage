@@ -6,7 +6,7 @@ sidebar_position: 3
 
 :::caution
 
-Please note that filenames are not unique in Google Drive. There can be multiple files with the same name within the same directory (even files and directories sharing the same name). By default, the library will not throw any errors when there are multiple files with the same name detected, but instead default to the first file found. However, this might be problematic when working with the [`CloudStorage.Documents` scope](../api/enums/CloudStorageScope). Please [see here](../guides/google-drive-files-same-name) for more info.
+Please note that filenames are not unique in Google Drive. There can be multiple files with the same name within the same directory (even files and directories sharing the same name). By default, the library will not throw any errors when there are multiple files with the same name detected, but instead default to the first file found. However, this might be problematic when working with the [`CloudStorageScope.Documents` scope](../api/enums/CloudStorageScope). Please [see here](../guides/google-drive-files-same-name) for more info.
 
 :::
 
@@ -91,11 +91,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  text: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
 });
 ```
 
-In the end, you are responsible for acquiring and potentially refreshing the access token. Do note however, that this process does not need to be done for iOS as iOS will not use the Google Drive REST API but instead fully rely on CloudKit / iCloud.
+Ultimately, you are responsible for acquiring and potentially refreshing the access token. Do note however, that this process does not need to be done for iOS as iOS will not use the Google Drive REST API but instead fully rely on CloudKit / iCloud.

@@ -4,7 +4,7 @@ import {
   CloudStorage,
   CloudStorageError,
   CloudStorageErrorCode,
-  CloudStorageFileStat,
+  type CloudStorageFileStat,
   CloudStorageScope,
   useIsCloudAvailable,
 } from 'react-native-cloud-storage';
@@ -13,8 +13,8 @@ import Card from '../components/Card';
 import Button from '../components/Button';
 
 const HomeView = () => {
-  const [scope, setScope] = useState(CloudStorageScope.Documents);
-  const [parentDirectory, setParentDirectory] = useState('');
+  const [scope, setScope] = useState(CloudStorage.getDefaultScope());
+  const [parentDirectory, setParentDirectory] = useState('/');
   const [filename, setFilename] = useState('test.txt');
   const [stats, setStats] = useState<CloudStorageFileStat | null>(null);
   const [input, setInput] = useState('');
@@ -41,6 +41,10 @@ const HomeView = () => {
   }, [accessToken]);
 
   useEffect(() => {
+    CloudStorage.setDefaultScope(scope);
+  }, [scope]);
+
+  useEffect(() => {
     setStats(null);
     setInput('');
   }, [parentDirectory, filename, scope]);
@@ -48,9 +52,11 @@ const HomeView = () => {
   const handleCheckDirectoryExists = async () => {
     setLoading(true);
     try {
-      const exists = await CloudStorage.exists(parentDirectory, scope);
+      const exists = await CloudStorage.exists(parentDirectory);
       Alert.alert(
-        parentDirectory.length ? `Directory ${parentDirectory} exists?` : 'Root Directory exists?',
+        parentDirectory === '/' || !parentDirectory.length
+          ? 'Root Directory exists?'
+          : `Directory ${parentDirectory} exists?`,
         exists ? '✅ Yes' : '❌ No'
       );
     } catch (e) {
@@ -63,7 +69,7 @@ const HomeView = () => {
   const handleCreateDirectory = async () => {
     setLoading(true);
     try {
-      await CloudStorage.mkdir(parentDirectory, scope).catch(() => setLoading(false));
+      await CloudStorage.mkdir(parentDirectory).catch(() => setLoading(false));
       readFile();
     } catch (e) {
       console.warn(e);
@@ -73,7 +79,7 @@ const HomeView = () => {
   const handleListContents = async () => {
     setLoading(true);
     try {
-      const contents = await CloudStorage.readdir(parentDirectory, scope);
+      const contents = await CloudStorage.readdir(parentDirectory);
       Alert.alert('Directory contents', contents.map((c) => `• ${c}`).join('\n'));
     } catch (e) {
       console.warn(e);
@@ -85,11 +91,11 @@ const HomeView = () => {
   const readFile = async () => {
     setLoading(true);
     try {
-      const newStats = await CloudStorage.stat(parentDirectory + '/' + filename, scope);
+      const newStats = await CloudStorage.stat(parentDirectory + '/' + filename);
       setStats(newStats);
       console.log('File stats', stats);
       if (newStats.isDirectory()) return;
-      setInput(await CloudStorage.readFile(parentDirectory + '/' + filename, scope));
+      setInput(await CloudStorage.readFile(parentDirectory + '/' + filename));
     } catch (e) {
       if (e instanceof CloudStorageError) {
         if (e.code === CloudStorageErrorCode.FILE_NOT_FOUND) {
@@ -107,7 +113,7 @@ const HomeView = () => {
   const handleCreateFile = async () => {
     setLoading(true);
     try {
-      await CloudStorage.writeFile(parentDirectory + '/' + filename, input, scope).catch(() => setLoading(false));
+      await CloudStorage.writeFile(parentDirectory + '/' + filename, input).catch(() => setLoading(false));
       readFile();
     } catch (e) {
       console.warn(e);
@@ -119,7 +125,7 @@ const HomeView = () => {
   const handleDelete = async () => {
     setLoading(true);
     try {
-      await CloudStorage.unlink(parentDirectory + '/' + filename, scope).catch(() => setLoading(false));
+      await CloudStorage.unlink(parentDirectory + '/' + filename).catch(() => setLoading(false));
       readFile();
     } catch (e) {
       console.warn(e);
@@ -150,7 +156,7 @@ const HomeView = () => {
         />
         <Text style={{ fontWeight: 'bold', marginTop: 10 }}>Parent directory</Text>
         <TextInput
-          placeholder="Parent directory (root if empty)"
+          placeholder="Parent directory"
           value={parentDirectory}
           onChangeText={setParentDirectory}
           style={styles.input}

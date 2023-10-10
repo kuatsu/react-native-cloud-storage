@@ -1,7 +1,7 @@
-import { withEntitlementsPlist, withInfoPlist, withPlugins } from '@expo/config-plugins';
-import type { ExpoConfig } from 'expo/config';
+import { withEntitlementsPlist, withInfoPlist, withPlugins, type ConfigPlugin } from '@expo/config-plugins';
+import type { RNCloudStorageConfigPluginOptions } from './types';
 
-const withRNCloudStorageInfoPlist = (config: ExpoConfig) =>
+const withRNCloudStorageInfoPlist: ConfigPlugin = (config) =>
   withInfoPlist(config, async (newConfig) => {
     if (!config.ios?.bundleIdentifier) {
       throw new Error('Missing iOS bundle identifier');
@@ -18,10 +18,7 @@ const withRNCloudStorageInfoPlist = (config: ExpoConfig) =>
     return newConfig;
   });
 
-const withRNCloudStorageEntitlementsPlist = (
-  config: ExpoConfig,
-  iCloudContainerEnvironment: 'Production' | 'Development'
-) =>
+const withRNCloudStorageEntitlementsPlist: ConfigPlugin<RNCloudStorageConfigPluginOptions> = (config, options) =>
   withEntitlementsPlist(config, async (newConfig) => {
     if (!config.ios?.bundleIdentifier) {
       throw new Error('Missing iOS bundle identifier');
@@ -29,7 +26,8 @@ const withRNCloudStorageEntitlementsPlist = (
     const entitlementsPlist = newConfig.modResults;
     entitlementsPlist['com.apple.developer.icloud-container-identifiers'] = [`iCloud.${config.ios.bundleIdentifier}`];
     entitlementsPlist['com.apple.developer.icloud-services'] = ['CloudDocuments'];
-    entitlementsPlist['com.apple.developer.icloud-container-environment'] = iCloudContainerEnvironment;
+    entitlementsPlist['com.apple.developer.icloud-container-environment'] =
+      options?.iCloudContainerEnvironment ?? 'Production';
     entitlementsPlist['com.apple.developer.ubiquity-container-identifiers'] = [`iCloud.${config.ios.bundleIdentifier}`];
     entitlementsPlist[
       'com.apple.developer.ubiquity-kvstore-identifier'
@@ -38,7 +36,7 @@ const withRNCloudStorageEntitlementsPlist = (
     return newConfig;
   });
 
-const withRNCloudStorageIos = (config: ExpoConfig, iCloudContainerEnvironment: 'Production' | 'Development') =>
-  withPlugins(config, [withRNCloudStorageInfoPlist, [withRNCloudStorageEntitlementsPlist, iCloudContainerEnvironment]]);
+const withRNCloudStorageIos: ConfigPlugin<RNCloudStorageConfigPluginOptions> = (config, options) =>
+  withPlugins(config, [withRNCloudStorageInfoPlist, [withRNCloudStorageEntitlementsPlist, options]]);
 
 export default withRNCloudStorageIos;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, ViewProps, Text } from 'react-native';
+import { StyleSheet, View, type ViewProps, Text } from 'react-native';
 
 interface CardProps extends ViewProps {
   title?: string;
