@@ -1,0 +1,44 @@
+name: Build iOS
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/build-ios.yml'
+      - 'ios/**'
+      - '*.podspec'
+      - 'example/ios/**'
+  pull_request:
+    paths:
+      - '.github/workflows/build-ios.yml'
+      - 'ios/**'
+      - '*.podspec'
+      - 'example/ios/**'
+jobs:
+  build:
+    name: Build iOS example app
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+      - name: Install pods
+        run: yarn example pods
+      - name: Install xcpretty
+        run: gem install xcpretty
+      - name: Build app
+        run: "set -o pipefail && xcodebuild \
+          CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ \
+          -derivedDataPath build -UseModernBuildSystem=YES \
+          -workspace CloudStorageExample.xcworkspace \
+          -scheme CloudStorageExample \
+          -sdk iphonesimulator \
+          -configuration Debug \
+          -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+          build \
+          CODE_SIGNING_ALLOWED=NO | xcpretty"
+        working-directory: example/ios
