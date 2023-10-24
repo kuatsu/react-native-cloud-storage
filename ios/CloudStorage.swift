@@ -17,6 +17,38 @@ class CloudStorage: NSObject {
     resolve(fileExists)
   }
 
+  @objc(appendToFile:withData:withScope:withResolver:withRejecter:)
+  func appendToFile(path: String, data: String, scope: String, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
+    // Append data to the file at path. If the file doesn't exist, create it.
+    let fileUrl: URL?
+    do {
+      fileUrl = try getFileURL(path, scope)
+    } catch let error as NSError {
+      reject(error.domain, error.userInfo["message"] as? String, error)
+      return
+    }
+
+    let fileManager = FileManager.default
+    if (!fileManager.fileExists(atPath: fileUrl!.path)) {
+      do {
+        try data.write(to: fileUrl!, atomically: true, encoding: .utf8)
+        resolve(true)
+      } catch {
+        reject("ERR_WRITE_ERROR", "Error writing file \(path)", error)
+      }
+    } else {
+      do {
+        let fileHandle = try FileHandle(forWritingTo: fileUrl!)
+        fileHandle.seekToEndOfFile()
+        fileHandle.write(data.data(using: .utf8)!)
+        fileHandle.closeFile()
+        resolve(true)
+      } catch {
+        reject("ERR_WRITE_ERROR", "Error writing file \(path)", error)
+      }
+    }
+  }
+
   @objc(createFile:withData:withScope:withOverwrite:withResolver:withRejecter:)
   func createFile(path: String, data: String, scope: String, overwrite: Bool, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
     let fileUrl: URL?

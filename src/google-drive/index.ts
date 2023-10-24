@@ -230,6 +230,40 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
     }
   }
 
+  async appendToFile(path: string, data: string, scope: NativeRNCloudCloudStorageScope): Promise<void> {
+    let fileId: string | undefined;
+    let prevContent = '';
+    try {
+      fileId = await this.getFileId(path, scope);
+      prevContent = await GoogleDriveApiClient.drive.files.getText(fileId);
+    } catch (e: any) {
+      if (e instanceof CloudStorageError && e.code === CloudStorageErrorCode.FILE_NOT_FOUND) {
+        /* do nothing, simply create the file */
+      } else {
+        throw e;
+      }
+    }
+
+    const uploader = GoogleDriveApiClient.drive.files
+      .newMultipartUploader()
+      .setData(prevContent + data, MimeTypes.TEXT);
+    if (fileId) uploader.setIdOfFileToUpdate(fileId);
+    else {
+      const files = await this.listInternalFiles(scope);
+      const { directories, filename } = this.resolvePathToDirectories(path);
+      const parentDirectoryId = this.findParentDirectoryId(files, directories);
+      uploader.setRequestBody({
+        name: filename,
+        parents: parentDirectoryId
+          ? [parentDirectoryId]
+          : scope === 'app_data'
+          ? [this.getRootDirectory(scope)]
+          : undefined,
+      });
+    }
+    await uploader.execute();
+  }
+
   async createFile(
     path: string,
     data: string,

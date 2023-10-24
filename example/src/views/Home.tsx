@@ -18,6 +18,7 @@ const HomeView = () => {
   const [filename, setFilename] = useState('test.txt');
   const [stats, setStats] = useState<CloudStorageFileStat | null>(null);
   const [input, setInput] = useState('');
+  const [appendInput, setAppendInput] = useState('');
   const [accessToken, setAccessToken] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -120,6 +121,17 @@ const HomeView = () => {
     }
   };
 
+  const handleAppend = async () => {
+    setLoading(true);
+    try {
+      await CloudStorage.appendFile(parentDirectory + '/' + filename, appendInput).catch(() => setLoading(false));
+      readFile();
+      setAppendInput('');
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
   const handleRead = readFile;
 
   const handleDelete = async () => {
@@ -178,6 +190,13 @@ const HomeView = () => {
           style={styles.input}
         />
         <Button title="Write to file" onPress={handleCreateFile} />
+        <TextInput
+          placeholder="File contents to append"
+          value={appendInput}
+          onChangeText={setAppendInput}
+          style={styles.input}
+        />
+        <Button title="Append to file" onPress={handleAppend} />
         <Text style={styles.smallText}>
           The filename will be prefixed with the parent directory. If the file does not exist, it will be created. If it
           does exist, it will be overwritten.

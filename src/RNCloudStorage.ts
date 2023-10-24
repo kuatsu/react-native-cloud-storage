@@ -31,6 +31,17 @@ const RNCloudStorage = {
   },
 
   /**
+   * Appends the data to the file at the given path, creating the file if it doesn't exist.
+   * @param path The file to append to.
+   * @param data The data to append.
+   * @param scope The directory scope the path is in. Defaults to the set default scope.
+   * @returns A promise that resolves when the data has been appended.
+   */
+  appendFile: (path: string, data: string, scope?: CloudStorageScope): Promise<void> => {
+    return nativeInstance.appendToFile(verifyLeadingSlash(path), data, scope ?? defaultScope);
+  },
+
+  /**
    * Tests whether or not the file at the given path exists.
    * @param path The path to test.
    * @param scope The directory scope the path is in. Defaults to the set default scope.

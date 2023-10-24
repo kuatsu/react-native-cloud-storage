@@ -32,6 +32,18 @@ When creating files or directories, always make sure that all directories in the
 
 ## Methods
 
+### `appendFile(path, data, scope)`
+
+Appends the data to the file at the given path. Creates the file if it doesn't exist yet.
+
+**Parameters**:
+
+- `path` (`string`): Required. The path including the filename to append data to.
+- `content` (`string`): Required. The content to append.
+- `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Optional. The storage scope (documents/app data) to use. Defaults to [`CloudStorageScope.AppData`](./enums/CloudStorageScope), unless the default scope has been changed via [`setDefaultScope()`](#setdefaultscopescope).
+
+**Returns**: A `Promise` that resolves to `void` once the data has been appended.
+
 ### `exists(path, scope)`
 
 Tests whether or not the file or directory at the given path exists.

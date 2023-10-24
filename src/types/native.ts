@@ -25,6 +25,7 @@ export enum CloudStorageErrorCode {
 
 export default interface NativeRNCloudStorage {
   fileExists: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<boolean>;
+  appendToFile: (path: string, data: string, scope: NativeRNCloudCloudStorageScope) => Promise<void>;
   createFile: (path: string, data: string, scope: NativeRNCloudCloudStorageScope, overwrite: boolean) => Promise<void>;
   createDirectory: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<void>;
   listFiles: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<string[]>;
