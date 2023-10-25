@@ -28,7 +28,5 @@ jobs:
           java-version: 1.8
       - name: Install dependencies
         run: yarn --frozen-lockfile
-      - name: Build library using gradle
-        run: cd android && ./gradlew assembleDebug && cd ..
       - name: Build example app using gradle
         run: cd example/android && ./gradlew assembleDebug && cd ../..
