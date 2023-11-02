@@ -19,13 +19,9 @@ jobs:
     name: Build iOS example app
     runs-on: macOS-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: 'yarn'
-      - name: Install dependencies
-        run: yarn --frozen-lockfile
+      - uses: actions/checkout@v3
+      - name: Setup
+        uses: ./.github/actions/setup
       - name: Install pods
         run: yarn example pods
       - name: Install xcpretty
