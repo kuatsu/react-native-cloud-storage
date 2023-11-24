@@ -14,7 +14,7 @@ yarn add react-native-cloud-storage
 
 ## Documentation
 
-The documentation is located [here](https://react-native-cloud-storage.vercel.app/docs/intro).
+The documentation is located [here](https://react-native-cloud-storage.oss.kuatsu.de/docs/intro).
 
 ## Contributing
 
