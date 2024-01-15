@@ -123,10 +123,10 @@ class CloudStorage: NSObject {
     }
   }
 
-  @objc(triggerDownloadFile:withScope:withResolver:withRejecter:)
-    func triggerDownloadFile(path: String, scope: String, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
+  @objc(downloadFile:withScope:withResolver:withRejecter:)
+    func downloadFile(path: String, scope: String, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
         let fileManager = FileManager.default
-        
+
         guard let directory = getDirectory(scope) else {
             reject("ERR_READ_ERROR", "Error reading directory \(scope)", NSError())
             return
@@ -139,7 +139,7 @@ class CloudStorage: NSObject {
         let filePath = directory.appendingPathComponent(path)
 
         let isDownloadable = fileManager.isUbiquitousItem(at: filePath)
-        
+
         if (!isDownloadable) {
             resolve(false)
             return
@@ -153,7 +153,7 @@ class CloudStorage: NSObject {
           }
         resolve(true)
     }
-    
+
 
   @objc(deleteFile:withScope:withResolver:withRejecter:)
   func deleteFile(path: String, scope: String, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {

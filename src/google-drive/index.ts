@@ -361,8 +361,8 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
     return content;
   }
 
-  async triggerDownloadFile(_path: string, _scope: NativeRNCloudCloudStorageScope): Promise<boolean> {
-    // Not doing anything here, just placeholder to conform the interface so it doesn't fail on Android
+  async downloadFile(_path: string, _scope: NativeRNCloudCloudStorageScope): Promise<boolean> {
+    // Not doing anything here, just a placeholder to conform to the interface so it doesn't fail on Android
     return true;
   }
 

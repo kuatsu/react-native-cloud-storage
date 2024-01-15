@@ -30,7 +30,7 @@ export default interface NativeRNCloudStorage {
   createDirectory: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<void>;
   listFiles: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<string[]>;
   readFile: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<string>;
-  triggerDownloadFile: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<boolean>;
+  downloadFile: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<boolean>;
   deleteFile: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<void>;
   statFile: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<NativeRNCloudCloudStorageFileStat>;
   isCloudAvailable: () => Promise<boolean>;
