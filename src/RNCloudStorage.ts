@@ -93,7 +93,7 @@ const RNCloudStorage = {
   },
 
   /**
-   * Triggers the download of the file at the given path from iCloud. Does not have any effect on Google Drive.
+   * Downloads the file at the given path from iCloud. Does not have any effect on Google Drive.
    * @param path The file to trigger the download for.
    * @param scope The directory scope the path is in. Defaults to the set default scope.
    * @returns A promise that resolves to true if the download was triggered, false otherwise.
