@@ -123,6 +123,38 @@ class CloudStorage: NSObject {
     }
   }
 
+  @objc(triggerDownloadFile:withScope:withResolver:withRejecter:)
+    func triggerDownloadFile(path: String, scope: String, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
+        let fileManager = FileManager.default
+        
+        guard let directory = getDirectory(scope) else {
+            reject("ERR_READ_ERROR", "Error reading directory \(scope)", NSError())
+            return
+        }
+
+        // remove leading slashes
+        let path = path.replacingOccurrences(of: "^/+", with: "", options: .regularExpression)
+
+        // append path to scope directory and return URL
+        let filePath = directory.appendingPathComponent(path)
+
+        let isDownloadable = fileManager.isUbiquitousItem(at: filePath)
+        
+        if (!isDownloadable) {
+            resolve(false)
+            return
+        }
+          do {
+            // trigger download of file^
+             try fileManager.startDownloadingUbiquitousItem(at: filePath)
+          } catch {
+            reject("ERR_FILE_NOT_DOWNLOADABLE", "File or directory \(path) not downloadable", error)
+            return
+          }
+        resolve(true)
+    }
+    
+
   @objc(deleteFile:withScope:withResolver:withRejecter:)
   func deleteFile(path: String, scope: String, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
     let fileUrl: URL?
