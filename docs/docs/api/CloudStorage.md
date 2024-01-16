@@ -80,7 +80,7 @@ Gets the currently stored Google Drive access token (see [`setGoogleDriveAccessT
 
 Tests whether or not the cloud storage is available.
 On iOS, this actually verifies with the system whether or not iCloud is available. This might not be the case right at app launch or when the user is not logged into iCloud.
-On Android, this simply checks whether or not a Google Drive API access token has been set using [setGoogleDriveAccessToken](#setgoogledriveaccesstokenaccesstoken).
+On all other platforms, this simply checks whether or not a Google Drive API access token has been set using [setGoogleDriveAccessToken](#setgoogledriveaccesstokenaccesstoken).
 
 **Returns**: A `Promise` that resolves to a `boolean`. `true` if the cloud storage is available, `false` otherwise.
 

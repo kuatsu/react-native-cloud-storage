@@ -45,6 +45,8 @@ const App: React.FC = () => {
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     androidClientId: 'GOOGLE_GUID.apps.googleusercontent.com',
+    // if you're also deploying to web, uncomment the next line
+    // webClientId: 'GOOGLE_GUID.apps.googleusercontent.com',
     scopes: ['https://www.googleapis.com/auth/drive.appdata'],
   });
 
@@ -64,7 +66,7 @@ const App: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {Platform.OS === 'android' && accessToken === null ? (
+      {Platform.OS !== 'ios' && accessToken === null ? (
         <Button
           title="Sign in with Google"
           disabled={!request}
