@@ -19,7 +19,7 @@ import { useCloudFile } from 'react-native-cloud-storage';
 
 **Returns**: An object containing the following properties:
 
-- `content`: The content of the file (`string`).
+- `content`: The content of the file (`string`, or `null` if the file does not exist).
 - `download()`: Function to download the file's content from iCloud. Refer to [`downloadFile()`](../CloudStorage#downloadfilepath-scope) for more information.
 - `read()`: Function to re-read the file (automatically called on every `write` call and change of `path` or `scope`).
 - `write(newContent)`: Function to write the content of the first parameter (`string`) to the file. **Note**: This will overwrite the file's current content. Automatically calls `read()` afterwards.
