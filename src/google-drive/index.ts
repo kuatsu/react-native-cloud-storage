@@ -5,8 +5,8 @@ import {
   type NativeRNCloudCloudStorageFileStat,
   type NativeRNCloudCloudStorageScope,
 } from '../types/native';
-import type { GoogleDriveDetailedFile, GoogleDriveFile, GoogleDriveListOperationResponse } from './types';
 import CloudStorageError from '../utils/CloudStorageError';
+import type { GoogleDriveDetailedFile, GoogleDriveFile, GoogleDriveListOperationResponse } from './types';
 
 export default class GoogleDriveApiClient implements NativeRNCloudStorage {
   private static drive: GDrive = new GDrive();
@@ -359,6 +359,11 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
     const fileId = await this.getFileId(path, scope);
     const content = await GoogleDriveApiClient.drive.files.getText(fileId);
     return content;
+  }
+
+  async downloadFile(_path: string, _scope: NativeRNCloudCloudStorageScope): Promise<void> {
+    // Not doing anything here, just a placeholder to conform to the interface so it doesn't fail on Android
+    return;
   }
 
   async deleteFile(path: string, scope: NativeRNCloudCloudStorageScope): Promise<void> {

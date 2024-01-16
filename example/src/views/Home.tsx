@@ -144,6 +144,18 @@ const HomeView = () => {
     }
   };
 
+  const handleDownload = async () => {
+    setLoading(true);
+    try {
+      await CloudStorage.downloadFile(parentDirectory + '/' + filename);
+      Alert.alert('File download', 'File downloaded successfully.');
+      setLoading(false);
+    } catch (e) {
+      console.warn(e);
+      setLoading(false);
+    }
+  };
+
   return (
     <ScrollView
       style={styles.scrollView}
@@ -181,6 +193,7 @@ const HomeView = () => {
       <Card title="File Operations">
         <Text style={{ fontWeight: 'bold' }}>Filename of working file</Text>
         <TextInput placeholder="Filename" value={filename} onChangeText={setFilename} style={styles.input} />
+        {Platform.OS === 'ios' && <Button title="Download file" onPress={handleDownload} />}
         <Button title="Read file" onPress={handleRead} />
         <Button title="Delete file" onPress={handleDelete} />
         <TextInput

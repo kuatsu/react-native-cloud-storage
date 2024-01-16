@@ -1,7 +1,7 @@
+import { Platform } from 'react-native';
 import createRNCloudStorage from './createRNCloudStorage';
 import GoogleDriveApiClient from './google-drive';
-import { type CloudStorageFileStat, CloudStorageScope } from './types/main';
-import { Platform } from 'react-native';
+import { CloudStorageScope, type CloudStorageFileStat } from './types/main';
 import { verifyLeadingSlash } from './utils/helpers';
 
 const nativeInstance = createRNCloudStorage();
@@ -90,6 +90,16 @@ const RNCloudStorage = {
    */
   readFile: (path: string, scope?: CloudStorageScope): Promise<string> => {
     return nativeInstance.readFile(verifyLeadingSlash(path), scope ?? defaultScope);
+  },
+
+  /**
+   * Downloads the file at the given path from iCloud. Does not have any effect on Google Drive.
+   * @param path The file to trigger the download for.
+   * @param scope The directory scope the path is in. Defaults to the set default scope.
+   * @returns A promise that resolves once the download has been triggered.
+   */
+  downloadFile: (path: string, scope?: CloudStorageScope): Promise<void> => {
+    return nativeInstance.downloadFile(verifyLeadingSlash(path), scope ?? defaultScope);
   },
 
   /**
