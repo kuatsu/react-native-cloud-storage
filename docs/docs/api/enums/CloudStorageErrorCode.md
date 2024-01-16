@@ -13,7 +13,7 @@ import { CloudStorageErrorCode } from 'react-native-cloud-storage';
 ## Definition
 
 ```ts
-export enum CloudStorageErrorCode {
+enum CloudStorageErrorCode {
   FILE_NOT_FOUND = 'ERR_FILE_NOT_FOUND',
   PATH_IS_DIRECTORY = 'ERR_PATH_IS_DIRECTORY',
   DIRECTORY_NOT_FOUND = 'ERR_DIRECTORY_NOT_FOUND',
