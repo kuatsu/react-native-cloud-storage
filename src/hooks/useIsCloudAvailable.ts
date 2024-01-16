@@ -10,8 +10,7 @@ export const useIsCloudAvailable = (_iCloudTimeout?: number) => {
   const [isAvailable, setIsAvailable] = useState(false);
 
   useEffect(() => {
-    // On iOS, a native event is emitted when the iCloud availability changes. On Android, we just assume it's always
-    // available, since it's just using the Google Drive API.
+    // Listen for changes to the cloud availability using the native event emitter
     let eventEmitter: NativeEventEmitter | typeof DeviceEventEmitter;
     if (Platform.OS === 'ios') {
       eventEmitter = new NativeEventEmitter(NativeModules.CloudStorageEventEmitter);
