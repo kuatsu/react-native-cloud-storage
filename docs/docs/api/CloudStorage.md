@@ -46,7 +46,7 @@ Appends the data to the file at the given path. Creates the file if it doesn't e
 
 ### `downloadFile(path, scope)`
 
-When a file has been uploaded to iCloud, it is not immediately synced across devices. This method will download the file from iCloud so you can safely process it. If it has already been downloaded, this will not do anything and immediately return. Does not have any effect on Google Drive.
+When a file has been uploaded to iCloud, it is not immediately synced across devices. In this case, those files will have an `.icloud` extension, so trying to read them will fail. This method will download the file from iCloud so you can safely process it afterwards. If it has already been downloaded, this will not do anything and immediately return. Does not have any effect on Google Drive.
 
 **Parameters**:
 
