@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
  * A utility hook for reading and writing to a single file in the cloud.
  * @param path The path to the file.
  * @param scope The directory scope the path is in. If not provided, defaults to the default scope set in the library.
- * @returns An object containing the file's contents and functions for reading, writing, and removing the file.
+ * @returns An object containing the file's contents and functions for downloading, reading, writing, and removing the file.
  */
 export const useCloudFile = (path: string, scope?: CloudStorageScope) => {
   const [content, setContent] = useState<string | null>(null);
@@ -37,6 +37,10 @@ export const useCloudFile = (path: string, scope?: CloudStorageScope) => {
     setContent(null);
   }, [path, scope]);
 
+  const download = useCallback(async () => {
+    await RNCloudStorage.downloadFile(path, scope);
+  }, [path, scope]);
+
   return {
     content,
     read,
@@ -47,5 +51,10 @@ export const useCloudFile = (path: string, scope?: CloudStorageScope) => {
      * @alias write
      */
     update: write,
+    /**
+     * Downloads the file from iCloud to the device. Needed if the file hasn't been synced yet. Has no effect on
+     * Google Drive.
+     */
+    download,
   };
 };
