@@ -7,7 +7,7 @@ sidebar_position: 1
 The `useCloudFile` hook is a helper hook designed to improve the developer experience when working with a single file in the cloud. This is especially useful when, for example, working with a single file containing the app's state as backup.
 
 ```ts
-import { useCloudFile } from { react-native-cloud-storage };
+import { useCloudFile } from 'react-native-cloud-storage';
 ```
 
 ## API
@@ -29,7 +29,7 @@ import { useCloudFile } from { react-native-cloud-storage };
 
 ```tsx
 import React, { useState, useEffect } from 'react';
-import { useCloudFile } from { react-native-cloud-storage };
+import { useCloudFile } from 'react-native-cloud-storage';
 
 const App: React.FC = () => {
   const { content, read, write, remove } = useCloudFile('/test.txt');
@@ -41,7 +41,7 @@ const App: React.FC = () => {
   }, [counter]);
 
   const increase = () => {
-    setCounter(prevCounter => prevCounter + 1);
+    setCounter((prevCounter) => prevCounter + 1);
   };
 
   return (
@@ -51,6 +51,6 @@ const App: React.FC = () => {
       <Button title="Delete" onPress={remove} />
       <Button title="Re-read" onPress={read} />
     </View>
-  )
-}
+  );
+};
 ```

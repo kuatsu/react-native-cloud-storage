@@ -9,7 +9,7 @@ The `useIsCloudAvailable` hook listens to changes in the availability of iCloud.
 This is helpful when you want to read from the cloud storage on app launch, as reading from iCloud without waiting for the storage to be available will block the main thread.
 
 ```ts
-import { useIsCloudAvailable } from { react-native-cloud-storage };
+import { useIsCloudAvailable } from 'react-native-cloud-storage';
 ```
 
 ## API
