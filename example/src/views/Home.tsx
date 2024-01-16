@@ -147,9 +147,8 @@ const HomeView = () => {
   const handleDownload = async () => {
     setLoading(true);
     try {
-      const res = await CloudStorage.downloadFile(parentDirectory + '/' + filename);
-      if (res) Alert.alert('File download', 'File downloaded successfully.');
-      else Alert.alert('File download', 'File download failed.');
+      await CloudStorage.downloadFile(parentDirectory + '/' + filename);
+      Alert.alert('File download', 'File downloaded successfully.');
       setLoading(false);
     } catch (e) {
       console.warn(e);

@@ -46,14 +46,14 @@ Appends the data to the file at the given path. Creates the file if it doesn't e
 
 ### `downloadFile(path, scope)`
 
-When a file has been uploaded to iCloud, it is not immediately synced across devices. This method will download the file from iCloud so you can safely process it. Does not have any effect on Google Drive and simply returns `true`.
+When a file has been uploaded to iCloud, it is not immediately synced across devices. This method will download the file from iCloud so you can safely process it. If it has already been downloaded, this will not do anything and immediately return. Does not have any effect on Google Drive.
 
 **Parameters**:
 
 - `path` (`string`): Required. The path including the filename to download.
 - `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Optional. The storage scope (documents/app data) to use. Defaults to [`CloudStorageScope.AppData`](./enums/CloudStorageScope), unless the default scope has been changed via [`setDefaultScope()`](#setdefaultscopescope).
 
-**Returns**: A `Promise` that resolves to a `boolean`. `true` if the file was downloaded successfully, `false` otherwise.
+**Returns**: A `Promise` that resolves to `void` once the download has been triggered.
 
 ### `exists(path, scope)`
 

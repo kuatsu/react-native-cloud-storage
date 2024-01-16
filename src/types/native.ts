@@ -20,6 +20,7 @@ export enum CloudStorageErrorCode {
   DELETE_ERROR = 'ERR_DELETE_ERROR',
   STAT_ERROR = 'ERR_STAT_ERROR',
   UNKNOWN = 'ERR_UNKNOWN',
+  FILE_NOT_DOWNLOADABLE = 'ERR_FILE_NOT_DOWNLOADABLE',
   GOOGLE_DRIVE_ACCESS_TOKEN_MISSING = 'ERR_GOOGLE_DRIVE_ACCESS_TOKEN_MISSING',
 }
 
@@ -30,7 +31,7 @@ export default interface NativeRNCloudStorage {
   createDirectory: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<void>;
   listFiles: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<string[]>;
   readFile: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<string>;
-  downloadFile: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<boolean>;
+  downloadFile: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<void>;
   deleteFile: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<void>;
   statFile: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<NativeRNCloudCloudStorageFileStat>;
   isCloudAvailable: () => Promise<boolean>;

@@ -96,9 +96,9 @@ const RNCloudStorage = {
    * Downloads the file at the given path from iCloud. Does not have any effect on Google Drive.
    * @param path The file to trigger the download for.
    * @param scope The directory scope the path is in. Defaults to the set default scope.
-   * @returns A promise that resolves to true if the download was triggered, false otherwise.
+   * @returns A promise that resolves once the download has been triggered.
    */
-  downloadFile: (path: string, scope?: CloudStorageScope): Promise<boolean> => {
+  downloadFile: (path: string, scope?: CloudStorageScope): Promise<void> => {
     return nativeInstance.downloadFile(verifyLeadingSlash(path), scope ?? defaultScope);
   },
 

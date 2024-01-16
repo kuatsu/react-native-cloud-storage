@@ -141,16 +141,16 @@ class CloudStorage: NSObject {
         let isDownloadable = fileManager.isUbiquitousItem(at: filePath)
 
         if (!isDownloadable) {
-            resolve(false)
-            return
+          reject("ERR_FILE_NOT_DOWNLOADABLE", "File or directory \(path) is not an iCloud file", NSError())
+          return
         }
-          do {
-            // trigger download of file^
-             try fileManager.startDownloadingUbiquitousItem(at: filePath)
-          } catch {
-            reject("ERR_FILE_NOT_DOWNLOADABLE", "File or directory \(path) not downloadable", error)
-            return
-          }
+        do {
+          // trigger download of file
+          try fileManager.startDownloadingUbiquitousItem(at: filePath)
+        } catch {
+          reject("ERR_FILE_NOT_DOWNLOADABLE", "File or directory \(path) not downloadable", error)
+          return
+        }
         resolve(true)
     }
 
