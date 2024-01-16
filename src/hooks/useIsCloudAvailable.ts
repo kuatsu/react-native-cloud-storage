@@ -1,28 +1,40 @@
 import { useEffect, useState } from 'react';
-import { Platform } from 'react-native';
-import RNCloudStorage from '../RNCloudStorage';
+import { NativeEventEmitter, NativeModules, Platform, DeviceEventEmitter } from 'react-native';
 
-// TODO: there must be a better way to do this without a timeout?
-export const useIsCloudAvailable = (iCloudTimeout = 10) => {
+/**
+ * A hook that tests whether or not the cloud storage is available.
+ * @param _iCloudTimeout DEPRECATED: This parameter is deprecated and has no effect. It will be removed in a future version.
+ * @returns A boolean indicating whether or not the cloud storage is available.
+ */
+export const useIsCloudAvailable = (_iCloudTimeout?: number) => {
   const [isAvailable, setIsAvailable] = useState(false);
 
   useEffect(() => {
-    const interval = setInterval(async () => {
-      const newIsAvailable = await RNCloudStorage.isCloudAvailable();
-      setIsAvailable(newIsAvailable);
-      if (Platform.OS === 'ios' && newIsAvailable) {
-        clearInterval(interval);
-      }
-    }, 500);
-
+    // On iOS, a native event is emitted when the iCloud availability changes. On Android, we just assume it's always
+    // available, since it's just using the Google Drive API.
+    let eventEmitter: NativeEventEmitter | typeof DeviceEventEmitter;
     if (Platform.OS === 'ios') {
-      setTimeout(() => {
-        clearInterval(interval);
-      }, iCloudTimeout * 1000);
+      eventEmitter = new NativeEventEmitter(NativeModules.CloudStorageEventEmitter);
+    } else {
+      eventEmitter = DeviceEventEmitter;
     }
 
-    return () => clearInterval(interval);
-  }, [iCloudTimeout]);
+    eventEmitter.addListener('RNCloudStorage.cloud.availability-changed', (event: { available: boolean }) => {
+      setIsAvailable(event.available);
+    });
+
+    return () => {
+      eventEmitter.removeAllListeners('RNCloudStorage.cloud.availability-changed');
+    };
+  }, []);
+
+  useEffect(() => {
+    if (_iCloudTimeout !== undefined) {
+      console.warn(
+        'The iCloudTimeout parameter for useIsCloudFile is deprecated and has no effect. It will be removed in a future version. Please remove it from your code.'
+      );
+    }
+  }, [_iCloudTimeout]);
 
   return isAvailable;
 };

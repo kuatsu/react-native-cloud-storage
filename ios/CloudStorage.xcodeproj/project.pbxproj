@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		50ADE3732B56EE1300DB5583 /* CloudStorageEventEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5009AB9B2B56ECD30058E83A /* CloudStorageEventEmitter.swift */; };
 		F4FF95D7245B92E800C19C63 /* CloudStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FF95D6245B92E800C19C63 /* CloudStorage.swift */; };
 /* End PBXBuildFile section */
 
@@ -24,6 +25,8 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libCloudStorage.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCloudStorage.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		5009AB9B2B56ECD30058E83A /* CloudStorageEventEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudStorageEventEmitter.swift; sourceTree = "<group>"; };
+		50ADE3712B56EDFB00DB5583 /* CloudStorageEventEmitter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CloudStorageEventEmitter.m; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* CloudStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CloudStorage.m; sourceTree = "<group>"; };
 		F4FF95D5245B92E700C19C63 /* CloudStorage-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CloudStorage-Bridging-Header.h"; sourceTree = "<group>"; };
 		F4FF95D6245B92E800C19C63 /* CloudStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudStorage.swift; sourceTree = "<group>"; };
@@ -51,6 +54,8 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				50ADE3712B56EDFB00DB5583 /* CloudStorageEventEmitter.m */,
+				5009AB9B2B56ECD30058E83A /* CloudStorageEventEmitter.swift */,
 				F4FF95D6245B92E800C19C63 /* CloudStorage.swift */,
 				B3E7B5891CC2AC0600A0062D /* CloudStorage.m */,
 				F4FF95D5245B92E700C19C63 /* CloudStorage-Bridging-Header.h */,
@@ -116,6 +121,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F4FF95D7245B92E800C19C63 /* CloudStorage.swift in Sources */,
+				50ADE3732B56EE1300DB5583 /* CloudStorageEventEmitter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

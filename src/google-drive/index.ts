@@ -7,6 +7,7 @@ import {
 } from '../types/native';
 import CloudStorageError from '../utils/CloudStorageError';
 import type { GoogleDriveDetailedFile, GoogleDriveFile, GoogleDriveListOperationResponse } from './types';
+import { DeviceEventEmitter } from 'react-native';
 
 export default class GoogleDriveApiClient implements NativeRNCloudStorage {
   private static drive: GDrive = new GDrive();
@@ -37,6 +38,11 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
   // when setting accessToken, set it on the GDrive instance
   public static set accessToken(accessToken: string | undefined) {
     GoogleDriveApiClient.drive.accessToken = accessToken;
+
+    // emit an event for the useIsCloudAvailable hook
+    DeviceEventEmitter.emit('RNCloudStorage.cloud.availability-changed', {
+      available: !!accessToken?.length,
+    });
   }
 
   public static get accessToken(): string | undefined {
