@@ -33,7 +33,7 @@ enum CloudStorageErrorCode {
 When using pure JavaScript, simply use the appropriate values:
 
 ```js
-if (e.instanceof CloudStorageError && e.code === 'FILE_NOT_FOUND') {
+if (e instanceof CloudStorageError && e.code === 'FILE_NOT_FOUND') {
   /* do something */
 }
 ```
