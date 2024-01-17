@@ -1,13 +1,11 @@
+export type GoogleDriveFileSpace = 'appDataFolder' | 'drive';
 export interface GoogleDriveFile {
   id: string;
   kind: 'drive#file';
   mimeType: string;
   name: string;
   parents: string[];
-  spaces: ('appDataFolder' | 'drive')[];
-}
-
-export interface GoogleDriveDetailedFile extends GoogleDriveFile {
+  spaces: GoogleDriveFileSpace[];
   createdTime: string;
   modifiedTime: string;
   size?: number;

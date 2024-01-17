@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 import createRNCloudStorage from './createRNCloudStorage';
-import GoogleDriveApiClient from './google-drive';
+import GoogleDrive from './google-drive';
 import { CloudStorageScope, type CloudStorageFileStat } from './types/main';
 import { verifyLeadingSlash } from './utils/helpers';
 
@@ -10,15 +10,15 @@ let defaultScope = CloudStorageScope.AppData;
 const RNCloudStorage = {
   getDefaultScope: () => defaultScope,
   setDefaultScope: (scope: CloudStorageScope) => (defaultScope = scope),
-  getGoogleDriveAccessToken: () => GoogleDriveApiClient.accessToken,
-  setGoogleDriveAccessToken: (accessToken: string) => (GoogleDriveApiClient.accessToken = accessToken),
-  setThrowOnFilesWithSameName: (enable: boolean) => (GoogleDriveApiClient.throwOnFilesWithSameName = enable),
+  getGoogleDriveAccessToken: () => GoogleDrive.accessToken,
+  setGoogleDriveAccessToken: (accessToken: string) => (GoogleDrive.accessToken = accessToken),
+  setThrowOnFilesWithSameName: (enable: boolean) => (GoogleDrive.throwOnFilesWithSameName = enable),
   /* eslint-disable @typescript-eslint/no-unused-vars */
   subscribeToFilesWithSameName:
     Platform.OS === 'ios'
       ? // @ts-expect-error - subscriber is undefined; just a mock
         (subscriber: ({ path, fileIds }: { path: string; fileIds: string[] }) => void) => ({ remove: () => {} })
-      : (nativeInstance as GoogleDriveApiClient).subscribeToFilesWithSameName.bind(nativeInstance),
+      : (nativeInstance as GoogleDrive).subscribeToFilesWithSameName.bind(nativeInstance),
   /* eslint-enable @typescript-eslint/no-unused-vars */
 
   /**
