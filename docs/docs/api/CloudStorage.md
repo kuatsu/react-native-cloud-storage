@@ -74,7 +74,7 @@ Gets the currently stored default [`CloudStorageScope`](./enums/CloudStorageScop
 
 Gets the currently stored Google Drive access token (see [`setGoogleDriveAccessToken()`](#setgoogledriveaccesstokenaccesstoken)).
 
-**Returns**: A `Promise` that resolves to the `string` value of the access token, or `undefined` if it hasn't been set so far.
+**Returns**: A `Promise` that resolves to the `string` value of the access token, or `null` if it hasn't been set so far.
 
 ### `isCloudAvailable()`
 
