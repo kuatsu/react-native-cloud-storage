@@ -124,35 +124,37 @@ class CloudStorage: NSObject {
   }
 
   @objc(downloadFile:withScope:withResolver:withRejecter:)
-    func downloadFile(path: String, scope: String, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
-        let fileManager = FileManager.default
+  func downloadFile(path: String, scope: String, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
+    let fileManager = FileManager.default
 
-        guard let directory = getDirectory(scope) else {
-            reject("ERR_READ_ERROR", "Error reading directory \(scope)", NSError())
-            return
-        }
-
-        // remove leading slashes
-        let path = path.replacingOccurrences(of: "^/+", with: "", options: .regularExpression)
-
-        // append path to scope directory and return URL
-        let filePath = directory.appendingPathComponent(path)
-
-        let isDownloadable = fileManager.isUbiquitousItem(at: filePath)
-
-        if (!isDownloadable) {
-          reject("ERR_FILE_NOT_DOWNLOADABLE", "File or directory \(path) is not an iCloud file", NSError())
-          return
-        }
-        do {
-          // trigger download of file
-          try fileManager.startDownloadingUbiquitousItem(at: filePath)
-        } catch {
-          reject("ERR_FILE_NOT_DOWNLOADABLE", "File or directory \(path) not downloadable", error)
-          return
-        }
-        resolve(true)
+    guard let directory = getDirectory(scope) else {
+        let error = NSError(domain: "", code: 200, userInfo: [NSLocalizedDescriptionKey : "Error reading directory \(scope)"])
+        reject("ERR_READ_ERROR", "Error reading directory \(scope)", error)
+        return
     }
+
+    // remove leading slashes
+    let path = path.replacingOccurrences(of: "^/+", with: "", options: .regularExpression)
+
+    // append path to scope directory and return URL
+    let filePath = directory.appendingPathComponent(path)
+
+    let isDownloadable = fileManager.isUbiquitousItem(at: filePath)
+
+    if (!isDownloadable) {
+      reject("ERR_FILE_NOT_DOWNLOADABLE", "File or directory \(path) is not an iCloud file", NSError(domain: "", code: 202, userInfo: [NSLocalizedDescriptionKey : "File or directory \(path) is not an iCloud file"]))
+      return
+    }
+    do {
+      // trigger download of file
+      try fileManager.startDownloadingUbiquitousItem(at: filePath)
+    } catch {
+      let error = NSError(domain: "", code: 202, userInfo: [NSLocalizedDescriptionKey : "File or directory \(path) not downloadable"])
+      reject("ERR_FILE_NOT_DOWNLOADABLE", "File or directory \(path) not downloadable", error)
+      return
+    }
+    resolve(true)
+  }
 
 
   @objc(deleteFile:withScope:withResolver:withRejecter:)
