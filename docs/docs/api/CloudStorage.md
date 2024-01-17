@@ -137,7 +137,7 @@ The access token is stored statically and therefore only needs to be provided on
 
 **Parameters**:
 
-- `accessToken` (`string`): Required. The access token to use.
+- `accessToken` (`string | null`): Required. The access token to use, or `null` to clear the currently stored access token.
 
 **Returns**: `void`
 
