@@ -1,6 +1,6 @@
 import { NativeModules, Platform } from 'react-native';
 import type NativeRNCloudStorage from './types/native';
-import GoogleDriveApiClient from './google-drive';
+import GoogleDrive from './google-drive';
 import { CloudStorageErrorCode } from './types/native';
 import CloudStorageError from './utils/CloudStorageError';
 
@@ -49,5 +49,5 @@ export default function createRNCloudStorage(): NativeRNCloudStorage {
     );
   }
 
-  return new GoogleDriveApiClient();
+  return new GoogleDrive();
 }

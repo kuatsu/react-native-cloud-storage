@@ -6,23 +6,29 @@ import {
   type NativeRNCloudCloudStorageScope,
 } from '../types/native';
 import CloudStorageError from '../utils/CloudStorageError';
-import type { GoogleDriveDetailedFile, GoogleDriveFile, GoogleDriveListOperationResponse } from './types';
+import type { GoogleDriveFile, GoogleDriveFileSpace } from './types';
 import { DeviceEventEmitter } from 'react-native';
+import GoogleDriveApiClient from './client';
 
-export default class GoogleDriveApiClient implements NativeRNCloudStorage {
-  private static drive: GDrive = new GDrive();
+// TODO: replace legacyDrive fully with new drive implementation
+/**
+ * A proxy class that wraps the Google Drive API client implementation to match the native iOS interface.
+ */
+export default class GoogleDrive implements NativeRNCloudStorage {
+  private static drive: GoogleDriveApiClient = new GoogleDriveApiClient();
+  private static legacyDrive: GDrive = new GDrive();
   public static throwOnFilesWithSameName = false;
   public filesWithSameNameSubscribers: (({ path, fileIds }: { path: string; fileIds: string[] }) => void)[];
 
   constructor() {
     this.filesWithSameNameSubscribers = [];
-    GoogleDriveApiClient.drive.fetchTimeout = 3000;
+    GoogleDrive.legacyDrive.fetchTimeout = 3000;
     return new Proxy(this, {
       // before calling any function, check if the access token is set
-      get(target: GoogleDriveApiClient, prop: keyof GoogleDriveApiClient) {
+      get(target: GoogleDrive, prop: keyof GoogleDrive) {
         const allowedFunctions = ['isCloudAvailable', 'subscribeToFilesWithSameName'];
         if (typeof target[prop] === 'function' && !allowedFunctions.includes(prop.toString())) {
-          if (!GoogleDriveApiClient.drive.accessToken) {
+          if (!GoogleDrive.drive.accessToken.length) {
             throw new CloudStorageError(
               `Google Drive access token is not set, cannot call function ${prop.toString()}`,
               CloudStorageErrorCode.GOOGLE_DRIVE_ACCESS_TOKEN_MISSING
@@ -37,7 +43,8 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
 
   // when setting accessToken, set it on the GDrive instance
   public static set accessToken(accessToken: string | undefined) {
-    GoogleDriveApiClient.drive.accessToken = accessToken;
+    GoogleDrive.legacyDrive.accessToken = accessToken;
+    GoogleDrive.drive.accessToken = accessToken ?? '';
 
     // emit an event for the useIsCloudAvailable hook
     DeviceEventEmitter.emit('RNCloudStorage.cloud.availability-changed', {
@@ -45,8 +52,8 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
     });
   }
 
-  public static get accessToken(): string | undefined {
-    return GoogleDriveApiClient.drive.accessToken;
+  public static get accessToken(): string | null {
+    return GoogleDrive.drive.accessToken.length ? GoogleDrive.drive.accessToken : null;
   }
 
   public subscribeToFilesWithSameName(subscriber: ({ path, fileIds }: { path: string; fileIds: string[] }) => void): {
@@ -61,9 +68,9 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
     };
   }
 
-  public isCloudAvailable: () => Promise<boolean> = async () => !!GoogleDriveApiClient.accessToken?.length;
+  public isCloudAvailable: () => Promise<boolean> = async () => !!GoogleDrive.drive.accessToken.length;
 
-  private getRootDirectory(scope: NativeRNCloudCloudStorageScope): 'drive' | 'appDataFolder' {
+  private getRootDirectory(scope: NativeRNCloudCloudStorageScope): GoogleDriveFileSpace {
     switch (scope) {
       case 'documents':
         return 'drive';
@@ -135,21 +142,12 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
    * @returns A promise that resolves to the ID of the root directory or null if it could not be found.
    */
   private async getRootDirectoryId(scope: NativeRNCloudCloudStorageScope): Promise<string | null> {
-    const files = await this.listInternalFiles(scope);
+    const files = await GoogleDrive.drive.listFiles(this.getRootDirectory(scope));
     for (const file of files) {
       if (!files.find((f) => f.id === file.parents![0])) return file.parents![0] ?? null;
     }
 
     return null;
-  }
-
-  private async listInternalFiles(scope: NativeRNCloudCloudStorageScope): Promise<GoogleDriveFile[]> {
-    const files: GoogleDriveListOperationResponse = await GoogleDriveApiClient.drive.files.list({
-      spaces: [this.getRootDirectory(scope)],
-      fields: 'files(id,kind,mimeType,name,parents,spaces)',
-    });
-
-    return files.files;
   }
 
   private checkIfMultipleFilesWithSameName(
@@ -167,7 +165,7 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
 
     if (possibleFiles.length <= 1) return;
 
-    if (GoogleDriveApiClient.throwOnFilesWithSameName) {
+    if (GoogleDrive.throwOnFilesWithSameName) {
       throw new CloudStorageError(
         `Multiple files with the same name found at path ${path}: ${possibleFiles.map((f) => f.id).join(', ')}`,
         CloudStorageErrorCode.MULTIPLE_FILES_SAME_NAME
@@ -183,7 +181,7 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
     throwIfDirectory = true
   ): Promise<string> {
     try {
-      const files = await this.listInternalFiles(scope);
+      const files = await GoogleDrive.drive.listFiles(this.getRootDirectory(scope));
 
       if (path === '' || path === '/') {
         const rootDirectoryId = await this.getRootDirectoryId(scope);
@@ -241,7 +239,7 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
     let prevContent = '';
     try {
       fileId = await this.getFileId(path, scope);
-      prevContent = await GoogleDriveApiClient.drive.files.getText(fileId);
+      prevContent = await GoogleDrive.drive.getFileText(fileId);
     } catch (e: any) {
       if (e instanceof CloudStorageError && e.code === CloudStorageErrorCode.FILE_NOT_FOUND) {
         /* do nothing, simply create the file */
@@ -250,12 +248,10 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
       }
     }
 
-    const uploader = GoogleDriveApiClient.drive.files
-      .newMultipartUploader()
-      .setData(prevContent + data, MimeTypes.TEXT);
+    const uploader = GoogleDrive.legacyDrive.files.newMultipartUploader().setData(prevContent + data, MimeTypes.TEXT);
     if (fileId) uploader.setIdOfFileToUpdate(fileId);
     else {
-      const files = await this.listInternalFiles(scope);
+      const files = await GoogleDrive.drive.listFiles(this.getRootDirectory(scope));
       const { directories, filename } = this.resolvePathToDirectories(path);
       const parentDirectoryId = this.findParentDirectoryId(files, directories);
       uploader.setRequestBody({
@@ -300,10 +296,10 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
       }
     }
 
-    const uploader = GoogleDriveApiClient.drive.files.newMultipartUploader().setData(data, MimeTypes.TEXT);
+    const uploader = GoogleDrive.legacyDrive.files.newMultipartUploader().setData(data, MimeTypes.TEXT);
     if (fileId) uploader.setIdOfFileToUpdate(fileId);
     else {
-      const files = await this.listInternalFiles(scope);
+      const files = await GoogleDrive.drive.listFiles(this.getRootDirectory(scope));
       const { directories, filename } = this.resolvePathToDirectories(path);
       const parentDirectoryId = this.findParentDirectoryId(files, directories);
       uploader.setRequestBody({
@@ -319,7 +315,7 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
   }
 
   async listFiles(path: string, scope: NativeRNCloudCloudStorageScope): Promise<string[]> {
-    const allFiles = await this.listInternalFiles(scope);
+    const allFiles = await GoogleDrive.drive.listFiles(this.getRootDirectory(scope));
     if (path !== '') {
       const fileId = await this.getFileId(path, scope, false);
       const files = allFiles.filter((f) => (f.parents ?? [])[0] === fileId);
@@ -345,8 +341,8 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
       }
     }
 
-    const uploader = GoogleDriveApiClient.drive.files.newMetadataOnlyUploader();
-    const files = await this.listInternalFiles(scope);
+    const uploader = GoogleDrive.legacyDrive.files.newMetadataOnlyUploader();
+    const files = await GoogleDrive.drive.listFiles(this.getRootDirectory(scope));
     const { directories, filename } = this.resolvePathToDirectories(path);
     const parentDirectoryId = this.findParentDirectoryId(files, directories);
     uploader.setRequestBody({
@@ -363,7 +359,7 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
 
   async readFile(path: string, scope: NativeRNCloudCloudStorageScope): Promise<string> {
     const fileId = await this.getFileId(path, scope);
-    const content = await GoogleDriveApiClient.drive.files.getText(fileId);
+    const content = await GoogleDrive.drive.getFileText(fileId);
     return content;
   }
 
@@ -374,16 +370,12 @@ export default class GoogleDriveApiClient implements NativeRNCloudStorage {
 
   async deleteFile(path: string, scope: NativeRNCloudCloudStorageScope): Promise<void> {
     const fileId = await this.getFileId(path, scope);
-    await GoogleDriveApiClient.drive.files.delete(fileId);
+    await GoogleDrive.drive.deleteFile(fileId);
   }
 
   async statFile(path: string, scope: NativeRNCloudCloudStorageScope): Promise<NativeRNCloudCloudStorageFileStat> {
     const fileId = await this.getFileId(path, scope, false);
-    const file: GoogleDriveDetailedFile = await (
-      await GoogleDriveApiClient.drive.files.get(fileId!, {
-        fields: 'id,kind,mimeType,name,parents,spaces,size,createdTime,modifiedTime',
-      })
-    ).json();
+    const file = await GoogleDrive.drive.getFile(fileId!);
 
     return {
       size: file.size ?? 0,
