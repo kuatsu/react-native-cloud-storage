@@ -1,17 +1,17 @@
-import type {
-  GoogleDriveFile,
-  GoogleDriveFileSpace,
-  GoogleDriveListOperationQueryParameters,
-  GoogleDriveListOperationResponse,
+import {
+  MimeTypes,
+  type GoogleDriveFile,
+  type GoogleDriveFileSpace,
+  type GoogleDriveListOperationQueryParameters,
+  type GoogleDriveListOperationResponse,
 } from './types';
 
 const BASE_URL = 'https://www.googleapis.com/drive/v3';
+const BASE_UPLOAD_URL = 'https://www.googleapis.com/upload/drive/v3';
+const MULTIPART_BOUNDARY = 'foo_bar_baz';
 
 // TODO: fetch timeout
 // TODO: properly handle errors
-// TODO: read file
-// TODO: write file
-// TODO: delete file
 export default class GoogleDriveApiClient {
   public accessToken: string;
 
@@ -36,13 +36,12 @@ export default class GoogleDriveApiClient {
 
   private async request<T extends Record<string, any> | string | void = void>(
     operation: `/${string}`,
-    { queryParameters, ...options }: RequestInit & { queryParameters?: object } = {}
+    { queryParameters, baseUrl, ...options }: RequestInit & { queryParameters?: object; baseUrl?: string } = {}
   ): Promise<T> {
-    let path = `${BASE_URL}${operation}`;
+    let path = `${baseUrl ?? BASE_URL}${operation}`;
     if (queryParameters) {
       path += this.buildQueryString(queryParameters);
     }
-
     const response = await fetch(path, {
       ...options,
       headers: {
@@ -68,6 +67,19 @@ export default class GoogleDriveApiClient {
       return response.text() as unknown as Promise<T>;
     }
     return response.json();
+  }
+
+  private buildMultiPartBody(metadata: object, media: { mimeType: string; body: string }): string {
+    const body: string[] = [];
+    body.push(`--${MULTIPART_BOUNDARY}\r\n`);
+    body.push(`Content-Type: ${MimeTypes.JSON}; charset=UTF-8\r\n\r\n`);
+    body.push(`${JSON.stringify(metadata)}\r\n`);
+    body.push(`--${MULTIPART_BOUNDARY}\r\n`);
+    body.push(`Content-Type: ${media.mimeType}\r\n\r\n`);
+    body.push(`${media.body}\r\n`);
+    body.push(`--${MULTIPART_BOUNDARY}--`);
+
+    return body.join('');
   }
 
   public async listFiles(space: GoogleDriveFileSpace): Promise<GoogleDriveFile[]> {
@@ -109,6 +121,47 @@ export default class GoogleDriveApiClient {
   public async deleteFile(fileId: string): Promise<void> {
     return this.request(`/files/${fileId}`, {
       method: 'DELETE',
+    });
+  }
+
+  public async createFile(
+    metadata: { name: string; parents?: string[] },
+    media: { mimeType: string; body: string }
+  ): Promise<void> {
+    const multipartRequestBody = this.buildMultiPartBody(metadata, media);
+
+    await this.request(`/files`, {
+      queryParameters: { uploadType: 'multipart' },
+      method: 'POST',
+      headers: {
+        'Content-Type': `multipart/related; boundary=${MULTIPART_BOUNDARY}`,
+        'Content-Length': multipartRequestBody.length.toString(),
+      },
+      body: multipartRequestBody,
+      baseUrl: BASE_UPLOAD_URL,
+    });
+  }
+
+  public async createDirectory(metadata: { name: string; parents?: string[] }): Promise<void> {
+    await this.request(`/files`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': `application/json`,
+      },
+      body: JSON.stringify({ ...metadata, mimeType: MimeTypes.FOLDER }),
+    });
+  }
+
+  public async updateFile(fileId: string, media: { mimeType: string; body: string }): Promise<void> {
+    await this.request(`/files/${fileId}`, {
+      queryParameters: { uploadType: 'media' },
+      method: 'PATCH',
+      headers: {
+        'Content-Type': media.mimeType,
+        'Content-Length': media.body.length.toString(),
+      },
+      body: media.body,
+      baseUrl: BASE_UPLOAD_URL,
     });
   }
 }
