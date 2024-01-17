@@ -38,7 +38,7 @@ const HomeView = () => {
   }, []);
 
   useEffect(() => {
-    CloudStorage.setGoogleDriveAccessToken(accessToken);
+    CloudStorage.setGoogleDriveAccessToken(accessToken.length ? accessToken : null);
   }, [accessToken]);
 
   useEffect(() => {

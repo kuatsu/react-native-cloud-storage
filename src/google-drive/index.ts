@@ -39,7 +39,7 @@ export default class GoogleDrive implements NativeRNCloudStorage {
   }
 
   // when setting accessToken, set it on the GDrive instance
-  public static set accessToken(accessToken: string | undefined) {
+  public static set accessToken(accessToken: string | null) {
     GoogleDrive.drive.accessToken = accessToken ?? '';
 
     // emit an event for the useIsCloudAvailable hook

@@ -11,7 +11,7 @@ const RNCloudStorage = {
   getDefaultScope: () => defaultScope,
   setDefaultScope: (scope: CloudStorageScope) => (defaultScope = scope),
   getGoogleDriveAccessToken: () => GoogleDrive.accessToken,
-  setGoogleDriveAccessToken: (accessToken: string) => (GoogleDrive.accessToken = accessToken),
+  setGoogleDriveAccessToken: (accessToken: string | null) => (GoogleDrive.accessToken = accessToken),
   setThrowOnFilesWithSameName: (enable: boolean) => (GoogleDrive.throwOnFilesWithSameName = enable),
   /* eslint-disable @typescript-eslint/no-unused-vars */
   subscribeToFilesWithSameName:
