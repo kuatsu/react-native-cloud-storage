@@ -17123,7 +17123,6 @@ __metadata:
     react: 18.2.0
     react-native: 0.72.5
     react-native-builder-bob: ^0.20.0
-    react-native-google-drive-api-wrapper-js: ^1.2.3
     release-it: ^15.0.0
     typescript: ^5.0.2
   peerDependencies:
@@ -17135,17 +17134,6 @@ __metadata:
       optional: true
   languageName: unknown
   linkType: soft
-
-"react-native-google-drive-api-wrapper-js@npm:^1.2.3":
-  version: 1.2.3
-  resolution: "react-native-google-drive-api-wrapper-js@npm:1.2.3"
-  dependencies:
-    base64-js: ^1.5.1
-    simple-common-utils: ^2.3.0
-    utf8: ^3.0.0
-  checksum: fef52aa307cc5e2f7dbb7003fc55f70a4e96c5f13a48e47af08fad77a2372b5ec2a62e3b26bf0433c129e7f1e88a8bd73541a7293e551c7825b033cea1d3b1a2
-  languageName: node
-  linkType: hard
 
 "react-native-safe-area-context@npm:^4.7.2":
   version: 4.7.2
@@ -18452,13 +18440,6 @@ __metadata:
   version: 4.1.0
   resolution: "signal-exit@npm:4.1.0"
   checksum: 64c757b498cb8629ffa5f75485340594d2f8189e9b08700e69199069c8e3070fb3e255f7ab873c05dc0b3cec412aea7402e10a5990cb6a050bd33ba062a6c549
-  languageName: node
-  linkType: hard
-
-"simple-common-utils@npm:^2.3.0":
-  version: 2.6.0
-  resolution: "simple-common-utils@npm:2.6.0"
-  checksum: 55da0f82463ac668d106c97180c89cea888b943ddc7f9c7f6f259fec8418d394fd707d8e3adc5168d3ffd7bfac467d821e8caaea463c5ed53c4b4a1a29d72e29
   languageName: node
   linkType: hard
 
@@ -20094,13 +20075,6 @@ __metadata:
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
   checksum: 5c639e0f8da3521d605f59ce5be9e094ca772bd44a4ce7322b055a6f58eeed8dda3c94cabd90c7a41fb6fa852210092008afe48f7038792fd47501f33299116a
-  languageName: node
-  linkType: hard
-
-"utf8@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "utf8@npm:3.0.0"
-  checksum: cb89a69ad9ab393e3eae9b25305b3ff08bebca9adc839191a34f90777eb2942f86a96369d2839925fea58f8f722f7e27031d697f10f5f39690f8c5047303e62d
   languageName: node
   linkType: hard
 

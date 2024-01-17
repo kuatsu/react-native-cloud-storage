@@ -183,8 +183,5 @@
         }
       ]
     ]
-  },
-  "dependencies": {
-    "react-native-google-drive-api-wrapper-js": "^1.2.3"
   }
 }
