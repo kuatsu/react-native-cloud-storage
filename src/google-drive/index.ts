@@ -1,4 +1,3 @@
-import { HttpError } from 'react-native-google-drive-api-wrapper-js';
 import type NativeRNCloudStorage from '../types/native';
 import {
   CloudStorageErrorCode,
@@ -8,7 +7,7 @@ import {
 import CloudStorageError from '../utils/CloudStorageError';
 import { MimeTypes, type GoogleDriveFile, type GoogleDriveFileSpace } from './types';
 import { DeviceEventEmitter } from 'react-native';
-import GoogleDriveApiClient from './client';
+import GoogleDriveApiClient, { GoogleDriveHttpError } from './client';
 
 // TODO: replace legacyDrive fully with new drive implementation
 /**
@@ -208,7 +207,7 @@ export default class GoogleDrive implements NativeRNCloudStorage {
       }
       return file.id;
     } catch (e: unknown) {
-      if (e instanceof HttpError && e.json?.error?.status === 'UNAUTHENTICATED') {
+      if (e instanceof GoogleDriveHttpError && e.json?.error?.status === 'UNAUTHENTICATED') {
         throw new CloudStorageError(
           `Could not authenticate with Google Drive`,
           CloudStorageErrorCode.AUTHENTICATION_FAILED,

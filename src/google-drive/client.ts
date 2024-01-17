@@ -10,6 +10,17 @@ const BASE_URL = 'https://www.googleapis.com/drive/v3';
 const BASE_UPLOAD_URL = 'https://www.googleapis.com/upload/drive/v3';
 const MULTIPART_BOUNDARY = 'foo_bar_baz';
 
+export class GoogleDriveHttpError extends Error {
+  public status: number;
+  public json: any;
+
+  constructor(message: string, status: number, json: any) {
+    super(message);
+    this.status = status;
+    this.json = json;
+  }
+}
+
 // TODO: fetch timeout
 // TODO: properly handle errors
 export default class GoogleDriveApiClient {
@@ -51,16 +62,15 @@ export default class GoogleDriveApiClient {
     });
 
     if (!response.ok) {
-      // TODO: handle different errors
-      // console.log((await response.json()).error.errors);
       let errorMessage: string;
       try {
-        errorMessage =
-          (await response.json()).error?.errors?.[0]?.message ?? `Request failed with status ${response.status}`;
+        const json = await response.json();
+        errorMessage = json.error?.message ?? `Request failed with status ${response.status}`;
+        throw new GoogleDriveHttpError(errorMessage, response.status, await response.json());
       } catch (e) {
         errorMessage = `Request failed with status ${response.status}`;
+        throw new GoogleDriveHttpError(errorMessage, response.status, null);
       }
-      throw new Error(errorMessage);
     }
 
     if (options?.headers && 'Accept' in options.headers && options.headers.Accept !== 'application/json') {
