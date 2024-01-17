@@ -63,14 +63,14 @@ export default class GoogleDriveApiClient {
 
     if (!response.ok) {
       let errorMessage: string;
+      let json: any = null;
       try {
-        const json = await response.json();
+        json = await response.json();
         errorMessage = json.error?.message ?? `Request failed with status ${response.status}`;
-        throw new GoogleDriveHttpError(errorMessage, response.status, await response.json());
       } catch (e) {
         errorMessage = `Request failed with status ${response.status}`;
-        throw new GoogleDriveHttpError(errorMessage, response.status, null);
       }
+      throw new GoogleDriveHttpError(errorMessage, response.status, json);
     }
 
     if (options?.headers && 'Accept' in options.headers && options.headers.Accept !== 'application/json') {
