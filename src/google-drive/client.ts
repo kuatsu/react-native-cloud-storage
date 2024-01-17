@@ -83,19 +83,7 @@ export default class GoogleDriveApiClient {
         queryParameters,
       });
 
-      files.push(
-        ...(response.files ?? []).map((file) => ({
-          id: file.id!,
-          kind: 'drive#file' as const,
-          mimeType: file.mimeType!,
-          name: file.name!,
-          parents: file.parents!,
-          spaces: file.spaces! as ('drive' | 'appDataFolder')[],
-          size: file.size,
-          createdTime: file.createdTime,
-          modifiedTime: file.modifiedTime,
-        }))
-      );
+      files.push(...response.files);
       pageToken = response.nextPageToken ?? undefined;
     } while (pageToken);
 
