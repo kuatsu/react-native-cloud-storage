@@ -113,6 +113,17 @@ const RNCloudStorage = {
   },
 
   /**
+   * Deletes the directory at the given path.
+   * @param path The directory to delete.
+   * @param options Options for the delete operation. Defaults to { recursive: false }.
+   * @param scope The directory scope the path is in. Defaults to the set default scope.
+   * @returns A promise that resolves when the directory has been deleted.
+   */
+  rmdir: (path: string, options?: { recursive?: boolean }, scope?: CloudStorageScope): Promise<void> => {
+    return nativeInstance.deleteDirectory(verifyLeadingSlash(path), options?.recursive ?? false, scope ?? defaultScope);
+  },
+
+  /**
    * Gets the size, creation time, and modification time of the file at the given path.
    * @param path The file to stat.
    * @param scope The directory scope the path is in. Defaults to the set default scope.

@@ -74,6 +74,7 @@ const HomeView = () => {
       readFile();
     } catch (e) {
       console.warn(e);
+    } finally {
       setLoading(false);
     }
   };
@@ -119,6 +120,7 @@ const HomeView = () => {
       readFile();
     } catch (e) {
       console.warn(e);
+    } finally {
       setLoading(false);
     }
   };
@@ -131,20 +133,43 @@ const HomeView = () => {
       setAppendInput('');
     } catch (e) {
       console.warn(e);
+    } finally {
       setLoading(false);
     }
   };
 
   const handleRead = readFile;
 
-  const handleDelete = async () => {
+  const handleDeleteFile = async () => {
     setLoading(true);
     try {
       await CloudStorage.unlink(parentDirectory + '/' + filename);
       readFile();
     } catch (e) {
       console.warn(e);
+    } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteDirectory = async (recursive?: boolean) => {
+    if (recursive === undefined) {
+      Alert.alert('Delete directory', 'Do you want to delete the directory and all its contents (recursively)?', [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Directory only', onPress: () => handleDeleteDirectory(false) },
+        { text: 'Recursively', onPress: () => handleDeleteDirectory(true) },
+      ]);
+    } else {
+      setLoading(true);
+      try {
+        await CloudStorage.rmdir(parentDirectory, { recursive });
+        setStats(null);
+        setInput('');
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -153,9 +178,9 @@ const HomeView = () => {
     try {
       await CloudStorage.downloadFile(parentDirectory + '/' + filename);
       Alert.alert('File download', 'File downloaded successfully.');
-      setLoading(false);
     } catch (e) {
       console.warn(e);
+    } finally {
       setLoading(false);
     }
   };
@@ -193,13 +218,14 @@ const HomeView = () => {
         <Button title="Create this directory" onPress={handleCreateDirectory} />
         <Text style={styles.smallText}>Before performing any file operations, the parent directory must exist.</Text>
         <Button title="List contents of directory" onPress={handleListContents} />
+        <Button title="Delete directory" onPress={() => handleDeleteDirectory()} />
       </Card>
       <Card title="File Operations">
         <Text style={{ fontWeight: 'bold' }}>Filename of working file</Text>
         <TextInput placeholder="Filename" value={filename} onChangeText={setFilename} style={styles.input} />
         {Platform.OS === 'ios' && <Button title="Download file" onPress={handleDownload} />}
         <Button title="Read file" onPress={handleRead} />
-        <Button title="Delete file" onPress={handleDelete} />
+        <Button title="Delete file" onPress={handleDeleteFile} />
         <TextInput
           placeholder="File contents (read/write)"
           value={input}
