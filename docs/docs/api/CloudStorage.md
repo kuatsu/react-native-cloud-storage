@@ -122,7 +122,7 @@ Reads the file at the given path into a `string`.
 Deletes the directory at the given path. Can optionally delete the directory including all its contents (recursively).
 
 - `path` (`string`): Required. The full pathname of the directory to delete.
-- `options` (`{ recursive?: boolean }`): Optional. An object containing the `recursive` property which, if set to `true`, will delete the directory including all its contents (recursively). Defaults to `{ recursive: false }`.
+- `options` (`{ recursive?: boolean }`): Optional. An object containing the `recursive` property which, if set to `true`, will delete the directory including all its contents (recursively). If set to `false` (or omitted), the library will throw a [`CloudStorageErrorCode.DIRECTORY_NOT_EMPTY`](./enums/CloudStorageErrorCode) if the directory is not empty. Defaults to `{ recursive: false }`.
 - `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Optional. The storage scope (documents/app data) to use. Defaults to [`CloudStorageScope.AppData`](./enums/CloudStorageScope), unless the default scope has been changed via [`setDefaultScope()`](#setdefaultscopescope).
 
 **Returns**: A `Promise` that resolves once the directory has been deleted.
