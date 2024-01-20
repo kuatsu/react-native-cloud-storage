@@ -73,6 +73,9 @@ export default class GoogleDriveApiClient {
       throw new GoogleDriveHttpError(errorMessage, response.status, json);
     }
 
+    if (response.status === 204) {
+      return undefined as unknown as T;
+    }
     if (options?.headers && 'Accept' in options.headers && options.headers.Accept !== 'application/json') {
       return response.text() as unknown as Promise<T>;
     }
