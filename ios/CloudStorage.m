@@ -10,6 +10,7 @@ RCT_EXTERN_METHOD(listFiles:(NSString *)path withScope:(NSString *)scope withRes
 RCT_EXTERN_METHOD(readFile:(NSString *)path withScope:(NSString *)scope withResolver:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(downloadFile:(NSString *)path withScope:(NSString *)scope withResolver:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(deleteFile:(NSString *)path withScope:(NSString *)scope withResolver:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(deleteDirectory:(NSString *)path withRecursive:(BOOL)recursive withScope:(NSString *)scope withResolver:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(statFile:(NSString *)path withScope:(NSString *)scope withResolver:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(isCloudAvailable:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
 

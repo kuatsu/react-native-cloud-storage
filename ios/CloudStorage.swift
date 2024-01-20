@@ -167,12 +167,58 @@ class CloudStorage: NSObject {
       return
     }
 
+    if (fileUrl!.hasDirectoryPath) {
+      reject("ERR_PATH_IS_DIRECTORY", "Path \(path) is a directory", nil)
+      return
+    }
+
     let fileManager = FileManager.default
     do {
       try fileManager.removeItem(at: fileUrl!)
       resolve(true)
     } catch {
       reject("ERR_DELETE_ERROR", "Error deleting file \(path)", error)
+    }
+  }
+
+  @objc(deleteDirectory:withRecursive:withScope:withResolver:withRejecter:)
+  func deleteDirectory(path: String, recursive: Bool, scope: String, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
+    let fileUrl: URL?
+    do {
+      fileUrl = try getFileURL(path, scope, true)
+    } catch let error as NSError {
+      reject(error.domain, error.userInfo["message"] as? String, error)
+      return
+    }
+
+    if (!fileUrl!.hasDirectoryPath) {
+      reject("ERR_PATH_IS_FILE", "Path \(path) is a file", nil)
+      return
+    }
+
+    if (!recursive) {
+      // check if directory is empty
+      let fileManager = FileManager.default
+      do {
+        print(fileUrl!.path)
+        let files = try fileManager.contentsOfDirectory(atPath: fileUrl!.path)
+        print(files)
+        if (files.count > 0) {
+          reject("ERR_DIRECTORY_NOT_EMPTY", "Directory \(path) is not empty", nil)
+          return
+        }
+      } catch {
+        reject("ERR_UNKNOWN", "Error reading directory \(path)", error)
+        return
+      }
+    }
+
+    let fileManager = FileManager.default
+    do {
+      try fileManager.removeItem(at: fileUrl!)
+      resolve(true)
+    } catch {
+      reject("ERR_DELETE_ERROR", "Error deleting directory \(path)", error)
     }
   }
 
