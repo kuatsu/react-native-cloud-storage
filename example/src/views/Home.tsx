@@ -70,10 +70,11 @@ const HomeView = () => {
   const handleCreateDirectory = async () => {
     setLoading(true);
     try {
-      await CloudStorage.mkdir(parentDirectory).catch(() => setLoading(false));
+      await CloudStorage.mkdir(parentDirectory);
       readFile();
     } catch (e) {
       console.warn(e);
+      setLoading(false);
     }
   };
 
@@ -114,21 +115,23 @@ const HomeView = () => {
   const handleCreateFile = async () => {
     setLoading(true);
     try {
-      await CloudStorage.writeFile(parentDirectory + '/' + filename, input).catch(() => setLoading(false));
+      await CloudStorage.writeFile(parentDirectory + '/' + filename, input);
       readFile();
     } catch (e) {
       console.warn(e);
+      setLoading(false);
     }
   };
 
   const handleAppend = async () => {
     setLoading(true);
     try {
-      await CloudStorage.appendFile(parentDirectory + '/' + filename, appendInput).catch(() => setLoading(false));
+      await CloudStorage.appendFile(parentDirectory + '/' + filename, appendInput);
       readFile();
       setAppendInput('');
     } catch (e) {
       console.warn(e);
+      setLoading(false);
     }
   };
 
@@ -137,10 +140,11 @@ const HomeView = () => {
   const handleDelete = async () => {
     setLoading(true);
     try {
-      await CloudStorage.unlink(parentDirectory + '/' + filename).catch(() => setLoading(false));
+      await CloudStorage.unlink(parentDirectory + '/' + filename);
       readFile();
     } catch (e) {
       console.warn(e);
+      setLoading(false);
     }
   };
 
