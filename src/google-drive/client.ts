@@ -1,3 +1,5 @@
+import { providerService } from '../ProviderService';
+import { CloudStorageProvider } from '../types/main';
 import {
   MimeTypes,
   type GoogleDriveFile,
@@ -24,14 +26,9 @@ export class GoogleDriveHttpError extends Error {
 // TODO: fetch timeout
 // TODO: properly handle errors
 export default class GoogleDriveApiClient {
-  public accessToken: string;
-  public timeout: number;
   private _fetchTimeout: any;
 
-  constructor(accessToken: string = '') {
-    this.accessToken = accessToken;
-    this.timeout = 3000;
-  }
+  constructor() {}
 
   private buildQueryString(query: object): string {
     let res = Object.entries(query)
@@ -52,6 +49,8 @@ export default class GoogleDriveApiClient {
     operation: `/${string}`,
     { queryParameters, baseUrl, ...options }: RequestInit & { queryParameters?: object; baseUrl?: string } = {}
   ): Promise<T> {
+    const { timeout, accessToken } = providerService.getProviderOptions(CloudStorageProvider.GoogleDrive);
+
     let path = `${baseUrl ?? BASE_URL}${operation}`;
     if (queryParameters) {
       path += this.buildQueryString(queryParameters);
@@ -60,12 +59,12 @@ export default class GoogleDriveApiClient {
     const abortController: AbortController = new AbortController();
     this._fetchTimeout = setTimeout(() => {
       abortController.abort();
-    }, this.timeout);
+    }, timeout);
     const response = await fetch(path, {
       ...options,
       headers: {
         ...options.headers,
-        Authorization: `Bearer ${this.accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
       signal: abortController.signal,
     });

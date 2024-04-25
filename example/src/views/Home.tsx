@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, ActivityIndicator, ScrollView, Platform, Alert } from 'react-native';
+import { StyleSheet, View, Text, TextInput, ActivityIndicator, ScrollView, Alert, Platform } from 'react-native';
 import {
   CloudStorage,
   CloudStorageError,
   CloudStorageErrorCode,
   type CloudStorageFileStat,
+  CloudStorageProvider,
   CloudStorageScope,
   useIsCloudAvailable,
 } from 'react-native-cloud-storage';
@@ -12,8 +13,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Card from '../components/Card';
 import Button from '../components/Button';
 
+CloudStorage.setProviderOptions(CloudStorageProvider.GoogleDrive, {
+  strictFilenames: true,
+});
+
 const HomeView = () => {
-  const [scope, setScope] = useState(CloudStorage.getDefaultScope());
+  const [provider, setProvider] = useState(CloudStorage.getProvider());
+  const [scope, setScope] = useState(CloudStorage.getProviderOptions(CloudStorage.getProvider()).scope);
   const [parentDirectory, setParentDirectory] = useState('/');
   const [filename, setFilename] = useState('test.txt');
   const [stats, setStats] = useState<CloudStorageFileStat | null>(null);
@@ -30,19 +36,17 @@ const HomeView = () => {
   }, [cloudAvailable]);
 
   useEffect(() => {
-    const subscription = CloudStorage.subscribeToFilesWithSameName(({ path, fileIds }) =>
-      console.warn('Multiple files with same name', { path, fileIds })
-    );
-
-    return () => subscription.remove();
-  }, []);
-
-  useEffect(() => {
-    CloudStorage.setGoogleDriveAccessToken(accessToken.length ? accessToken : null);
+    CloudStorage.setProviderOptions(CloudStorageProvider.GoogleDrive, {
+      accessToken: accessToken.length ? accessToken : null,
+    });
   }, [accessToken]);
 
   useEffect(() => {
-    CloudStorage.setDefaultScope(scope);
+    CloudStorage.setProvider(provider);
+  }, [provider]);
+
+  useEffect(() => {
+    CloudStorage.setProviderOptions(CloudStorage.getProvider(), { scope });
   }, [scope]);
 
   useEffect(() => {
@@ -195,9 +199,27 @@ const HomeView = () => {
         </View>
       )}
       <Text style={styles.title}>RNCloudStorage{'\n'}Example App</Text>
-      <Text style={styles.subtitle}>Cloud storage available: {cloudAvailable ? '✅ Yes' : '❌ No'}</Text>
-      <Card title="Working Directory">
+      <Card title="Configuration">
         <Text>
+          <Text style={{ fontWeight: 'bold' }}>Cloud storage available:</Text> {cloudAvailable ? '✅ Yes' : '❌ No'}
+        </Text>
+        <Text style={{ marginTop: 10 }}>
+          <Text style={{ fontWeight: 'bold' }}>Provider:</Text>{' '}
+          {provider === CloudStorageProvider.ICloud ? 'iCloud' : 'Google Drive'}
+        </Text>
+        {Platform.OS === 'ios' && (
+          <Button
+            title={`Switch to ${provider === CloudStorageProvider.ICloud ? 'Google Drive' : 'iCloud'} provider`}
+            onPress={() =>
+              setProvider(
+                provider === CloudStorageProvider.ICloud
+                  ? CloudStorageProvider.GoogleDrive
+                  : CloudStorageProvider.ICloud
+              )
+            }
+          />
+        )}
+        <Text style={{ marginTop: 10 }}>
           <Text style={{ fontWeight: 'bold' }}>Directory Scope</Text>:{' '}
           {scope === CloudStorageScope.Documents ? 'Documents' : 'App Data'}
         </Text>
@@ -207,6 +229,19 @@ const HomeView = () => {
             setScope(scope === CloudStorageScope.Documents ? CloudStorageScope.AppData : CloudStorageScope.Documents)
           }
         />
+        {provider === CloudStorageProvider.GoogleDrive && (
+          <>
+            <Text style={{ fontWeight: 'bold', marginTop: 10 }}>Access Token</Text>
+            <TextInput
+              placeholder="Google Drive access token"
+              value={accessToken}
+              onChangeText={setAccessToken}
+              style={styles.input}
+            />
+          </>
+        )}
+      </Card>
+      <Card title="Working Directory">
         <Text style={{ fontWeight: 'bold', marginTop: 10 }}>Parent directory</Text>
         <TextInput
           placeholder="Parent directory"
@@ -223,7 +258,7 @@ const HomeView = () => {
       <Card title="File Operations">
         <Text style={{ fontWeight: 'bold' }}>Filename of working file</Text>
         <TextInput placeholder="Filename" value={filename} onChangeText={setFilename} style={styles.input} />
-        {Platform.OS === 'ios' && <Button title="Download file" onPress={handleDownload} />}
+        {provider === CloudStorageProvider.ICloud && <Button title="Download file" onPress={handleDownload} />}
         <Button title="Read file" onPress={handleRead} />
         <Button title="Delete file" onPress={handleDeleteFile} />
         <TextInput
@@ -249,17 +284,6 @@ const HomeView = () => {
           {stats ? (stats.isDirectory() ? '❌ No (is directory)' : '✅ Yes') : '❌ No'}
         </Text>
       </Card>
-      {Platform.OS !== 'ios' && (
-        <Card title="Google Drive">
-          <Text style={{ fontWeight: 'bold' }}>Access Token</Text>
-          <TextInput
-            placeholder="Google Drive access token"
-            value={accessToken}
-            onChangeText={setAccessToken}
-            style={styles.input}
-          />
-        </Card>
-      )}
     </ScrollView>
   );
 };
@@ -287,12 +311,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     textAlign: 'center',
     margin: 10,
-    fontWeight: 'bold',
-  },
-  subtitle: {
-    fontSize: 14,
-    textAlign: 'center',
-    marginBottom: 10,
     fontWeight: 'bold',
   },
   smallText: {

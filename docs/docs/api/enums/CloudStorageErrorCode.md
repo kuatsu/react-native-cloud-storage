@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 # CloudStorageErrorCode
@@ -28,7 +28,7 @@ enum CloudStorageErrorCode {
   STAT_ERROR = 'ERR_STAT_ERROR',
   UNKNOWN = 'ERR_UNKNOWN',
   FILE_NOT_DOWNLOADABLE = 'ERR_FILE_NOT_DOWNLOADABLE',
-  GOOGLE_DRIVE_ACCESS_TOKEN_MISSING = 'ERR_GOOGLE_DRIVE_ACCESS_TOKEN_MISSING',
+  ACCESS_TOKEN_MISSING = 'ERR_ACCESS_TOKEN_MISSING',
 }
 ```
 

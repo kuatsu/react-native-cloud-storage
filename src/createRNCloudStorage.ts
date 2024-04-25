@@ -3,6 +3,7 @@ import type NativeRNCloudStorage from './types/native';
 import GoogleDrive from './google-drive';
 import { CloudStorageErrorCode } from './types/native';
 import CloudStorageError from './utils/CloudStorageError';
+import { CloudStorageProvider } from './types/main';
 
 const LINKING_ERROR =
   `The package 'react-native-cloud-storage' doesn't seem to be linked. Make sure: \n\n` +
@@ -34,8 +35,8 @@ const nativeIosInstance = NativeModules.CloudStorage
     })
   : null;
 
-export default function createRNCloudStorage(): NativeRNCloudStorage {
-  if (Platform.OS === 'ios') {
+export default function createRNCloudStorage(provider: CloudStorageProvider): NativeRNCloudStorage {
+  if (provider === CloudStorageProvider.ICloud) {
     return (
       nativeIosInstance ??
       new Proxy(

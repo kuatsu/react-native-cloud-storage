@@ -15,7 +15,7 @@ import { useCloudFile } from 'react-native-cloud-storage';
 **Parameters**:
 
 - `path` (`string`): Required. The full pathname of the file to use. See [the definition of this parameter in `CloudStorage`](../CloudStorage#path).
-- `scope` ([`CloudStorageScope`](../enums/CloudStorageScope)): Optional. The storage scope (documents/app data) to use. Defaults to [`CloudStorageScope.AppData`](../enums/CloudStorageScope), unless the default scope has been changed via [`setDefaultScope()`](../CloudStorage#setdefaultscopescope).
+- `scope` ([`CloudStorageScope`](../enums/CloudStorageScope)): Optional. The storage scope (documents/app data) to use. Defaults to [`CloudStorageScope.AppData`](../enums/CloudStorageScope), unless the default scope of the provider has been changed via [`setProviderOptions()`](../CloudStorage#setprovideroptionsprovider-options).
 
 **Returns**: An object containing the following properties:
 

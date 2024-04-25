@@ -1,4 +1,4 @@
-import type NativeRNCloudStorage from '../types/native';
+import type NativeproviderService from '../types/native';
 import {
   CloudStorageErrorCode,
   type NativeRNCloudCloudStorageFileStat,
@@ -6,28 +6,27 @@ import {
 } from '../types/native';
 import CloudStorageError from '../utils/CloudStorageError';
 import { MimeTypes, type GoogleDriveFile, type GoogleDriveFileSpace } from './types';
-import { DeviceEventEmitter } from 'react-native';
 import GoogleDriveApiClient, { GoogleDriveHttpError } from './client';
+import { CloudStorageProvider } from '../types/main';
+import { providerService } from '../ProviderService';
 
 /**
  * A proxy class that wraps the Google Drive API client implementation to match the native iOS interface.
  */
-export default class GoogleDrive implements NativeRNCloudStorage {
+export default class GoogleDrive implements NativeproviderService {
   private static drive: GoogleDriveApiClient = new GoogleDriveApiClient();
-  public static throwOnFilesWithSameName = false;
-  public filesWithSameNameSubscribers: (({ path, fileIds }: { path: string; fileIds: string[] }) => void)[];
 
   constructor() {
-    this.filesWithSameNameSubscribers = [];
     return new Proxy(this, {
       // before calling any function, check if the access token is set
       get(target: GoogleDrive, prop: keyof GoogleDrive) {
-        const allowedFunctions = ['isCloudAvailable', 'subscribeToFilesWithSameName'];
+        const allowedFunctions = ['isCloudAvailable'];
         if (typeof target[prop] === 'function' && !allowedFunctions.includes(prop.toString())) {
-          if (!GoogleDrive.drive.accessToken.length) {
+          const { accessToken } = providerService.getProviderOptions(CloudStorageProvider.GoogleDrive);
+          if (!accessToken?.length) {
             throw new CloudStorageError(
               `Google Drive access token is not set, cannot call function ${prop.toString()}`,
-              CloudStorageErrorCode.GOOGLE_DRIVE_ACCESS_TOKEN_MISSING
+              CloudStorageErrorCode.ACCESS_TOKEN_MISSING
             );
           }
         }
@@ -37,37 +36,10 @@ export default class GoogleDrive implements NativeRNCloudStorage {
     });
   }
 
-  // when setting accessToken, set it on the GDrive instance
-  public static set accessToken(accessToken: string | null) {
-    GoogleDrive.drive.accessToken = accessToken ?? '';
-
-    // emit an event for the useIsCloudAvailable hook
-    DeviceEventEmitter.emit('RNCloudStorage.cloud.availability-changed', {
-      available: !!accessToken?.length,
-    });
-  }
-
-  public static set timeout(timeout: number) {
-    GoogleDrive.drive.timeout = timeout;
-  }
-
-  public static get accessToken(): string | null {
-    return GoogleDrive.drive.accessToken.length ? GoogleDrive.drive.accessToken : null;
-  }
-
-  public subscribeToFilesWithSameName(subscriber: ({ path, fileIds }: { path: string; fileIds: string[] }) => void): {
-    remove: () => void;
-  } {
-    this.filesWithSameNameSubscribers.push(subscriber);
-
-    return {
-      remove: () => {
-        this.filesWithSameNameSubscribers = this.filesWithSameNameSubscribers.filter((s) => s !== subscriber);
-      },
-    };
-  }
-
-  public isCloudAvailable: () => Promise<boolean> = async () => !!GoogleDrive.drive.accessToken.length;
+  public isCloudAvailable: () => Promise<boolean> = async () => {
+    const { accessToken } = providerService.getProviderOptions(CloudStorageProvider.GoogleDrive);
+    return !!accessToken?.length;
+  };
 
   private getRootDirectory(scope: NativeRNCloudCloudStorageScope): GoogleDriveFileSpace {
     switch (scope) {
@@ -155,6 +127,8 @@ export default class GoogleDrive implements NativeRNCloudStorage {
     filename: string,
     parentDirectoryId: string | null
   ) {
+    const { strictFilenames } = providerService.getProviderOptions(CloudStorageProvider.GoogleDrive);
+
     let possibleFiles: GoogleDriveFile[];
     if (parentDirectoryId) {
       possibleFiles = files.filter((f) => f.name === filename && f.parents![0] === parentDirectoryId);
@@ -164,13 +138,11 @@ export default class GoogleDrive implements NativeRNCloudStorage {
 
     if (possibleFiles.length <= 1) return;
 
-    if (GoogleDrive.throwOnFilesWithSameName) {
+    if (strictFilenames) {
       throw new CloudStorageError(
         `Multiple files with the same name found at path ${path}: ${possibleFiles.map((f) => f.id).join(', ')}`,
         CloudStorageErrorCode.MULTIPLE_FILES_SAME_NAME
       );
-    } else {
-      this.filesWithSameNameSubscribers.forEach((s) => s({ path, fileIds: possibleFiles.map((f) => f.id) }));
     }
   }
 
@@ -379,7 +351,7 @@ export default class GoogleDrive implements NativeRNCloudStorage {
   }
 
   async downloadFile(_path: string, _scope: NativeRNCloudCloudStorageScope): Promise<void> {
-    // Not doing anything here, just a placeholder to conform to the interface so it doesn't fail on Android
+    // Downloading files from Google Drive is not necessary / possible, as they need to be downloaded on every read operation via the API anyway
     return;
   }
 

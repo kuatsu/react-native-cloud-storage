@@ -15,7 +15,7 @@ const FeatureList: FeatureItem[] = [
     description: (
       <>
         <code>react-native-cloud-storage</code> was designed to reduce much of the boilerplate when it comes to working
-        with CloudKit (iCloud) and the Google Drive REST API.
+        with cloud storage providers such as iCloud and Google Drive.
       </>
     ),
   },
