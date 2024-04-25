@@ -2,6 +2,7 @@ import createNativeCloudStorage from './createRNCloudStorage';
 import { CloudStorageProvider, CloudStorageScope, type CloudStorageFileStat } from './types/main';
 import { providerService } from './ProviderService';
 import type NativeRNCloudStorage from './types/native';
+import { isProviderSupported } from './utils/helpers';
 
 const createCloudStorage = (nativeInstance: NativeRNCloudStorage) => ({
   /**
@@ -168,13 +169,21 @@ let RNCloudStorage = {
    * Gets a new instance of the CloudStorage API for the given provider.
    * @param provider The provider to get an instance for.
    * @returns A new instance of the CloudStorage API, without the provider configuration methods.
+   * @throws An error if the provider is not supported on the current platform.
    */
-  getProviderInstance: (provider: CloudStorageProvider) => createCloudStorage(createNativeCloudStorage(provider)),
+  getProviderInstance: (provider: CloudStorageProvider) => {
+    if (!isProviderSupported(provider)) {
+      throw new Error(`Provider ${provider} is not supported on the current platform.`);
+    }
+
+    return createCloudStorage(createNativeCloudStorage(provider));
+  },
 
   /**
    * Gets the list of supported CloudStorageProviders on the current platform.
    * @returns An array of supported CloudStorageProviders.
-   */ getSupportedProviders: providerService.getSupportedProviders,
+   */
+  getSupportedProviders: providerService.getSupportedProviders,
 
   /**
    * Gets the current CloudStorageProvider.
