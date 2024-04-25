@@ -159,7 +159,13 @@ If enabled, the library will throw **before** a file operation if there are mult
 
 ### `setTimeout(timeout)`
 
-Sets the timeout for fetch operations on Google Drive API. Defaults to 3000 milliseconds.
+Sets the timeout for fetch operations on Google Drive API.
+
+**Parameters**:
+
+- `timeout` (`number`): Required. The timeout after which requests to the Google Drive API are aborted. Defaults to 3000 milliseconds.
+
+**Returns**: `void`
 
 ### `stat(path, scope)`
 
