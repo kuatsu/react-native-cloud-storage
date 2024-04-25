@@ -3,10 +3,9 @@ import { NativeEventEmitter, NativeModules, Platform, DeviceEventEmitter } from 
 
 /**
  * A hook that tests whether or not the cloud storage is available.
- * @param _iCloudTimeout DEPRECATED: This parameter is deprecated and has no effect. It will be removed in a future version.
  * @returns A boolean indicating whether or not the cloud storage is available.
  */
-export const useIsCloudAvailable = (_iCloudTimeout?: number) => {
+export const useIsCloudAvailable = () => {
   const [isAvailable, setIsAvailable] = useState(false);
 
   useEffect(() => {
@@ -26,14 +25,6 @@ export const useIsCloudAvailable = (_iCloudTimeout?: number) => {
       eventEmitter.removeAllListeners('RNCloudStorage.cloud.availability-changed');
     };
   }, []);
-
-  useEffect(() => {
-    if (_iCloudTimeout !== undefined) {
-      console.warn(
-        'The iCloudTimeout parameter for useIsCloudFile is deprecated and has no effect. It will be removed in a future version. Please remove it from your code.'
-      );
-    }
-  }, [_iCloudTimeout]);
 
   return isAvailable;
 };

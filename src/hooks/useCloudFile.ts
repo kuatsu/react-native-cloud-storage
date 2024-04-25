@@ -47,11 +47,6 @@ export const useCloudFile = (path: string, scope?: CloudStorageScope) => {
     write,
     remove,
     /**
-     * @deprecated Use `write` instead.
-     * @alias write
-     */
-    update: write,
-    /**
      * Downloads the file from iCloud to the device. Needed if the file hasn't been synced yet. Has no effect on
      * Google Drive.
      */

@@ -2,7 +2,6 @@ import { Platform } from 'react-native';
 import createRNCloudStorage from './createRNCloudStorage';
 import GoogleDrive from './google-drive';
 import { CloudStorageScope, type CloudStorageFileStat } from './types/main';
-import { verifyLeadingSlash } from './utils/helpers';
 
 const nativeInstance = createRNCloudStorage();
 let defaultScope = CloudStorageScope.AppData;
@@ -39,7 +38,7 @@ const RNCloudStorage = {
    * @returns A promise that resolves when the data has been appended.
    */
   appendFile: (path: string, data: string, scope?: CloudStorageScope): Promise<void> => {
-    return nativeInstance.appendToFile(verifyLeadingSlash(path), data, scope ?? defaultScope);
+    return nativeInstance.appendToFile(path, data, scope ?? defaultScope);
   },
 
   /**
@@ -49,7 +48,7 @@ const RNCloudStorage = {
    * @returns A promise that resolves to true if the path exists, false otherwise.
    */
   exists: (path: string, scope?: CloudStorageScope): Promise<boolean> => {
-    return nativeInstance.fileExists(verifyLeadingSlash(path), scope ?? defaultScope);
+    return nativeInstance.fileExists(path, scope ?? defaultScope);
   },
 
   /**
@@ -60,7 +59,7 @@ const RNCloudStorage = {
    * @returns A promise that resolves when the file has been written.
    */
   writeFile: (path: string, data: string, scope?: CloudStorageScope): Promise<void> => {
-    return nativeInstance.createFile(verifyLeadingSlash(path), data, scope ?? defaultScope, true);
+    return nativeInstance.createFile(path, data, scope ?? defaultScope, true);
   },
 
   /**
@@ -70,7 +69,7 @@ const RNCloudStorage = {
    * @returns A promise that resolves when the directory has been created.
    */
   mkdir: (path: string, scope?: CloudStorageScope): Promise<void> => {
-    return nativeInstance.createDirectory(verifyLeadingSlash(path), scope ?? defaultScope);
+    return nativeInstance.createDirectory(path, scope ?? defaultScope);
   },
 
   /**
@@ -80,7 +79,7 @@ const RNCloudStorage = {
    * @returns A promise that resolves to an array of file names, excluding '.' and '..'.
    */
   readdir: (path: string, scope?: CloudStorageScope): Promise<string[]> => {
-    return nativeInstance.listFiles(verifyLeadingSlash(path), scope ?? defaultScope);
+    return nativeInstance.listFiles(path, scope ?? defaultScope);
   },
 
   /**
@@ -90,7 +89,7 @@ const RNCloudStorage = {
    * @returns A promise that resolves to the contents of the file.
    */
   readFile: (path: string, scope?: CloudStorageScope): Promise<string> => {
-    return nativeInstance.readFile(verifyLeadingSlash(path), scope ?? defaultScope);
+    return nativeInstance.readFile(path, scope ?? defaultScope);
   },
 
   /**
@@ -100,7 +99,7 @@ const RNCloudStorage = {
    * @returns A promise that resolves once the download has been triggered.
    */
   downloadFile: (path: string, scope?: CloudStorageScope): Promise<void> => {
-    return nativeInstance.downloadFile(verifyLeadingSlash(path), scope ?? defaultScope);
+    return nativeInstance.downloadFile(path, scope ?? defaultScope);
   },
 
   /**
@@ -110,7 +109,7 @@ const RNCloudStorage = {
    * @returns A promise that resolves when the file has been deleted.
    */
   unlink: (path: string, scope?: CloudStorageScope): Promise<void> => {
-    return nativeInstance.deleteFile(verifyLeadingSlash(path), scope ?? defaultScope);
+    return nativeInstance.deleteFile(path, scope ?? defaultScope);
   },
 
   /**
@@ -121,7 +120,7 @@ const RNCloudStorage = {
    * @returns A promise that resolves when the directory has been deleted.
    */
   rmdir: (path: string, options?: { recursive?: boolean }, scope?: CloudStorageScope): Promise<void> => {
-    return nativeInstance.deleteDirectory(verifyLeadingSlash(path), options?.recursive ?? false, scope ?? defaultScope);
+    return nativeInstance.deleteDirectory(path, options?.recursive ?? false, scope ?? defaultScope);
   },
 
   /**
@@ -131,7 +130,7 @@ const RNCloudStorage = {
    * @returns A promise that resolves to the CloudStorageFileStat object.
    */
   stat: async (path: string, scope?: CloudStorageScope): Promise<CloudStorageFileStat> => {
-    const native = await nativeInstance.statFile(verifyLeadingSlash(path), scope ?? defaultScope);
+    const native = await nativeInstance.statFile(path, scope ?? defaultScope);
 
     return {
       ...native,
