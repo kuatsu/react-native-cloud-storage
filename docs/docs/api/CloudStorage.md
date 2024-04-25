@@ -36,6 +36,18 @@ Gets the cloud storage provider currently in use.
 
 **Returns**: The currently used [`CloudStorageProvider`](./enums/CloudStorageProvider).
 
+### `getProviderInstance(provider)`
+
+Gets a new instance of the `CloudStorage` API, forcing the use of the given provider. This is useful when you want to use multiple providers in the same app.
+
+For more info, [see here](../guides/using-multiple-providers).
+
+**Parameters**:
+
+- `provider` ([`CloudStorageProvider`](./enums/CloudStorageProvider)): Required. The provider to use.
+
+**Returns**: A new instance of the `CloudStorage` API. This instance will only include the [cloud operation methods](#cloud-operations) and not the configuration methods.
+
 ### `getProviderOptions(provider)`
 
 Gets the currently set options of the given provider.
@@ -45,6 +57,12 @@ Gets the currently set options of the given provider.
 - `provider` ([`CloudStorageProvider`](./enums/CloudStorageProvider)): Required. The provider to get the options of.
 
 **Returns**: The options of the given provider.
+
+### `getSupportedProviders()`
+
+Gets the list of supported cloud storage providers on the current platform.
+
+**Returns**: An array of [`CloudStorageProvider`](./enums/CloudStorageProvider) values.
 
 ### `setProvider(provider)`
 

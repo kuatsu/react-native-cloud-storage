@@ -1,49 +1,9 @@
-import createRNCloudStorage from './createRNCloudStorage';
+import createNativeCloudStorage from './createRNCloudStorage';
 import { CloudStorageProvider, CloudStorageScope, type CloudStorageFileStat } from './types/main';
 import { providerService } from './ProviderService';
+import type NativeRNCloudStorage from './types/native';
 
-let nativeInstance = createRNCloudStorage(providerService.getProvider());
-
-const RNCloudStorage = {
-  //#region Provider Options
-  /**
-   * Gets the list of supported CloudStorageProviders on the current platform.
-   * @returns An array of supported CloudStorageProviders.
-   */
-  getSupportedProviders: providerService.getSupportedProviders,
-
-  /**
-   * Gets the current CloudStorageProvider.
-   * @returns The current CloudStorageProvider.
-   */
-  getProvider: providerService.getProvider,
-
-  /**
-   * Sets the current CloudStorageProvider.
-   * @param newProvider The provider to set as the current provider.
-   * @throws An error if the provider is not supported on the current platform.
-   */
-  setProvider: (newProvider: CloudStorageProvider) => {
-    providerService.setProvider(newProvider);
-    nativeInstance = createRNCloudStorage(newProvider);
-  },
-
-  /**
-   * Gets the options for the given provider.
-   * @param provider The provider to get the options for. To get the options for the current provider, use `CloudStorage.getProvider()`.
-   * @returns The options for the given provider.
-   */
-  getProviderOptions: providerService.getProviderOptions,
-
-  /**
-   * Sets the options for the given provider.
-   * @param provider The provider to set the options for. To set the options for the current provider, use `CloudStorage.getProvider()`.
-   * @param options The options to set for the provider.
-   */
-  setProviderOptions: providerService.setProviderOptions,
-  //#endregion
-
-  //#region Native Methods
+const createCloudStorage = (nativeInstance: NativeRNCloudStorage) => ({
   /**
    * Tests whether or not the cloud storage is available. Always returns true for Google Drive. iCloud may be
    * unavailable right after app launch or if the user is not logged in.
@@ -197,7 +157,54 @@ const RNCloudStorage = {
       isFile: () => native.isFile,
     };
   },
-  //#endregion
+});
+
+let defaultNativeCloudStorage = createCloudStorage(createNativeCloudStorage(providerService.getProvider()));
+
+let RNCloudStorage = {
+  ...defaultNativeCloudStorage,
+
+  /**
+   * Gets a new instance of the CloudStorage API for the given provider.
+   * @param provider The provider to get an instance for.
+   * @returns A new instance of the CloudStorage API, without the provider configuration methods.
+   */
+  getProviderInstance: (provider: CloudStorageProvider) => createCloudStorage(createNativeCloudStorage(provider)),
+
+  /**
+   * Gets the list of supported CloudStorageProviders on the current platform.
+   * @returns An array of supported CloudStorageProviders.
+   */ getSupportedProviders: providerService.getSupportedProviders,
+
+  /**
+   * Gets the current CloudStorageProvider.
+   * @returns The current CloudStorageProvider.
+   */
+  getProvider: providerService.getProvider,
+
+  /**
+   * Sets the current CloudStorageProvider.
+   * @param newProvider The provider to set as the current provider.
+   * @throws An error if the provider is not supported on the current platform.
+   */
+  setProvider: (newProvider: CloudStorageProvider) => {
+    providerService.setProvider(newProvider);
+    defaultNativeCloudStorage = createCloudStorage(createNativeCloudStorage(newProvider));
+  },
+
+  /**
+   * Gets the options for the given provider.
+   * @param provider The provider to get the options for. To get the options for the current provider, use `CloudStorage.getProvider()`.
+   * @returns The options for the given provider.
+   */
+  getProviderOptions: providerService.getProviderOptions,
+
+  /**
+   * Sets the options for the given provider.
+   * @param provider The provider to set the options for. To set the options for the current provider, use `CloudStorage.getProvider()`.
+   * @param options The options to set for the provider.
+   */
+  setProviderOptions: providerService.setProviderOptions,
 
   //#region Deprecated v1 Methods
   /**
