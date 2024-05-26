@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NativeEventEmitter, NativeModules, Platform, DeviceEventEmitter } from 'react-native';
+import RNCloudStorage from '../RNCloudStorage';
 
 /**
  * A hook that tests whether or not the cloud storage is available.
@@ -10,6 +11,9 @@ export const useIsCloudAvailable = (_iCloudTimeout?: number) => {
   const [isAvailable, setIsAvailable] = useState(false);
 
   useEffect(() => {
+    // Set the initial availability state
+    RNCloudStorage.isCloudAvailable().then(setIsAvailable);
+
     // Listen for changes to the cloud availability using the native event emitter
     let eventEmitter: NativeEventEmitter | typeof DeviceEventEmitter;
     if (Platform.OS === 'ios') {
