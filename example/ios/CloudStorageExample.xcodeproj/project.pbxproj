@@ -12,6 +12,7 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2A1142FBB621C63F5C49917D /* libPods-CloudStorageExample-CloudStorageExampleTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD9DFD294A0BCE299B0C6CC /* libPods-CloudStorageExample-CloudStorageExampleTests.a */; };
+		50D7C2952CA59EA100165214 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 50D7C2942CA59EA100165214 /* PrivacyInfo.xcprivacy */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		E68151217011A8CA48B80660 /* libPods-CloudStorageExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B0BFAD7F42A9E0C28A9F889 /* libPods-CloudStorageExample.a */; };
 /* End PBXBuildFile section */
@@ -37,6 +38,7 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = CloudStorageExample/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = CloudStorageExample/main.m; sourceTree = "<group>"; };
 		149F0AAA18CC28E039A93D1C /* Pods-CloudStorageExample-CloudStorageExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudStorageExample-CloudStorageExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-CloudStorageExample-CloudStorageExampleTests/Pods-CloudStorageExample-CloudStorageExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
+		50D7C2942CA59EA100165214 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = CloudStorageExample/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		50EA6A242ACDA32100DC97DD /* CloudStorageExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = CloudStorageExample.entitlements; path = CloudStorageExample/CloudStorageExample.entitlements; sourceTree = "<group>"; };
 		5E89360EBE20D4ECFAB75726 /* Pods-CloudStorageExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudStorageExample.debug.xcconfig"; path = "Target Support Files/Pods-CloudStorageExample/Pods-CloudStorageExample.debug.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = CloudStorageExample/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -118,6 +120,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				50D7C2942CA59EA100165214 /* PrivacyInfo.xcprivacy */,
 				13B07FAE1A68108700A75B9A /* CloudStorageExample */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* CloudStorageExampleTests */,
@@ -244,6 +247,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				50D7C2952CA59EA100165214 /* PrivacyInfo.xcprivacy in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);
@@ -435,6 +439,7 @@
 			baseConfigurationReference = 149F0AAA18CC28E039A93D1C /* Pods-CloudStorageExample-CloudStorageExampleTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = HJ544P3S3Z;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -463,6 +468,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = HJ544P3S3Z;
 				INFOPLIST_FILE = CloudStorageExampleTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -606,12 +612,7 @@
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-Wl",
-					"-ld_classic",
-					"-Wl -ld_classic ",
-				);
+				OTHER_LDFLAGS = "$(inherited)";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 			};
@@ -681,12 +682,7 @@
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-Wl",
-					"-ld_classic",
-					"-Wl -ld_classic ",
-				);
+				OTHER_LDFLAGS = "$(inherited)";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
