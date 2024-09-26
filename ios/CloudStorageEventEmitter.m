@@ -6,7 +6,7 @@
 RCT_EXTERN_METHOD(supportedEvents)
 RCT_EXTERN_METHOD(startObserving)
 RCT_EXTERN_METHOD(stopObserving)
-RCT_EXTERN_METHOD(iCloudIdentityChanged)
+RCT_EXTERN_METHOD(iCloudIdentityChanged:(NSNotification *)notification)
 
 + (BOOL)requiresMainQueueSetup
 {
