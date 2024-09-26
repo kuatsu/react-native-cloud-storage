@@ -18,6 +18,8 @@ jobs:
           days-before-close: 7
           stale-issue-label: stale
           stale-pr-label: stale
+          exempt-issue-labels: 'help wanted,in progress,pinned'
+          exempt-pr-labels: 'in progress,pinned'
   stale-missing-info:
     runs-on: ubuntu-latest
     permissions:
