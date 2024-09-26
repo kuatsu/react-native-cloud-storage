@@ -36,10 +36,10 @@ Afterwards, [add the provided config plugin](https://react-native-cloud-storage.
 ```jsx
 import React from 'react';
 import { Platform, View, Text, Button } from 'react-native';
-import { CloudStorage, useCloudAvailable } from 'react-native-cloud-storage';
+import { CloudStorage, useIsCloudAvailable } from 'react-native-cloud-storage';
 
 const App = () => {
-  const cloudAvailable = useCloudAvailable();
+  const cloudAvailable = useIsCloudAvailable();
 
   React.useEffect(() => {
     if (Platform.OS !== 'ios') {
