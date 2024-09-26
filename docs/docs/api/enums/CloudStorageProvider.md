@@ -29,7 +29,7 @@ CloudStorage.setProvider('googledrive');
 
 ## Provider options
 
-The provider options can be set via [`setProviderOptions()`](../CloudStorage#setprovideroptionsoptions). The following options are available:
+The provider options can be set via [`setProviderOptions()`](../CloudStorage#setprovideroptionsprovider-options). The following options are available:
 
 ### `CloudStorageProvider.ICloud`
 
