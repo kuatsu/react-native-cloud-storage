@@ -13,10 +13,11 @@ If you want to use _multiple_ providers in your app, you can get a new instance 
 ```ts
 import { CloudStorageProvider, CloudStorageScope, CloudStorage } from 'react-native-cloud-storage';
 
+// WARNING: This will throw an error if the iCloud provider is not available on the platform (i.e. not on iOS)
 const iCloudStorage = new CloudStorage(CloudStorageProvider.ICloud);
-const googleDriveStorage = new CloudStorage(CloudStorageProvider.GoogleDrive);
 
-googleDriveStorage.setProviderOptions({ accessToken: 'some_access_token' });
+// You can pass provider options directly in the constructor, or use `googleDriveStorage.setProviderOptions()`
+const googleDriveStorage = new CloudStorage(CloudStorageProvider.GoogleDrive, { accessToken: 'some_access_token' });
 
 // Then, use the provider-specific instances
 const handleSaveFileToICloud = async () => {
