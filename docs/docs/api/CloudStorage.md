@@ -43,6 +43,15 @@ Creates a new `CloudStorage` instance using the given provider.
 
 ## Configuration methods
 
+### `getDefaultInstance()`
+
+- **Available on static class**: ✅ Yes
+- **Available on instances**: ❌ No
+
+Gets the internal default instance of `CloudStorage`.
+
+**Returns**: The default `CloudStorage` instance.
+
 ### `getDefaultProvider()`
 
 - **Available on static class**: ✅ Yes

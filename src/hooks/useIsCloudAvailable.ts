@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import RNCloudStorage from '../RNCloudStorage';
-import { cloudStorageEventEmitter } from '../utils/CloudStorageEventEmitter';
 
 /**
  * A hook that tests whether or not the cloud storage is available.
@@ -9,24 +8,23 @@ import { cloudStorageEventEmitter } from '../utils/CloudStorageEventEmitter';
  */
 export const useIsCloudAvailable = (cloudStorageInstance?: RNCloudStorage) => {
   const [isAvailable, setIsAvailable] = useState(false);
-  const instance = cloudStorageInstance ?? RNCloudStorage;
+  const instance = cloudStorageInstance ?? RNCloudStorage.getDefaultInstance();
+
+  const handleAvailabilityChange = useCallback((available: boolean) => {
+    setIsAvailable(available);
+  }, []);
 
   useEffect(() => {
     // Set the initial availability state
     instance.isCloudAvailable().then(setIsAvailable);
 
     // Listen for changes to the cloud availability using the native event emitter
-    cloudStorageEventEmitter.addListener(
-      'RNCloudStorage.cloud.availability-changed',
-      (event: { available: boolean }) => {
-        setIsAvailable(event.available);
-      }
-    );
+    instance.subscribeToCloudAvailability(handleAvailabilityChange);
 
     return () => {
-      cloudStorageEventEmitter.removeAllListeners('RNCloudStorage.cloud.availability-changed');
+      instance.unsubscribeFromCloudAvailability(handleAvailabilityChange);
     };
-  }, [instance]);
+  }, [instance, handleAvailabilityChange]);
 
   return isAvailable;
 };

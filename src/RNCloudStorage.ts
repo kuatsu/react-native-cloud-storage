@@ -7,11 +7,10 @@ import {
 } from './types/main';
 import type NativeRNCloudStorage from './types/native';
 import { isProviderSupported } from './utils/helpers';
-import { NativeModules, Platform } from 'react-native';
+import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
 import CloudStorageError from './utils/CloudStorageError';
 import { CloudStorageErrorCode } from './types/native';
 import GoogleDrive from './google-drive';
-import { cloudStorageEventEmitter } from './utils/CloudStorageEventEmitter';
 
 const LINKING_ERROR =
   `The package 'react-native-cloud-storage' doesn't seem to be linked. Make sure: \n\n` +
@@ -61,6 +60,7 @@ export default class RNCloudStorage {
     provider: CloudStorageProvider;
     options: (typeof defaultProviderOptions)[keyof typeof defaultProviderOptions];
   };
+  private cloudAvailabilityListeners: ((available: boolean) => void)[] = [];
 
   //#region Constructor and configuration
   /**
@@ -80,6 +80,7 @@ export default class RNCloudStorage {
       options: defaultProviderOptions[provider ?? RNCloudStorage.getDefaultProvider()],
     };
 
+    this.setProvider(provider ?? RNCloudStorage.getDefaultProvider());
     if (options) {
       this.setProviderOptions(options);
     }
@@ -146,6 +147,23 @@ export default class RNCloudStorage {
       provider,
       options: defaultProviderOptions[provider],
     };
+
+    // Emit an event to notify useIsCloudAvailable() hook consumers of the new cloud availability status
+    this.nativeInstance.isCloudAvailable().then((available) => {
+      this.cloudAvailabilityListeners.forEach((listener) => {
+        listener(available);
+      });
+    });
+
+    if (provider === CloudStorageProvider.ICloud) {
+      // Listen to native cloud availability change events
+      const eventEmitter = new NativeEventEmitter(NativeModules.CloudStorageEventEmitter);
+      eventEmitter.addListener('RNCloudStorage.cloud.availability-changed', (event: { available: boolean }) => {
+        this.cloudAvailabilityListeners.forEach((listener) => {
+          listener(event.available);
+        });
+      });
+    }
   }
 
   /**
@@ -169,11 +187,20 @@ export default class RNCloudStorage {
 
     if (this.provider.provider === CloudStorageProvider.GoogleDrive && 'accessToken' in newOptions) {
       // Emit an event to notify useIsCloudAvailable() hook consumers of the new cloud availability status
-      cloudStorageEventEmitter.emit('RNCloudStorage.cloud.availability-changed', {
-        available: (newOptions as Required<CloudStorageProviderOptions[CloudStorageProvider.GoogleDrive]>).accessToken
-          ?.length,
+      this.cloudAvailabilityListeners.forEach((listener) => {
+        listener(
+          !!(newOptions as Required<CloudStorageProviderOptions[CloudStorageProvider.GoogleDrive]>).accessToken?.length
+        );
       });
     }
+  }
+
+  subscribeToCloudAvailability(listener: (available: boolean) => void): void {
+    this.cloudAvailabilityListeners.push(listener);
+  }
+
+  unsubscribeFromCloudAvailability(listener: (available: boolean) => void): void {
+    this.cloudAvailabilityListeners = this.cloudAvailabilityListeners.filter((l) => l !== listener);
   }
   //#endregion
 
@@ -300,7 +327,7 @@ export default class RNCloudStorage {
   //#endregion
 
   //#region Static methods for default static instance
-  private static getDefaultInstance(): RNCloudStorage {
+  static getDefaultInstance(): RNCloudStorage {
     if (!RNCloudStorage.defaultInstance) {
       RNCloudStorage.defaultInstance = new RNCloudStorage();
     }

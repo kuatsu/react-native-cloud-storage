@@ -27,7 +27,7 @@ const HomeView = () => {
   const [accessToken, setAccessToken] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const cloudAvailable = useIsCloudAvailable();
+  const cloudAvailable = useIsCloudAvailable(cloudStorage);
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
