@@ -4,22 +4,19 @@ sidebar_position: 1
 
 # Using multiple Cloud Storage Providers
 
-By default, the [`CloudStorage`](../api/CloudStorage) API will use the provider set via [`setProvider()`](../api/CloudStorage#setproviderprovider) (or the default provider based on the platform).
+By default, the [`CloudStorage`](../api/CloudStorage) API will use a default storage provider based on the platform (CloudKit for iOS, Google Drive for all other platforms). If you want to only use once specific provider, you can globally override this by calling [`CloudStorage.setProvider()`](../api/CloudStorage#setproviderprovider) with the provider you want to use. The default static instance (`CloudStorage`) will then use the specified provider.
 
-If you want to use multiple providers in your app, you can however get a new instance of the `CloudStorage` API which uses a specific provider. For example, this can be useful if you want to provide multiple cloud backup options to the user at the same time, allowing him to backup his files to iCloud and Google Drive simultaneously.
-
-Those new instances only contain the [cloud operation methods](../api/CloudStorage#cloud-operations) and do not contain the configuration methods such as [`setProviderOptions()`](../api/CloudStorage#setprovideroptionsprovider-options). The provider-specific configuration must be done via the main `CloudStorage` instance.
+If you want to use _multiple_ providers in your app, you can get a new instance of the `CloudStorage` API and specify a provider in the constructor. This can be useful if you want to provide multiple cloud backup options to the user at the same time, allowing him to backup his files to iCloud and Google Drive simultaneously.
 
 ## Example
 
 ```ts
 import { CloudStorageProvider, CloudStorageScope, CloudStorage } from 'react-native-cloud-storage';
 
-const iCloudStorage = CloudStorage.getProviderInstance(CloudStorageProvider.ICloud);
-const googleDriveStorage = CloudStorage.getProviderInstance(CloudStorageProvider.GoogleDrive);
+const iCloudStorage = new CloudStorage(CloudStorageProvider.ICloud);
+const googleDriveStorage = new CloudStorage(CloudStorageProvider.GoogleDrive);
 
-// Configuration methods are still only available on the main CloudStorage instance – set provider-specific options there, they are shared across all instances
-CloudStorage.setProviderOptions(CloudStorageProvider.GoogleDrive, { accessToken: 'some_access_token' });
+googleDriveStorage.setProviderOptions({ accessToken: 'some_access_token' });
 
 // Then, use the provider-specific instances
 const handleSaveFileToICloud = async () => {

@@ -13,13 +13,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Card from '../components/Card';
 import Button from '../components/Button';
 
-CloudStorage.setProviderOptions(CloudStorageProvider.GoogleDrive, {
-  strictFilenames: true,
-});
-
 const HomeView = () => {
-  const [provider, setProvider] = useState(CloudStorage.getProvider());
-  const [scope, setScope] = useState(CloudStorage.getProviderOptions(CloudStorage.getProvider()).scope);
+  const [provider, setProvider] = useState(CloudStorage.getDefaultProvider());
+  const [cloudStorage, setCloudStorage] = useState(
+    new CloudStorage(provider, provider === CloudStorageProvider.GoogleDrive ? { strictFilenames: true } : undefined)
+  );
+  const [scope, setScope] = useState(cloudStorage.getProviderOptions().scope);
   const [parentDirectory, setParentDirectory] = useState('/');
   const [filename, setFilename] = useState('test.txt');
   const [stats, setStats] = useState<CloudStorageFileStat | null>(null);
@@ -36,18 +35,22 @@ const HomeView = () => {
   }, [cloudAvailable]);
 
   useEffect(() => {
-    CloudStorage.setProviderOptions(CloudStorageProvider.GoogleDrive, {
+    if (cloudStorage.getProvider() !== CloudStorageProvider.GoogleDrive) return;
+
+    cloudStorage.setProviderOptions({
       accessToken: accessToken.length ? accessToken : null,
     });
-  }, [accessToken]);
+  }, [accessToken, cloudStorage]);
 
   useEffect(() => {
-    CloudStorage.setProvider(provider);
+    setCloudStorage(
+      new CloudStorage(provider, provider === CloudStorageProvider.GoogleDrive ? { strictFilenames: true } : undefined)
+    );
   }, [provider]);
 
   useEffect(() => {
-    CloudStorage.setProviderOptions(CloudStorage.getProvider(), { scope });
-  }, [scope]);
+    cloudStorage.setProviderOptions({ scope });
+  }, [scope, cloudStorage]);
 
   useEffect(() => {
     setStats(null);
@@ -57,7 +60,7 @@ const HomeView = () => {
   const handleCheckDirectoryExists = async () => {
     setLoading(true);
     try {
-      const exists = await CloudStorage.exists(parentDirectory);
+      const exists = await cloudStorage.exists(parentDirectory);
       Alert.alert(
         parentDirectory === '/' || !parentDirectory.length
           ? 'Root Directory exists?'
@@ -74,7 +77,7 @@ const HomeView = () => {
   const handleCreateDirectory = async () => {
     setLoading(true);
     try {
-      await CloudStorage.mkdir(parentDirectory);
+      await cloudStorage.mkdir(parentDirectory);
       readFile();
     } catch (e) {
       console.warn(e);
@@ -86,7 +89,7 @@ const HomeView = () => {
   const handleListContents = async () => {
     setLoading(true);
     try {
-      const contents = await CloudStorage.readdir(parentDirectory);
+      const contents = await cloudStorage.readdir(parentDirectory);
       Alert.alert('Directory contents', contents.map((c) => `• ${c}`).join('\n'));
     } catch (e) {
       console.warn(e);
@@ -98,11 +101,11 @@ const HomeView = () => {
   const readFile = async () => {
     setLoading(true);
     try {
-      const newStats = await CloudStorage.stat(parentDirectory + '/' + filename);
+      const newStats = await cloudStorage.stat(parentDirectory + '/' + filename);
       setStats(newStats);
       console.log('File stats', newStats);
       if (newStats.isDirectory()) return;
-      setInput(await CloudStorage.readFile(parentDirectory + '/' + filename));
+      setInput(await cloudStorage.readFile(parentDirectory + '/' + filename));
     } catch (e) {
       if (e instanceof CloudStorageError) {
         if (e.code === CloudStorageErrorCode.FILE_NOT_FOUND) {
@@ -120,7 +123,7 @@ const HomeView = () => {
   const handleCreateFile = async () => {
     setLoading(true);
     try {
-      await CloudStorage.writeFile(parentDirectory + '/' + filename, input);
+      await cloudStorage.writeFile(parentDirectory + '/' + filename, input);
       readFile();
     } catch (e) {
       console.warn(e);
@@ -132,7 +135,7 @@ const HomeView = () => {
   const handleAppend = async () => {
     setLoading(true);
     try {
-      await CloudStorage.appendFile(parentDirectory + '/' + filename, appendInput);
+      await cloudStorage.appendFile(parentDirectory + '/' + filename, appendInput);
       readFile();
       setAppendInput('');
     } catch (e) {
@@ -147,7 +150,7 @@ const HomeView = () => {
   const handleDeleteFile = async () => {
     setLoading(true);
     try {
-      await CloudStorage.unlink(parentDirectory + '/' + filename);
+      await cloudStorage.unlink(parentDirectory + '/' + filename);
       readFile();
     } catch (e) {
       console.warn(e);
@@ -166,7 +169,7 @@ const HomeView = () => {
     } else {
       setLoading(true);
       try {
-        await CloudStorage.rmdir(parentDirectory, { recursive });
+        await cloudStorage.rmdir(parentDirectory, { recursive });
         setStats(null);
         setInput('');
       } catch (e) {
@@ -180,7 +183,7 @@ const HomeView = () => {
   const handleDownload = async () => {
     setLoading(true);
     try {
-      await CloudStorage.downloadFile(parentDirectory + '/' + filename);
+      await cloudStorage.downloadFile(parentDirectory + '/' + filename);
       Alert.alert('File download', 'File downloaded successfully.');
     } catch (e) {
       console.warn(e);

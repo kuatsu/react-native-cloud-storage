@@ -1,5 +1,4 @@
-import { providerService } from '../ProviderService';
-import { CloudStorageProvider } from '../types/main';
+import { type CloudStorageProviderOptions, type DeepRequired } from '../types/main';
 import {
   MimeTypes,
   type GoogleDriveFile,
@@ -27,8 +26,11 @@ export class GoogleDriveHttpError extends Error {
 // TODO: properly handle errors
 export default class GoogleDriveApiClient {
   private _fetchTimeout: any;
+  private options: DeepRequired<CloudStorageProviderOptions['googledrive']>;
 
-  constructor() {}
+  constructor(options: DeepRequired<CloudStorageProviderOptions['googledrive']>) {
+    this.options = options;
+  }
 
   private buildQueryString(query: object): string {
     let res = Object.entries(query)
@@ -49,7 +51,7 @@ export default class GoogleDriveApiClient {
     operation: `/${string}`,
     { queryParameters, baseUrl, ...options }: RequestInit & { queryParameters?: object; baseUrl?: string } = {}
   ): Promise<T> {
-    const { timeout, accessToken } = providerService.getProviderOptions(CloudStorageProvider.GoogleDrive);
+    const { timeout, accessToken } = this.options;
 
     let path = `${baseUrl ?? BASE_URL}${operation}`;
     if (queryParameters) {

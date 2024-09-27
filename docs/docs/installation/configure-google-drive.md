@@ -12,7 +12,7 @@ Please note that filenames are not unique in Google Drive. There can be multiple
 
 :::info
 
-Be aware that all file operations on Google Drive will take severely more time than on iCloud. This is because iCloud is implemented using a direct native API (CloudKit) while Google Drive is implemented using the HTTP REST API. A file read operation that might only take a split second on iCloud might take several seconds on Google Drive.
+Be aware that all file operations on Google Drive will take severely more time than on iCloud. This is because iCloud is implemented using a direct native API that uses a local mirror of the cloud filesystem (CloudKit) while Google Drive is implemented using the HTTP REST API. A file read operation that might only take a split second on iCloud might take several seconds on Google Drive.
 
 :::
 
@@ -24,7 +24,9 @@ Once you have acquired an access token from the user, you will need to provide i
 
 ```ts
 import { CloudStorage, CloudStorageProvider } from 'react-native-cloud-storage';
-CloudStorage.setProviderOptions(CloudStorageProvider.GoogleDrive, { accessToken: 'some_access_token' });
+if (CloudStorage.getProvider() === CloudStorageProvider.GoogleDrive) {
+  CloudStorage.setProviderOptions({ accessToken: 'some_access_token' });
+}
 ```
 
 Below is a more practical example of how this could look in action using the Expo AuthSession API:
@@ -53,8 +55,8 @@ const App: React.FC = () => {
       setAccessToken(response.authentication.accessToken);
     }
 
-    if (accessToken) {
-      CloudStorage.setProviderOptions(CloudStorageProvider.GoogleDrive, { accessToken });
+    if (accessToken && CloudStorage.getProvider() === CloudStorageProvider.GoogleDrive) {
+      CloudStorage.setProviderOptions({ accessToken });
     }
   }, [response, accessToken]);
 
@@ -64,7 +66,7 @@ const App: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {CloudStorage.getProvider() === CloudStorageProvider.GoogleDrive && accessToken === null ? (
+      {CloudStorage.getProvider() === CloudStorageProvider.GoogleDrive && !accessToken ? (
         <Button
           title="Sign in with Google"
           disabled={!request}
