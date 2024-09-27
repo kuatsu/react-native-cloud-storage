@@ -24,7 +24,7 @@ jobs:
         run: yarn lint
 
       - name: Run SwiftFormat
-        uses: swiftformat --verbose ios
+        run: swiftformat --verbose ios
 
       - name: Verify formatted code is unchanged
         run: git diff --exit-code HEAD
