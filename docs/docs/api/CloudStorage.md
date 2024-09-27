@@ -61,16 +61,12 @@ Gets the cloud storage provider currently in use.
 
 **Returns**: The currently used [`CloudStorageProvider`](./enums/CloudStorageProvider).
 
-### `getProviderOptions(provider)`
+### `getProviderOptions()`
 
 - **Available on static class**: ✅ Yes
 - **Available on instances**: ✅ Yes
 
-Gets the currently set options of the given provider.
-
-**Parameters**:
-
-- `provider` ([`CloudStorageProvider`](./enums/CloudStorageProvider)): Required. The provider to get the options of.
+Gets the currently set options of the current provider.
 
 **Returns**: The options of the given provider.
 
