@@ -95,7 +95,7 @@ jobs:
       - name: Release
         run: |
           if [ -n "${{ inputs.release_type }}" ]; then
-            yarn release --release-as ${{ inputs.release_type }}
+            yarn release --increment ${{ inputs.release_type }}
           else
             yarn release
           fi
