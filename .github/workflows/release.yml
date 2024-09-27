@@ -21,7 +21,9 @@ jobs:
         uses: irgaly/setup-mint@v1
 
       - name: Install SwiftFormat
-        run: mint install nicklockwood/SwiftFormat
+        run: |
+          mint install nicklockwood/SwiftFormat
+          echo "$HOME/.mint/bin" >> $GITHUB_PATH
 
       - name: Lint files
         run: yarn lint
