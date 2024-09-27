@@ -8,7 +8,8 @@ const currentYear = new Date().getFullYear();
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'react-native-cloud-storage',
+  title: 'React Native Cloud Storage',
+  tagline: 'iCloud and Google Drive for React Native, simplified.',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
@@ -57,9 +58,9 @@ const config = {
       // Replace with your project's social card
       // image: 'img/docusaurus-social-card.jpg',
       navbar: {
-        title: 'react-native-cloud-storage',
+        title: 'React Native Cloud Storage',
         logo: {
-          alt: 'react-native-cloud-storage',
+          alt: 'React Native Cloud Storage',
           src: 'img/logo.png',
         },
         items: [

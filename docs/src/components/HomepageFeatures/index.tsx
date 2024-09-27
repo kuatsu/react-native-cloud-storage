@@ -14,8 +14,8 @@ const FeatureList: FeatureItem[] = [
     Svg: require('@site/static/img/undraw_easy_to_use.svg').default,
     description: (
       <>
-        <code>react-native-cloud-storage</code> was designed to reduce much of the boilerplate when it comes to working
-        with cloud storage providers such as iCloud and Google Drive.
+        React Native Cloud Storage reduces much of the boilerplate when it comes to working with cloud storage providers
+        such as iCloud and Google Drive.
       </>
     ),
   },
@@ -25,7 +25,7 @@ const FeatureList: FeatureItem[] = [
     description: (
       <>
         Developer experience is a top priority in our API design. All core functionality follows the conventions of
-        <code>fs</code>.
+        Node.js's fs module.
       </>
     ),
   },
@@ -34,8 +34,7 @@ const FeatureList: FeatureItem[] = [
     Svg: require('@site/static/img/undraw_expo.svg').default,
     description: (
       <>
-        The library fully supports the Expo managed workflow using a config plugin. No need to eject to a bare workflow
-        or pure React Native.
+        The library fully supports Expo using a config plugin. No need to eject to a bare workflow or pure React Native.
       </>
     ),
   },
