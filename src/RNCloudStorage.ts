@@ -85,7 +85,7 @@ export default class RNCloudStorage {
     }
   }
 
-  get nativeInstance(): NativeRNCloudStorage {
+  private get nativeInstance(): NativeRNCloudStorage {
     switch (this.provider.provider) {
       case CloudStorageProvider.ICloud:
         return (
