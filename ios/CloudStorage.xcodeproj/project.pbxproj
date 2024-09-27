@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		50ADE3732B56EE1300DB5583 /* CloudStorageEventEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5009AB9B2B56ECD30058E83A /* CloudStorageEventEmitter.swift */; };
+		50BC353B2CA6ED940085E8B9 /* FileUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BC353A2CA6ED940085E8B9 /* FileUtils.swift */; };
+		50BC353F2CA6EF760085E8B9 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BC353E2CA6EF760085E8B9 /* Types.swift */; };
+		50BC35412CA6F0E80085E8B9 /* CloudKitUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BC35402CA6F0E80085E8B9 /* CloudKitUtils.swift */; };
+		50BC35452CA6FA6D0085E8B9 /* CloudStorageError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BC35442CA6FA6D0085E8B9 /* CloudStorageError.swift */; };
+		50BC35472CA6FF3F0085E8B9 /* Promise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BC35462CA6FF3F0085E8B9 /* Promise.swift */; };
 		F4FF95D7245B92E800C19C63 /* CloudStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FF95D6245B92E800C19C63 /* CloudStorage.swift */; };
 /* End PBXBuildFile section */
 
@@ -27,6 +32,11 @@
 		134814201AA4EA6300B7C361 /* libCloudStorage.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCloudStorage.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		5009AB9B2B56ECD30058E83A /* CloudStorageEventEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudStorageEventEmitter.swift; sourceTree = "<group>"; };
 		50ADE3712B56EDFB00DB5583 /* CloudStorageEventEmitter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CloudStorageEventEmitter.m; sourceTree = "<group>"; };
+		50BC353A2CA6ED940085E8B9 /* FileUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileUtils.swift; sourceTree = "<group>"; };
+		50BC353E2CA6EF760085E8B9 /* Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
+		50BC35402CA6F0E80085E8B9 /* CloudKitUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitUtils.swift; sourceTree = "<group>"; };
+		50BC35442CA6FA6D0085E8B9 /* CloudStorageError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudStorageError.swift; sourceTree = "<group>"; };
+		50BC35462CA6FF3F0085E8B9 /* Promise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Promise.swift; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* CloudStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CloudStorage.m; sourceTree = "<group>"; };
 		F4FF95D5245B92E700C19C63 /* CloudStorage-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CloudStorage-Bridging-Header.h"; sourceTree = "<group>"; };
 		F4FF95D6245B92E800C19C63 /* CloudStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudStorage.swift; sourceTree = "<group>"; };
@@ -51,9 +61,22 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		50BC35482CA704A60085E8B9 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				50BC35402CA6F0E80085E8B9 /* CloudKitUtils.swift */,
+				50BC35442CA6FA6D0085E8B9 /* CloudStorageError.swift */,
+				50BC353A2CA6ED940085E8B9 /* FileUtils.swift */,
+				50BC35462CA6FF3F0085E8B9 /* Promise.swift */,
+				50BC353E2CA6EF760085E8B9 /* Types.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				50BC35482CA704A60085E8B9 /* Utils */,
 				50ADE3712B56EDFB00DB5583 /* CloudStorageEventEmitter.m */,
 				5009AB9B2B56ECD30058E83A /* CloudStorageEventEmitter.swift */,
 				F4FF95D6245B92E800C19C63 /* CloudStorage.swift */,
@@ -120,8 +143,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				50BC353B2CA6ED940085E8B9 /* FileUtils.swift in Sources */,
+				50BC35412CA6F0E80085E8B9 /* CloudKitUtils.swift in Sources */,
+				50BC35472CA6FF3F0085E8B9 /* Promise.swift in Sources */,
+				50BC35452CA6FA6D0085E8B9 /* CloudStorageError.swift in Sources */,
 				F4FF95D7245B92E800C19C63 /* CloudStorage.swift in Sources */,
 				50ADE3732B56EE1300DB5583 /* CloudStorageEventEmitter.swift in Sources */,
+				50BC353F2CA6EF760085E8B9 /* Types.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

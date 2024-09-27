@@ -30,6 +30,7 @@ DerivedData
 *.ipa
 *.xcuserstate
 project.xcworkspace
+**/.xcode.env.local
 
 # Android/IJ
 #
@@ -44,7 +45,7 @@ android.iml
 
 # Cocoapods
 #
-example/ios/Pods
+**/Pods
 
 # Ruby
 example/vendor/

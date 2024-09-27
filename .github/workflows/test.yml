@@ -17,8 +17,30 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
 
+      - name: Setup Mint package manager
+        uses: irgaly/setup-mint@v1
+
+      - name: Cache Mint packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.mint
+          key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
+          restore-keys: |
+            ${{ runner.os }}-mint-
+
+      - name: Install SwiftFormat
+        run: |
+          mint install nicklockwood/SwiftFormat
+          echo "$HOME/.mint/bin" >> $GITHUB_PATH
+
       - name: Lint files
         run: yarn lint
+
+      - name: Run SwiftFormat
+        run: swiftformat --verbose ios
+
+      - name: Verify formatted code is unchanged
+        run: git diff --exit-code HEAD
 
       - name: Typecheck files
         run: yarn typecheck

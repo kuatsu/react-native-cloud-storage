@@ -1,3 +1,4 @@
+import { type CloudStorageProviderOptions, type DeepRequired } from '../types/main';
 import {
   MimeTypes,
   type GoogleDriveFile,
@@ -24,13 +25,11 @@ export class GoogleDriveHttpError extends Error {
 // TODO: fetch timeout
 // TODO: properly handle errors
 export default class GoogleDriveApiClient {
-  public accessToken: string;
-  public timeout: number;
   private _fetchTimeout: any;
+  private options: DeepRequired<CloudStorageProviderOptions['googledrive']>;
 
-  constructor(accessToken: string = '') {
-    this.accessToken = accessToken;
-    this.timeout = 3000;
+  constructor(options: DeepRequired<CloudStorageProviderOptions['googledrive']>) {
+    this.options = options;
   }
 
   private buildQueryString(query: object): string {
@@ -52,6 +51,8 @@ export default class GoogleDriveApiClient {
     operation: `/${string}`,
     { queryParameters, baseUrl, ...options }: RequestInit & { queryParameters?: object; baseUrl?: string } = {}
   ): Promise<T> {
+    const { timeout, accessToken } = this.options;
+
     let path = `${baseUrl ?? BASE_URL}${operation}`;
     if (queryParameters) {
       path += this.buildQueryString(queryParameters);
@@ -60,12 +61,12 @@ export default class GoogleDriveApiClient {
     const abortController: AbortController = new AbortController();
     this._fetchTimeout = setTimeout(() => {
       abortController.abort();
-    }, this.timeout);
+    }, timeout);
     const response = await fetch(path, {
       ...options,
       headers: {
         ...options.headers,
-        Authorization: `Bearer ${this.accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
       signal: abortController.signal,
     });

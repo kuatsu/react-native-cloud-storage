@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 # CloudStorageErrorCode
@@ -14,6 +14,7 @@ import { CloudStorageErrorCode } from 'react-native-cloud-storage';
 
 ```ts
 enum CloudStorageErrorCode {
+  INVALID_SCOPE = 'ERR_INVALID_SCOPE',
   FILE_NOT_FOUND = 'ERR_FILE_NOT_FOUND',
   PATH_IS_DIRECTORY = 'ERR_PATH_IS_DIRECTORY',
   PATH_IS_FILE = 'ERR_PATH_IS_FILE',
@@ -28,7 +29,7 @@ enum CloudStorageErrorCode {
   STAT_ERROR = 'ERR_STAT_ERROR',
   UNKNOWN = 'ERR_UNKNOWN',
   FILE_NOT_DOWNLOADABLE = 'ERR_FILE_NOT_DOWNLOADABLE',
-  GOOGLE_DRIVE_ACCESS_TOKEN_MISSING = 'ERR_GOOGLE_DRIVE_ACCESS_TOKEN_MISSING',
+  ACCESS_TOKEN_MISSING = 'ERR_ACCESS_TOKEN_MISSING',
 }
 ```
 

@@ -1,5 +1,5 @@
 ---
-sidebar_position: 1
+sidebar_position: 2
 ---
 
 # Handling multiple files with the same name in Google Drive
@@ -14,33 +14,8 @@ When only working in the `CloudStorageScope.AppData` scope, which should be the 
 
 :::
 
-This library accounts for this behavior by providing two ways of dealing with this:
-
 ## Throwing an error
 
-By default, the library will not throw when there are multiple files with the same name detected but instead default to the first one returned by the Google Drive API. You can however opt into throwing. Please note however that this will render the library completely useless for such cases until the user manually "fixed" this by renaming the files in his Google Drive, as the library will throw before performing any actions such as writing or reading. Behind the scenes, the library will always list all files first to get the file id of the given pathname in order to perform actual actions on this file. Throwing an error will already occur when there are multiple files with the same name detected on this step.
+By default, the library will not throw when there are multiple files with the same name detected but instead default to the first one returned by the Google Drive API. You can however opt into throwing. Please note however that this will render the library completely useless for such cases until the user manually "fixed" this by renaming the files in his Google Drive, as the library will throw before performing any file operations. Behind the scenes, the library will always list all files first to get the file id of the given pathname in order to perform actual actions on this file. Throwing an error will already occur when there are multiple files with the same name detected on this step.
 
-If you do wish to enable throwing, simply call [`CloudStorage.setThrowOnFilesWithSameName(true)`](../api/CloudStorage#setthrowonfileswithsamenameenable). The library will then throw a [`CloudStorageError`](../api/CloudStorageError) with the code [`CloudStorageErrorCode.MULTIPLE_FILES_SAME_NAME`](../api/enums/CloudStorageErrorCode). Again, this will only affect Google Drive and not have any effect on iOS devices as iCloud does not allow same filenames on different files within the same directory.
-
-## Subscribe to an event
-
-A much more flexible option to throwing is listening to events published by the library when detecting files with the same filename. File operations are then performed anyways, but your app will be notified when such an event happens and can therefore display a warning to the user, for example, and optionally rollback any changes made (you're responsible for backing up previous data in this case!).
-
-:::info
-
-Events are only published when the throwing option is disabled.
-
-:::
-
-To subscribe, simply add a listener like this:
-
-```ts
-const subscription = CloudStorage.subscribeToFilesWithSameName(({ path, fileIds }) => {
-  console.log(`There are multiple files with the path ${path}!`, { fileIds });
-});
-
-// to unsubscribe again
-subscription.remove();
-```
-
-See also the [API documentation](../api/CloudStorage#subscribetofileswithsamenamesubscriber).
+If you do wish to enable throwing, simply call [`CloudStorage.setProviderOptions({ strictFilenames: true })`](../api/CloudStorage#setprovideroptionsoptions) on a `CloudStorage` instance set to Google Drive. The library will then throw a [`CloudStorageError`](../api/CloudStorageError) with the code [`CloudStorageErrorCode.MULTIPLE_FILES_SAME_NAME`](../api/enums/CloudStorageErrorCode). Again, this will only affect Google Drive and not have any effect on other providers such as iCloud, which do not allow same filenames on different files within the same directory.

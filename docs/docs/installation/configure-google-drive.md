@@ -12,7 +12,7 @@ Please note that filenames are not unique in Google Drive. There can be multiple
 
 :::info
 
-Be aware that all file operations on Google Drive will take severely more time than on iCloud. This is because iCloud is implemented using a direct native API (CloudKit) while Google Drive is implemented using the HTTP REST API. A file read operation that might only take a split second on iCloud might take several seconds on Google Drive.
+Be aware that all file operations on Google Drive will take severely more time than on iCloud. This is because iCloud is implemented using a direct native API that uses a local mirror of the cloud filesystem (CloudKit) while Google Drive is implemented using the HTTP REST API. A file read operation that might only take a split second on iCloud might take several seconds on Google Drive.
 
 :::
 
@@ -23,20 +23,20 @@ You therefore need to acquire the token with another library. Popular choices ar
 Once you have acquired an access token from the user, you will need to provide it to the library:
 
 ```ts
-import { CloudStorage } from 'react-native-cloud-storage';
-CloudStorage.setGoogleDriveAccessToken(accessToken);
+import { CloudStorage, CloudStorageProvider } from 'react-native-cloud-storage';
+if (CloudStorage.getProvider() === CloudStorageProvider.GoogleDrive) {
+  CloudStorage.setProviderOptions({ accessToken: 'some_access_token' });
+}
 ```
-
-The access token is stored globally / statically so that it is valid across the project.
 
 Below is a more practical example of how this could look in action using the Expo AuthSession API:
 
 ```tsx
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Button, Platform } from 'react-native';
+import { StyleSheet, Text, View, Button } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
-import { CloudStorage, CloudStorageScope } from 'react-native-cloud-storage';
+import { CloudStorage, CloudStorageProvider, CloudStorageScope } from 'react-native-cloud-storage';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -55,8 +55,8 @@ const App: React.FC = () => {
       setAccessToken(response.authentication.accessToken);
     }
 
-    if (accessToken) {
-      CloudStorage.setGoogleDriveAccessToken(accessToken);
+    if (accessToken && CloudStorage.getProvider() === CloudStorageProvider.GoogleDrive) {
+      CloudStorage.setProviderOptions({ accessToken });
     }
   }, [response, accessToken]);
 
@@ -66,7 +66,7 @@ const App: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {Platform.OS !== 'ios' && accessToken === null ? (
+      {CloudStorage.getProvider() === CloudStorageProvider.GoogleDrive && !accessToken ? (
         <Button
           title="Sign in with Google"
           disabled={!request}
@@ -96,4 +96,4 @@ const styles = StyleSheet.create({
 });
 ```
 
-Ultimately, you are responsible for acquiring and potentially refreshing the access token. Do note however, that this process does not need to be done for iOS as iOS will not use the Google Drive REST API but instead fully rely on CloudKit / iCloud.
+Ultimately, you are responsible for acquiring and potentially refreshing the access token. Do note however, that this process only needs to be done when Google Drive is used and is not required on other providers such as iCloud.

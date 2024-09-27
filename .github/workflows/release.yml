@@ -1,5 +1,11 @@
 name: Release
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type (patch, minor, major, or a semver version)'
+        required: false
+        type: string
 
 jobs:
   lint:
@@ -11,8 +17,30 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
 
+      - name: Setup Mint package manager
+        uses: irgaly/setup-mint@v1
+
+      - name: Cache Mint packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.mint
+          key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
+          restore-keys: |
+            ${{ runner.os }}-mint-
+
+      - name: Install SwiftFormat
+        run: |
+          mint install nicklockwood/SwiftFormat
+          echo "$HOME/.mint/bin" >> $GITHUB_PATH
+
       - name: Lint files
         run: yarn lint
+
+      - name: Run SwiftFormat
+        run: swiftformat --verbose ios
+
+      - name: Verify formatted code is unchanged
+        run: git diff --exit-code HEAD
 
       - name: Typecheck files
         run: yarn typecheck
@@ -52,7 +80,24 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Validate release type
+        if: ${{ inputs.release_type != '' }}
+        run: |
+          if [[ "${{ inputs.release_type }}" =~ ^(patch|minor|major)$ ]]; then
+            echo "Valid release type: ${{ inputs.release_type }}"
+          elif [[ "${{ inputs.release_type }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Valid semver version: ${{ inputs.release_type }}"
+          else
+            echo "Invalid input. Must be 'patch', 'minor', 'major', or a valid semver version (e.g., 1.2.3)."
+            exit 1
+          fi
+
       - name: Release
-        run: yarn release
+        run: |
+          if [ -n "${{ inputs.release_type }}" ]; then
+            yarn release --release-as ${{ inputs.release_type }}
+          else
+            yarn release
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.CICD_PAT }}

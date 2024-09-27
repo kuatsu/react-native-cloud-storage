@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, ActivityIndicator, ScrollView, Platform, Alert } from 'react-native';
+import { StyleSheet, View, Text, TextInput, ActivityIndicator, ScrollView, Alert, Platform } from 'react-native';
 import {
   CloudStorage,
   CloudStorageError,
   CloudStorageErrorCode,
   type CloudStorageFileStat,
+  CloudStorageProvider,
   CloudStorageScope,
   useIsCloudAvailable,
 } from 'react-native-cloud-storage';
@@ -13,7 +14,11 @@ import Card from '../components/Card';
 import Button from '../components/Button';
 
 const HomeView = () => {
-  const [scope, setScope] = useState(CloudStorage.getDefaultScope());
+  const [provider, setProvider] = useState(CloudStorage.getDefaultProvider());
+  const [cloudStorage, setCloudStorage] = useState(
+    new CloudStorage(provider, provider === CloudStorageProvider.GoogleDrive ? { strictFilenames: true } : undefined)
+  );
+  const [scope, setScope] = useState(cloudStorage.getProviderOptions().scope);
   const [parentDirectory, setParentDirectory] = useState('/');
   const [filename, setFilename] = useState('test.txt');
   const [stats, setStats] = useState<CloudStorageFileStat | null>(null);
@@ -22,7 +27,7 @@ const HomeView = () => {
   const [accessToken, setAccessToken] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const cloudAvailable = useIsCloudAvailable();
+  const cloudAvailable = useIsCloudAvailable(cloudStorage);
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
@@ -30,20 +35,22 @@ const HomeView = () => {
   }, [cloudAvailable]);
 
   useEffect(() => {
-    const subscription = CloudStorage.subscribeToFilesWithSameName(({ path, fileIds }) =>
-      console.warn('Multiple files with same name', { path, fileIds })
+    if (cloudStorage.getProvider() !== CloudStorageProvider.GoogleDrive) return;
+
+    cloudStorage.setProviderOptions({
+      accessToken: accessToken.length ? accessToken : null,
+    });
+  }, [accessToken, cloudStorage]);
+
+  useEffect(() => {
+    setCloudStorage(
+      new CloudStorage(provider, provider === CloudStorageProvider.GoogleDrive ? { strictFilenames: true } : undefined)
     );
-
-    return () => subscription.remove();
-  }, []);
+  }, [provider]);
 
   useEffect(() => {
-    CloudStorage.setGoogleDriveAccessToken(accessToken.length ? accessToken : null);
-  }, [accessToken]);
-
-  useEffect(() => {
-    CloudStorage.setDefaultScope(scope);
-  }, [scope]);
+    cloudStorage.setProviderOptions({ scope });
+  }, [scope, cloudStorage]);
 
   useEffect(() => {
     setStats(null);
@@ -53,7 +60,7 @@ const HomeView = () => {
   const handleCheckDirectoryExists = async () => {
     setLoading(true);
     try {
-      const exists = await CloudStorage.exists(parentDirectory);
+      const exists = await cloudStorage.exists(parentDirectory);
       Alert.alert(
         parentDirectory === '/' || !parentDirectory.length
           ? 'Root Directory exists?'
@@ -70,7 +77,7 @@ const HomeView = () => {
   const handleCreateDirectory = async () => {
     setLoading(true);
     try {
-      await CloudStorage.mkdir(parentDirectory);
+      await cloudStorage.mkdir(parentDirectory);
       readFile();
     } catch (e) {
       console.warn(e);
@@ -82,7 +89,7 @@ const HomeView = () => {
   const handleListContents = async () => {
     setLoading(true);
     try {
-      const contents = await CloudStorage.readdir(parentDirectory);
+      const contents = await cloudStorage.readdir(parentDirectory);
       Alert.alert('Directory contents', contents.map((c) => `• ${c}`).join('\n'));
     } catch (e) {
       console.warn(e);
@@ -94,11 +101,11 @@ const HomeView = () => {
   const readFile = async () => {
     setLoading(true);
     try {
-      const newStats = await CloudStorage.stat(parentDirectory + '/' + filename);
+      const newStats = await cloudStorage.stat(parentDirectory + '/' + filename);
       setStats(newStats);
-      console.log('File stats', stats);
+      console.log('File stats', newStats);
       if (newStats.isDirectory()) return;
-      setInput(await CloudStorage.readFile(parentDirectory + '/' + filename));
+      setInput(await cloudStorage.readFile(parentDirectory + '/' + filename));
     } catch (e) {
       if (e instanceof CloudStorageError) {
         if (e.code === CloudStorageErrorCode.FILE_NOT_FOUND) {
@@ -116,7 +123,7 @@ const HomeView = () => {
   const handleCreateFile = async () => {
     setLoading(true);
     try {
-      await CloudStorage.writeFile(parentDirectory + '/' + filename, input);
+      await cloudStorage.writeFile(parentDirectory + '/' + filename, input);
       readFile();
     } catch (e) {
       console.warn(e);
@@ -128,7 +135,7 @@ const HomeView = () => {
   const handleAppend = async () => {
     setLoading(true);
     try {
-      await CloudStorage.appendFile(parentDirectory + '/' + filename, appendInput);
+      await cloudStorage.appendFile(parentDirectory + '/' + filename, appendInput);
       readFile();
       setAppendInput('');
     } catch (e) {
@@ -143,7 +150,7 @@ const HomeView = () => {
   const handleDeleteFile = async () => {
     setLoading(true);
     try {
-      await CloudStorage.unlink(parentDirectory + '/' + filename);
+      await cloudStorage.unlink(parentDirectory + '/' + filename);
       readFile();
     } catch (e) {
       console.warn(e);
@@ -162,7 +169,7 @@ const HomeView = () => {
     } else {
       setLoading(true);
       try {
-        await CloudStorage.rmdir(parentDirectory, { recursive });
+        await cloudStorage.rmdir(parentDirectory, { recursive });
         setStats(null);
         setInput('');
       } catch (e) {
@@ -176,7 +183,7 @@ const HomeView = () => {
   const handleDownload = async () => {
     setLoading(true);
     try {
-      await CloudStorage.downloadFile(parentDirectory + '/' + filename);
+      await cloudStorage.downloadFile(parentDirectory + '/' + filename);
       Alert.alert('File download', 'File downloaded successfully.');
     } catch (e) {
       console.warn(e);
@@ -195,9 +202,27 @@ const HomeView = () => {
         </View>
       )}
       <Text style={styles.title}>RNCloudStorage{'\n'}Example App</Text>
-      <Text style={styles.subtitle}>Cloud storage available: {cloudAvailable ? '✅ Yes' : '❌ No'}</Text>
-      <Card title="Working Directory">
+      <Card title="Configuration">
         <Text>
+          <Text style={{ fontWeight: 'bold' }}>Cloud storage available:</Text> {cloudAvailable ? '✅ Yes' : '❌ No'}
+        </Text>
+        <Text style={{ marginTop: 10 }}>
+          <Text style={{ fontWeight: 'bold' }}>Provider:</Text>{' '}
+          {provider === CloudStorageProvider.ICloud ? 'iCloud' : 'Google Drive'}
+        </Text>
+        {Platform.OS === 'ios' && (
+          <Button
+            title={`Switch to ${provider === CloudStorageProvider.ICloud ? 'Google Drive' : 'iCloud'} provider`}
+            onPress={() =>
+              setProvider(
+                provider === CloudStorageProvider.ICloud
+                  ? CloudStorageProvider.GoogleDrive
+                  : CloudStorageProvider.ICloud
+              )
+            }
+          />
+        )}
+        <Text style={{ marginTop: 10 }}>
           <Text style={{ fontWeight: 'bold' }}>Directory Scope</Text>:{' '}
           {scope === CloudStorageScope.Documents ? 'Documents' : 'App Data'}
         </Text>
@@ -207,6 +232,19 @@ const HomeView = () => {
             setScope(scope === CloudStorageScope.Documents ? CloudStorageScope.AppData : CloudStorageScope.Documents)
           }
         />
+        {provider === CloudStorageProvider.GoogleDrive && (
+          <>
+            <Text style={{ fontWeight: 'bold', marginTop: 10 }}>Access Token</Text>
+            <TextInput
+              placeholder="Google Drive access token"
+              value={accessToken}
+              onChangeText={setAccessToken}
+              style={styles.input}
+            />
+          </>
+        )}
+      </Card>
+      <Card title="Working Directory">
         <Text style={{ fontWeight: 'bold', marginTop: 10 }}>Parent directory</Text>
         <TextInput
           placeholder="Parent directory"
@@ -223,7 +261,7 @@ const HomeView = () => {
       <Card title="File Operations">
         <Text style={{ fontWeight: 'bold' }}>Filename of working file</Text>
         <TextInput placeholder="Filename" value={filename} onChangeText={setFilename} style={styles.input} />
-        {Platform.OS === 'ios' && <Button title="Download file" onPress={handleDownload} />}
+        {provider === CloudStorageProvider.ICloud && <Button title="Download file" onPress={handleDownload} />}
         <Button title="Read file" onPress={handleRead} />
         <Button title="Delete file" onPress={handleDeleteFile} />
         <TextInput
@@ -249,17 +287,6 @@ const HomeView = () => {
           {stats ? (stats.isDirectory() ? '❌ No (is directory)' : '✅ Yes') : '❌ No'}
         </Text>
       </Card>
-      {Platform.OS !== 'ios' && (
-        <Card title="Google Drive">
-          <Text style={{ fontWeight: 'bold' }}>Access Token</Text>
-          <TextInput
-            placeholder="Google Drive access token"
-            value={accessToken}
-            onChangeText={setAccessToken}
-            style={styles.input}
-          />
-        </Card>
-      )}
     </ScrollView>
   );
 };
@@ -287,12 +314,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     textAlign: 'center',
     margin: 10,
-    fontWeight: 'bold',
-  },
-  subtitle: {
-    fontSize: 14,
-    textAlign: 'center',
-    marginBottom: 10,
     fontWeight: 'bold',
   },
   smallText: {
