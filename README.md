@@ -42,7 +42,7 @@ const App = () => {
   const cloudAvailable = useIsCloudAvailable();
 
   React.useEffect(() => {
-    if (CloudStorage.getProvider() === CloudStorageProvider.GoogleDrive) {
+    if (CloudStorage.getDefaultProvider() === CloudStorageProvider.GoogleDrive) {
       // get access token via @react-native-google-signin/google-signin or similar
       CloudStorage.setProviderOptions({ accessToken: 'some-access-token' });
     }
