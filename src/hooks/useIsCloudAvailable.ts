@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { NativeEventEmitter, NativeModules, Platform, DeviceEventEmitter } from 'react-native';
 import RNCloudStorage from '../RNCloudStorage';
+import { cloudStorageEventEmitter } from '../utils/CloudStorageEventEmitter';
 
 /**
  * A hook that tests whether or not the cloud storage is available.
@@ -14,19 +14,15 @@ export const useIsCloudAvailable = () => {
     RNCloudStorage.isCloudAvailable().then(setIsAvailable);
 
     // Listen for changes to the cloud availability using the native event emitter
-    let eventEmitter: NativeEventEmitter | typeof DeviceEventEmitter;
-    if (Platform.OS === 'ios') {
-      eventEmitter = new NativeEventEmitter(NativeModules.CloudStorageEventEmitter);
-    } else {
-      eventEmitter = DeviceEventEmitter;
-    }
-
-    eventEmitter.addListener('RNCloudStorage.cloud.availability-changed', (event: { available: boolean }) => {
-      setIsAvailable(event.available);
-    });
+    cloudStorageEventEmitter.addListener(
+      'RNCloudStorage.cloud.availability-changed',
+      (event: { available: boolean }) => {
+        setIsAvailable(event.available);
+      }
+    );
 
     return () => {
-      eventEmitter.removeAllListeners('RNCloudStorage.cloud.availability-changed');
+      cloudStorageEventEmitter.removeAllListeners('RNCloudStorage.cloud.availability-changed');
     };
   }, []);
 

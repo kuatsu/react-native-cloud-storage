@@ -1,4 +1,4 @@
-import { Platform, DeviceEventEmitter } from 'react-native';
+import { Platform } from 'react-native';
 import {
   type DeepRequired,
   CloudStorageProvider,
@@ -6,6 +6,8 @@ import {
   CloudStorageScope,
 } from './types/main';
 import { isProviderSupported } from './utils/helpers';
+import { cloudStorageEventEmitter } from './utils/CloudStorageEventEmitter';
+import createNativeCloudStorage from './createRNCloudStorage';
 
 let currentProvider = Platform.select({
   ios: CloudStorageProvider.ICloud,
@@ -31,6 +33,22 @@ export const providerService = {
       throw new Error(`CloudStorage Provider ${newProvider} is not supported on this platform`);
     }
 
+    // Emit an event to notify useIsCloudAvailable() hook consumers of the new cloud availability status
+    if (newProvider === CloudStorageProvider.ICloud) {
+      const nativeInstance = createNativeCloudStorage(newProvider);
+      cloudStorageEventEmitter.emit('RNCloudStorage.cloud.availability-changed', {
+        available: nativeInstance.isCloudAvailable(),
+      });
+    } else if (newProvider === CloudStorageProvider.GoogleDrive) {
+      cloudStorageEventEmitter.emit('RNCloudStorage.cloud.availability-changed', {
+        available: (
+          currentProviderOptions[CloudStorageProvider.GoogleDrive] as Required<
+            CloudStorageProviderOptions[CloudStorageProvider.GoogleDrive]
+          >
+        ).accessToken?.length,
+      });
+    }
+
     currentProvider = newProvider;
   },
   getProviderOptions: <T extends CloudStorageProvider>(provider: T): DeepRequired<CloudStorageProviderOptions>[T] => {
@@ -45,7 +63,7 @@ export const providerService = {
 
     if (provider === CloudStorageProvider.GoogleDrive && 'accessToken' in newOptions) {
       // Emit an event to notify useIsCloudAvailable() hook consumers of the new cloud availability status
-      DeviceEventEmitter.emit('RNCloudStorage.cloud.availability-changed', {
+      cloudStorageEventEmitter.emit('RNCloudStorage.cloud.availability-changed', {
         available: (newOptions as Required<CloudStorageProviderOptions[CloudStorageProvider.GoogleDrive]>).accessToken
           ?.length,
       });
