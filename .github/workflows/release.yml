@@ -1,5 +1,11 @@
 name: Release
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type (patch, minor, or major)'
+        required: false
+        type: string
 
 jobs:
   lint:
@@ -52,7 +58,20 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Validate release type
+        if: ${{ inputs.release_type != '' }}
+        run: |
+          if [[ "${{ inputs.release_type }}" != "patch" && "${{ inputs.release_type }}" != "minor" && "${{ inputs.release_type }}" != "major" ]]; then
+            echo "Invalid release type. Must be 'patch', 'minor', or 'major'."
+            exit 1
+          fi
+
       - name: Release
-        run: yarn release
+        run: |
+          if [ -n "${{ inputs.release_type }}" ]; then
+            yarn release --release-as ${{ inputs.release_type }}
+          else
+            yarn release
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.CICD_PAT }}
