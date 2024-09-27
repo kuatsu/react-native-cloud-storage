@@ -100,7 +100,7 @@ const HomeView = () => {
     try {
       const newStats = await CloudStorage.stat(parentDirectory + '/' + filename);
       setStats(newStats);
-      console.log('File stats', stats);
+      console.log('File stats', newStats);
       if (newStats.isDirectory()) return;
       setInput(await CloudStorage.readFile(parentDirectory + '/' + filename));
     } catch (e) {

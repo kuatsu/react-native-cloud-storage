@@ -24,7 +24,7 @@ class CloudStorageEventEmitter: RCTEventEmitter {
   }
 
   @objc func iCloudIdentityChanged(_ notification: Notification? = nil) {
-    let token = FileManager.default.ubiquityIdentityToken
-    CloudStorageEventEmitter.shared.sendEvent(withName: "RNCloudStorage.cloud.availability-changed", body: ["available": token != nil])
+    let isAvailable = CloudKitUtils.isCloudKitAvailable()
+    CloudStorageEventEmitter.shared.sendEvent(withName: "RNCloudStorage.cloud.availability-changed", body: ["available": isAvailable])
   }
 }

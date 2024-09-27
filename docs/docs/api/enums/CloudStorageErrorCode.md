@@ -14,6 +14,7 @@ import { CloudStorageErrorCode } from 'react-native-cloud-storage';
 
 ```ts
 enum CloudStorageErrorCode {
+  INVALID_SCOPE = 'ERR_INVALID_SCOPE',
   FILE_NOT_FOUND = 'ERR_FILE_NOT_FOUND',
   PATH_IS_DIRECTORY = 'ERR_PATH_IS_DIRECTORY',
   PATH_IS_FILE = 'ERR_PATH_IS_FILE',
