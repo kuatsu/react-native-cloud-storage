@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       release_type:
-        description: 'Release type (patch, minor, or major)'
+        description: 'Release type (patch, minor, major, or a semver version)'
         required: false
         type: string
 
@@ -68,8 +68,12 @@ jobs:
       - name: Validate release type
         if: ${{ inputs.release_type != '' }}
         run: |
-          if [[ "${{ inputs.release_type }}" != "patch" && "${{ inputs.release_type }}" != "minor" && "${{ inputs.release_type }}" != "major" ]]; then
-            echo "Invalid release type. Must be 'patch', 'minor', or 'major'."
+          if [[ "${{ inputs.release_type }}" =~ ^(patch|minor|major)$ ]]; then
+            echo "Valid release type: ${{ inputs.release_type }}"
+          elif [[ "${{ inputs.release_type }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Valid semver version: ${{ inputs.release_type }}"
+          else
+            echo "Invalid input. Must be 'patch', 'minor', 'major', or a valid semver version (e.g., 1.2.3)."
             exit 1
           fi
 
