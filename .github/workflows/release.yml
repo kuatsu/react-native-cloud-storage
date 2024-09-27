@@ -20,6 +20,14 @@ jobs:
       - name: Setup Mint package manager
         uses: irgaly/setup-mint@v1
 
+      - name: Cache Mint packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.mint
+          key: ${{ runner.os }}-mint-${{ hashFiles('~/.mint/bin/**') }}
+          restore-keys: |
+            ${{ runner.os }}-mint-
+
       - name: Install SwiftFormat
         run: |
           mint install nicklockwood/SwiftFormat
