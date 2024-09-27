@@ -43,6 +43,15 @@ Creates a new `CloudStorage` instance using the given provider.
 
 ## Configuration methods
 
+### `getDefaultProvider()`
+
+- **Available on static class**: ✅ Yes
+- **Available on instances**: ❌ No
+
+Gets the default cloud storage provider for the current platform.
+
+**Returns**: The default [`CloudStorageProvider`](./enums/CloudStorageProvider) for the current platform (e.g. [`CloudStorageProvider.ICloud`](./enums/CloudStorageProvider) on iOS and [`CloudStorageProvider.GoogleDrive`](./enums/CloudStorageProvider) on all other platforms).
+
 ### `getProvider()`
 
 - **Available on static class**: ❌ No (the static default instance will use the default provider of the current platform)
