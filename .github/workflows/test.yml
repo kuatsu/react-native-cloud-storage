@@ -17,8 +17,11 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
 
-      - name: Install Swift tools
-        run: make swift-tools
+      - name: Setup Mint package manager
+        uses: irgaly/setup-mint@v1
+
+      - name: Install SwiftFormat
+        run: mint install nicklockwood/SwiftFormat
 
       - name: Lint files
         run: yarn lint
