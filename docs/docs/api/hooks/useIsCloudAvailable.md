@@ -18,4 +18,4 @@ import { useIsCloudAvailable } from 'react-native-cloud-storage';
 
 - `cloudStorageInstance` ([`CloudStorage`](../CloudStorage)): Optional. An instance of [`CloudStorage`](../CloudStorage). If not specified, the default static instance will be used.
 
-**Returns**: A `boolean` which is `true` if the cloud storage is online, `false` otherwise. For a more specific definition, ([see here](../CloudStorage#iscloudavailable))
+**Returns**: A `boolean` which is `true` if the cloud storage is online, `false` otherwise. For a more specific definition, [see here](../CloudStorage#iscloudavailable).
