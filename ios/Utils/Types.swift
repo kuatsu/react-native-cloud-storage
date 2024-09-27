@@ -8,24 +8,29 @@
 
 import Foundation
 
+// MARK: - DirectoryScope
+
 @frozen
 enum DirectoryScope: String {
   case appData = "app_data"
-  case documents = "documents"
+  case documents
 }
 
-struct FileStat: Encodable {
-    let size: UInt64
-    let birthtimeMs: Double
-    let mtimeMs: Double
-    let isDirectory: Bool
-    let isFile: Bool
+// MARK: - FileStat
 
-    func toDictionary() -> [String: Any] {
-        guard let data = try? JSONEncoder().encode(self),
-              let dictionary = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any] else {
-            return [:]
-        }
-        return dictionary
+struct FileStat: Encodable {
+  let size: UInt64
+  let birthtimeMs: Double
+  let mtimeMs: Double
+  let isDirectory: Bool
+  let isFile: Bool
+
+  func toDictionary() -> [String: Any] {
+    guard let data = try? JSONEncoder().encode(self),
+          let dictionary = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
+    else {
+      return [:]
     }
+    return dictionary
+  }
 }

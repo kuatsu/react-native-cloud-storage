@@ -10,7 +10,7 @@ class CloudStorageEventEmitter: RCTEventEmitter {
   }
 
   override func supportedEvents() -> [String]! {
-    return ["RNCloudStorage.cloud.availability-changed"]
+    ["RNCloudStorage.cloud.availability-changed"]
   }
 
   override func startObserving() {
@@ -23,7 +23,7 @@ class CloudStorageEventEmitter: RCTEventEmitter {
     NotificationCenter.default.removeObserver(self, name: NSNotification.Name.NSUbiquityIdentityDidChange, object: nil)
   }
 
-  @objc func iCloudIdentityChanged(_ notification: Notification? = nil) {
+  @objc func iCloudIdentityChanged(_: Notification? = nil) {
     let isAvailable = CloudKitUtils.isCloudKitAvailable()
     CloudStorageEventEmitter.shared.sendEvent(withName: "RNCloudStorage.cloud.availability-changed", body: ["available": isAvailable])
   }

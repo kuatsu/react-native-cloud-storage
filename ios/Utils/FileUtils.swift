@@ -12,18 +12,18 @@ enum FileUtils {
   private static let fileManager = FileManager.default
 
   static func checkFileExists(fileUrl: URL) throws -> Bool {
-    return fileManager.fileExists(atPath: fileUrl.path)
+    fileManager.fileExists(atPath: fileUrl.path)
   }
 
   /**
-    Reads a file and returns its content as a string.
+     Reads a file and returns its content as a string.
 
-    - Parameter fileUrl: The URL of the file to read.
-    - Returns: The content of the file as a string.
-    - Throws: An NSError if the file couldn't be read.
-  */
+     - Parameter fileUrl: The URL of the file to read.
+     - Returns: The content of the file as a string.
+     - Throws: An NSError if the file couldn't be read.
+   */
   static func readFile(fileUrl: URL) throws -> String {
-    if !(try checkFileExists(fileUrl: fileUrl)) {
+    if try !checkFileExists(fileUrl: fileUrl) {
       throw CloudStorageError.fileNotFound(path: fileUrl.path)
     }
 
@@ -36,13 +36,13 @@ enum FileUtils {
   }
 
   /**
-    Writes a string to a file. If the file already exists, it will be overwritten.
+     Writes a string to a file. If the file already exists, it will be overwritten.
 
-    - Parameter fileUrl: The URL of the file to write to.
-    - Parameter content: The string to write to the file.
-    - Throws: An NSError if the file couldn't be written to.
-  */
-  static func writeFile(fileUrl: URL, content: String) throws -> Void {
+     - Parameter fileUrl: The URL of the file to write to.
+     - Parameter content: The string to write to the file.
+     - Throws: An NSError if the file couldn't be written to.
+   */
+  static func writeFile(fileUrl: URL, content: String) throws {
     do {
       try content.write(to: fileUrl, atomically: true, encoding: .utf8)
     } catch {
@@ -51,12 +51,12 @@ enum FileUtils {
   }
 
   /**
-    Creates a directory.
+     Creates a directory.
 
-    - Parameter directoryUrl: The URL of the directory to create.
-    - Throws: An NSError if the directory couldn't be created.
-  */
-  static func createDirectory(directoryUrl: URL) throws -> Void {
+     - Parameter directoryUrl: The URL of the directory to create.
+     - Throws: An NSError if the directory couldn't be created.
+   */
+  static func createDirectory(directoryUrl: URL) throws {
     do {
       try fileManager.createDirectory(at: directoryUrl, withIntermediateDirectories: true, attributes: nil)
     } catch {
@@ -65,12 +65,12 @@ enum FileUtils {
   }
 
   /**
-    Lists the files in a directory.
+     Lists the files in a directory.
 
-    - Parameter directoryUrl: The URL of the directory to list the files of.
-    - Returns: An array of Strings representing the file names.
-    - Throws: An NSError if the directory couldn't be read.
-  */
+     - Parameter directoryUrl: The URL of the directory to list the files of.
+     - Returns: An array of Strings representing the file names.
+     - Throws: An NSError if the directory couldn't be read.
+   */
   static func listFiles(directoryUrl: URL) throws -> [String] {
     do {
       let fileUrls = try fileManager.contentsOfDirectory(atPath: directoryUrl.path)
@@ -81,12 +81,12 @@ enum FileUtils {
   }
 
   /**
-    Deletes a file or directory.
+     Deletes a file or directory.
 
-    - Parameter fileUrl: The URL of the file or directory to delete.
-    - Throws: An NSError if the file / directory couldn't be deleted.
-  */
-  static func deleteFileOrDirectory(fileUrl: URL) throws -> Void {
+     - Parameter fileUrl: The URL of the file or directory to delete.
+     - Throws: An NSError if the file / directory couldn't be deleted.
+   */
+  static func deleteFileOrDirectory(fileUrl: URL) throws {
     do {
       try fileManager.removeItem(at: fileUrl)
     } catch {
@@ -95,14 +95,14 @@ enum FileUtils {
   }
 
   /**
-    Gets the stats of a file.
+     Gets the stats of a file.
 
-    - Parameter fileUrl: The URL of the file to get the stats of.
-    - Returns: The stats of the file.
-    - Throws: An NSError if the stats couldn't be retrieved.
-  */
+     - Parameter fileUrl: The URL of the file to get the stats of.
+     - Returns: The stats of the file.
+     - Throws: An NSError if the stats couldn't be retrieved.
+   */
   static func statFile(fileUrl: URL) throws -> FileStat {
-    if !(try checkFileExists(fileUrl: fileUrl)) {
+    if try !checkFileExists(fileUrl: fileUrl) {
       throw CloudStorageError.fileNotFound(path: fileUrl.path)
     }
 
@@ -127,6 +127,6 @@ enum FileUtils {
   }
 
   static func sanitizePath(path: String) -> String {
-    return path.replacingOccurrences(of: "^/+", with: "", options: .regularExpression)
+    path.replacingOccurrences(of: "^/+", with: "", options: .regularExpression)
   }
 }

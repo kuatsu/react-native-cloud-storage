@@ -3,7 +3,7 @@ import Foundation
 @objc(CloudStorage)
 class CloudStorage: NSObject {
   @objc(fileExists:withScope:withResolver:withRejecter:)
-  func fileExists(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+  func fileExists(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
       let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
       return try FileUtils.checkFileExists(fileUrl: fileUrl)
@@ -11,7 +11,7 @@ class CloudStorage: NSObject {
   }
 
   @objc(appendToFile:withData:withScope:withResolver:withRejecter:)
-  func appendToFile(path: String, data: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+  func appendToFile(path: String, data: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
       let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
 
@@ -26,11 +26,11 @@ class CloudStorage: NSObject {
   }
 
   @objc(createFile:withData:withScope:withOverwrite:withResolver:withRejecter:)
-  func createFile(path: String, data: String, scope: String, overwrite: Bool, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+  func createFile(path: String, data: String, scope: String, overwrite: Bool, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
       let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
 
-      if (try FileUtils.checkFileExists(fileUrl: fileUrl) && !overwrite) {
+      if try (FileUtils.checkFileExists(fileUrl: fileUrl) && !overwrite) {
         throw CloudStorageError.fileAlreadyExists(path: path)
       }
 
@@ -39,7 +39,7 @@ class CloudStorage: NSObject {
   }
 
   @objc(createDirectory:withScope:withResolver:withRejecter:)
-  func createDirectory(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+  func createDirectory(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
       let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
       return try FileUtils.createDirectory(directoryUrl: fileUrl)
@@ -47,7 +47,7 @@ class CloudStorage: NSObject {
   }
 
   @objc(listFiles:withScope:withResolver:withRejecter:)
-  func listFiles(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+  func listFiles(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
       let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
       return try FileUtils.listFiles(directoryUrl: fileUrl)
@@ -55,7 +55,7 @@ class CloudStorage: NSObject {
   }
 
   @objc(readFile:withScope:withResolver:withRejecter:)
-  func readFile(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+  func readFile(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
       let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
       return try FileUtils.readFile(fileUrl: fileUrl)
@@ -63,16 +63,15 @@ class CloudStorage: NSObject {
   }
 
   @objc(downloadFile:withScope:withResolver:withRejecter:)
-  func downloadFile(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+  func downloadFile(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
       let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
       return try CloudKitUtils.downloadFile(fileUrl: fileUrl)
     }
   }
 
-
   @objc(deleteFile:withScope:withResolver:withRejecter:)
-  func deleteFile(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+  func deleteFile(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
       let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
       return try FileUtils.deleteFileOrDirectory(fileUrl: fileUrl)
@@ -80,7 +79,7 @@ class CloudStorage: NSObject {
   }
 
   @objc(deleteDirectory:withRecursive:withScope:withResolver:withRejecter:)
-  func deleteDirectory(path: String, recursive: Bool, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+  func deleteDirectory(path: String, recursive _: Bool, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
       let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
       return try FileUtils.deleteFileOrDirectory(fileUrl: fileUrl)
@@ -88,7 +87,7 @@ class CloudStorage: NSObject {
   }
 
   @objc(statFile:withScope:withResolver:withRejecter:)
-  func statFile(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+  func statFile(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
       let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
       return try FileUtils.statFile(fileUrl: fileUrl).toDictionary()
@@ -96,9 +95,9 @@ class CloudStorage: NSObject {
   }
 
   @objc(isCloudAvailable:withRejecter:)
-  func isCloudAvailable(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+  func isCloudAvailable(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
-      return CloudKitUtils.isCloudKitAvailable()
+      CloudKitUtils.isCloudKitAvailable()
     }
   }
 }

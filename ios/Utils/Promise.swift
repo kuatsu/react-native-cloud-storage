@@ -8,6 +8,8 @@
 
 import Foundation
 
+// MARK: - Promise
+
 class Promise {
   private let resolver: RCTPromiseResolveBlock
   private let rejecter: RCTPromiseRejectBlock
@@ -52,5 +54,5 @@ func withPromise(_ promise: Promise, _ block: () throws -> Any?) {
  * `CloudStorageError.unknown`.
  */
 func withPromise(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock, _ block: () throws -> Any?) {
-  return withPromise(Promise(resolver: resolve, rejecter: reject), block)
+  withPromise(Promise(resolver: resolve, rejecter: reject), block)
 }
