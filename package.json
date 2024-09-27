@@ -1,6 +1,6 @@
 {
   "name": "react-native-cloud-storage",
-  "version": "1.4.2",
+  "version": "1.5.1",
   "description": "Save to & read from iCloud and Google Drive using React Native",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
