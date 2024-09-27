@@ -20,6 +20,13 @@ jobs:
       - name: Lint files
         run: yarn lint
 
+      - name: Run SwiftLint
+        uses: norio-nomura/action-swiftlint@master
+        with:
+          args: --strict
+        env:
+          WORKING_DIRECTORY: ios
+
       - name: Typecheck files
         run: yarn typecheck
 
