@@ -103,7 +103,8 @@ Use `Platform.select` to set the provider based on the platform:
 import { Platform } from 'react-native';
 import { CloudStorage, CloudStorageProvider } from 'react-native-cloud-storage';
 
-CloudStorage.setProvider(
+const cloudStorage = new CloudStorage();
+cloudStorage.setProvider(
   Platform.select({
     ios: CloudStorageProvider.ICloud,
     default: CloudStorageProvider.GoogleDrive,
