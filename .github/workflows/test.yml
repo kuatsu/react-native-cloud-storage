@@ -17,15 +17,14 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
 
+      - name: Install Swift tools
+        run: make swift-tools
+
       - name: Lint files
         run: yarn lint
 
-      - name: Run SwiftLint
-        uses: norio-nomura/action-swiftlint@master
-        with:
-          args: --strict
-        env:
-          WORKING_DIRECTORY: ios
+      - name: Run SwiftFormat
+        uses: swiftformat --verbose ios
 
       - name: Typecheck files
         run: yarn typecheck
