@@ -4,9 +4,9 @@ sidebar_position: 1
 
 # Using multiple Cloud Storage Providers
 
-By default, the [`CloudStorage`](../api/CloudStorage) API will use a default storage provider based on the platform (CloudKit for iOS, Google Drive for all other platforms). If you want to only use once specific provider, you can globally override this by calling [`CloudStorage.setProvider()`](../api/CloudStorage#setproviderprovider) with the provider you want to use. The default static instance (`CloudStorage`) will then use the specified provider.
+By default, the [`CloudStorage`](../api/CloudStorage) API will use a default storage provider based on the platform (CloudKit for iOS, Google Drive for all other platforms).
 
-If you want to use _multiple_ providers in your app, you can get a new instance of the `CloudStorage` API and specify a provider in the constructor. This can be useful if you want to provide multiple cloud backup options to the user at the same time, allowing him to backup his files to iCloud and Google Drive simultaneously.
+If you want to use _one specific provider_ or _multiple providers_ in your app, you can get a new instance of the `CloudStorage` API and specify a provider in the constructor. This can be useful if you want to provide multiple cloud backup options to the user at the same time, allowing him to backup his files to iCloud and Google Drive simultaneously, or if you want to use one provider (i.e. Google Drive) on all platforms.
 
 ## Example
 
