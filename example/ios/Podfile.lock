@@ -935,7 +935,7 @@ PODS:
   - React-Mapbuffer (0.74.5):
     - glog
     - React-debug
-  - react-native-cloud-storage (1.4.1):
+  - react-native-cloud-storage (2.0.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1464,7 +1464,7 @@ SPEC CHECKSUMS:
   React-jsitracing: 3b6060bbf5317663667e1dd93560c7943ab86ccc
   React-logger: 257858bd55f3a4e1bc0cf07ddc8fb9faba6f8c7c
   React-Mapbuffer: 6c1cacdbf40b531f549eba249e531a7d0bfd8e7f
-  react-native-cloud-storage: f2dff757f446de82546eb9bfff627f7fdf4693c1
+  react-native-cloud-storage: c78adc8f77aabb44c86ae1098b976bc7ea243b2a
   react-native-safe-area-context: f0d592c427d75508f2a7cd7375f533cc9283cd8a
   React-nativeconfig: ba9a2e54e2f0882cf7882698825052793ed4c851
   React-NativeModulesApple: 8d11ff8955181540585c944cf48e9e7236952697
