@@ -50,7 +50,7 @@ Creates a new `CloudStorage` instance using the given provider.
 
 Gets the internal default instance of `CloudStorage`.
 
-**Returns**: The default `CloudStorage` instance.
+**Returns**: The default `CloudStorage` instance, used when calling static methods.
 
 ### `getDefaultProvider()`
 
@@ -63,7 +63,7 @@ Gets the default cloud storage provider for the current platform.
 
 ### `getProvider()`
 
-- **Available on static class**: ❌ No (the static default instance will use the default provider of the current platform)
+- **Available on static class**: ✅ Yes (gets the provider of the static default instance)
 - **Available on instances**: ✅ Yes
 
 Gets the cloud storage provider currently in use.
@@ -72,7 +72,7 @@ Gets the cloud storage provider currently in use.
 
 ### `getProviderOptions()`
 
-- **Available on static class**: ✅ Yes
+- **Available on static class**: ✅ Yes (gets the options of the static default instance)
 - **Available on instances**: ✅ Yes
 
 Gets the currently set options of the current provider.
@@ -90,7 +90,7 @@ Gets the list of supported cloud storage providers on the current platform.
 
 ### `setProvider(provider)`
 
-- **Available on static class**: ❌ No (the static default instance will use the default provider of the current platform)
+- **Available on static class**: ✅ Yes (sets the provider of the static default instance)
 - **Available on instances**: ✅ Yes
 
 Sets the cloud storage provider to use.
@@ -103,8 +103,7 @@ Use `Platform.select` to set the provider based on the platform:
 import { Platform } from 'react-native';
 import { CloudStorage, CloudStorageProvider } from 'react-native-cloud-storage';
 
-const cloudStorage = new CloudStorage();
-cloudStorage.setProvider(
+CloudStorage.setProvider(
   Platform.select({
     ios: CloudStorageProvider.ICloud,
     default: CloudStorageProvider.GoogleDrive,
@@ -122,7 +121,7 @@ cloudStorage.setProvider(
 
 ### `setProviderOptions(options)`
 
-- **Available on static class**: ✅ Yes
+- **Available on static class**: ✅ Yes (sets the options of the static default instance)
 - **Available on instances**: ✅ Yes
 
 Sets the options of the current provider. For a list of available options per provider, [see here](./enums/CloudStorageProvider#provider-options).

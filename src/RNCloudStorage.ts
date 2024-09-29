@@ -335,6 +335,22 @@ export default class RNCloudStorage {
   }
 
   /**
+   * Gets the current provider of the default static instance.
+   * @returns The current provider of the default static instance.
+   */
+  static getProvider(): CloudStorageProvider {
+    return RNCloudStorage.getDefaultInstance().getProvider();
+  }
+
+  /**
+   * Sets the provider of the default static instance.
+   * @param provider The provider to set.
+   */
+  static setProvider(provider: CloudStorageProvider): void {
+    RNCloudStorage.getDefaultInstance().setProvider(provider);
+  }
+
+  /**
    * Gets the current options for the provider of the default static instance.
    * @returns The current options for the provider of the default static instance.
    */

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { StyleSheet, View, Text, TextInput, ActivityIndicator, ScrollView, Alert, Platform } from 'react-native';
 import {
   CloudStorage,
@@ -15,10 +15,7 @@ import Button from '../components/Button';
 
 const HomeView = () => {
   const [provider, setProvider] = useState(CloudStorage.getDefaultProvider());
-  const [cloudStorage, setCloudStorage] = useState(
-    new CloudStorage(provider, provider === CloudStorageProvider.GoogleDrive ? { strictFilenames: true } : undefined)
-  );
-  const [scope, setScope] = useState(cloudStorage.getProviderOptions().scope);
+  const [scope, setScope] = useState(CloudStorageScope.AppData);
   const [parentDirectory, setParentDirectory] = useState('/');
   const [filename, setFilename] = useState('test.txt');
   const [stats, setStats] = useState<CloudStorageFileStat | null>(null);
@@ -26,6 +23,13 @@ const HomeView = () => {
   const [appendInput, setAppendInput] = useState('');
   const [accessToken, setAccessToken] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const cloudStorage = useMemo(() => {
+    return new CloudStorage(
+      provider,
+      provider === CloudStorageProvider.GoogleDrive ? { strictFilenames: true } : undefined
+    );
+  }, [provider]);
 
   const cloudAvailable = useIsCloudAvailable(cloudStorage);
   const insets = useSafeAreaInsets();
@@ -41,12 +45,6 @@ const HomeView = () => {
       accessToken: accessToken.length ? accessToken : null,
     });
   }, [accessToken, cloudStorage]);
-
-  useEffect(() => {
-    setCloudStorage(
-      new CloudStorage(provider, provider === CloudStorageProvider.GoogleDrive ? { strictFilenames: true } : undefined)
-    );
-  }, [provider]);
 
   useEffect(() => {
     cloudStorage.setProviderOptions({ scope });
