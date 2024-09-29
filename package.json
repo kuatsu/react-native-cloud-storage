@@ -34,7 +34,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
-    "prepare": "bob build",
+    "prepare": "yarn clean && bob build && rm -rf lib/commonjs/package.json",
     "release": "release-it",
     "check": "yarn lint && scripts/swiftformat.sh"
   },
@@ -72,7 +72,7 @@
     "prettier": "^2.0.5",
     "react": "18.2.0",
     "react-native": "0.74.5",
-    "react-native-builder-bob": "^0.28.0",
+    "react-native-builder-bob": "^0.30.2",
     "release-it": "^15.0.0",
     "typescript": "^5.0.2"
   },
