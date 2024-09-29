@@ -34,7 +34,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
-    "prepare": "yarn clean && bob build && rm -rf lib/commonjs/package.json",
+    "prepare": "yarn clean && bob build && rm -f lib/commonjs/package.json",
     "release": "release-it",
     "check": "yarn lint && scripts/swiftformat.sh"
   },
