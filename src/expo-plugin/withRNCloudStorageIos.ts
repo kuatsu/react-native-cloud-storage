@@ -3,7 +3,7 @@ import { type ExpoConfig } from '@expo/config-types';
 import type { RNCloudStorageConfigPluginOptions } from './types';
 
 const getICloudContainerIdentifier = (config: ExpoConfig, options: RNCloudStorageConfigPluginOptions) => {
-  if (options.iCloudContainerIdentifier) return options.iCloudContainerIdentifier;
+  if (options?.iCloudContainerIdentifier) return options.iCloudContainerIdentifier;
 
   if (!config?.ios?.bundleIdentifier) throw new Error('Missing iOS bundle identifier');
   return `iCloud.${config.ios.bundleIdentifier}`;
