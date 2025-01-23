@@ -112,6 +112,7 @@ export default class GoogleDriveApiClient {
       const queryParameters: GoogleDriveListOperationQueryParameters = {
         fields: `files(${fields.join(',')}),nextPageToken`,
         spaces: space,
+        pageToken,
       };
       const response = await this.request<GoogleDriveListOperationResponse>(`/files`, {
         queryParameters,
