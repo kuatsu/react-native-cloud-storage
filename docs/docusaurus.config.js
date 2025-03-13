@@ -98,6 +98,11 @@ const config = {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
       },
+      algolia: {
+        appId: 'OFUZ8EY1AT',
+        apiKey: 'df6a6580f66eefffb1dbb3342492bace',
+        indexName: 'react-native-cloud-storage-oss-kuatsu',
+      },
     }),
 };
 
