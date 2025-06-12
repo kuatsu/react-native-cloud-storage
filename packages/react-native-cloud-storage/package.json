@@ -61,11 +61,11 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
-    "@expo/config-plugins": "^7.2.5",
+    "@expo/config-plugins": "^10.0.2",
     "@release-it/conventional-changelog": "^5.0.0",
-    "@types/react": "~19.0.0",
+    "@types/react": "~19.0.10",
     "react": "19.0.0",
-    "react-native": "0.74.5",
+    "react-native": "0.79.3",
     "react-native-builder-bob": "^0.30.2",
     "release-it": "^15.0.0",
     "typescript": "~5.8.3"
@@ -83,7 +83,6 @@
   "jest": {
     "preset": "react-native",
     "modulePathIgnorePatterns": [
-      "<rootDir>/example/node_modules",
       "<rootDir>/dist/"
     ]
   },
