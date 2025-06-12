@@ -42,7 +42,7 @@ const HomeView = () => {
     if (cloudStorage.getProvider() !== CloudStorageProvider.GoogleDrive) return;
 
     cloudStorage.setProviderOptions({
-      accessToken: accessToken.length ? accessToken : null,
+      accessToken: accessToken.length > 0 ? accessToken : null,
     });
   }, [accessToken, cloudStorage]);
 
@@ -60,13 +60,13 @@ const HomeView = () => {
     try {
       const exists = await cloudStorage.exists(parentDirectory);
       Alert.alert(
-        parentDirectory === '/' || !parentDirectory.length
+        parentDirectory === '/' || parentDirectory.length === 0
           ? 'Root Directory exists?'
           : `Directory ${parentDirectory} exists?`,
         exists ? '✅ Yes' : '❌ No'
       );
-    } catch (e) {
-      console.warn(e);
+    } catch (error) {
+      console.warn(error);
     } finally {
       setLoading(false);
     }
@@ -77,8 +77,8 @@ const HomeView = () => {
     try {
       await cloudStorage.mkdir(parentDirectory);
       readFile();
-    } catch (e) {
-      console.warn(e);
+    } catch (error) {
+      console.warn(error);
     } finally {
       setLoading(false);
     }
@@ -89,8 +89,8 @@ const HomeView = () => {
     try {
       const contents = await cloudStorage.readdir(parentDirectory);
       Alert.alert('Directory contents', contents.map((c) => `• ${c}`).join('\n'));
-    } catch (e) {
-      console.warn(e);
+    } catch (error) {
+      console.warn(error);
     } finally {
       setLoading(false);
     }
@@ -104,15 +104,15 @@ const HomeView = () => {
       console.log('File stats', newStats);
       if (newStats.isDirectory()) return;
       setInput(await cloudStorage.readFile(parentDirectory + '/' + filename));
-    } catch (e) {
-      if (e instanceof CloudStorageError) {
-        if (e.code === CloudStorageErrorCode.FILE_NOT_FOUND) {
+    } catch (error) {
+      if (error instanceof CloudStorageError) {
+        if (error.code === CloudStorageErrorCode.FILE_NOT_FOUND) {
           setStats(null);
           setInput('');
         } else {
-          console.warn('Native storage error', e.code, e.message);
+          console.warn('Native storage error', error.code, error.message);
         }
-      } else console.warn('Unknown error', e);
+      } else console.warn('Unknown error', error);
     } finally {
       setLoading(false);
     }
@@ -123,8 +123,8 @@ const HomeView = () => {
     try {
       await cloudStorage.writeFile(parentDirectory + '/' + filename, input);
       readFile();
-    } catch (e) {
-      console.warn(e);
+    } catch (error) {
+      console.warn(error);
     } finally {
       setLoading(false);
     }
@@ -136,8 +136,8 @@ const HomeView = () => {
       await cloudStorage.appendFile(parentDirectory + '/' + filename, appendInput);
       readFile();
       setAppendInput('');
-    } catch (e) {
-      console.warn(e);
+    } catch (error) {
+      console.warn(error);
     } finally {
       setLoading(false);
     }
@@ -150,8 +150,8 @@ const HomeView = () => {
     try {
       await cloudStorage.unlink(parentDirectory + '/' + filename);
       readFile();
-    } catch (e) {
-      console.warn(e);
+    } catch (error) {
+      console.warn(error);
     } finally {
       setLoading(false);
     }
@@ -170,8 +170,8 @@ const HomeView = () => {
         await cloudStorage.rmdir(parentDirectory, { recursive });
         setStats(null);
         setInput('');
-      } catch (e) {
-        console.warn(e);
+      } catch (error) {
+        console.warn(error);
       } finally {
         setLoading(false);
       }
@@ -183,8 +183,8 @@ const HomeView = () => {
     try {
       await cloudStorage.downloadFile(parentDirectory + '/' + filename);
       Alert.alert('File download', 'File downloaded successfully.');
-    } catch (e) {
-      console.warn(e);
+    } catch (error) {
+      console.warn(error);
     } finally {
       setLoading(false);
     }

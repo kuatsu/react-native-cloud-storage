@@ -5,7 +5,9 @@
   "scripts": {
     "start": "expo start",
     "android": "rm -rf android && expo run:android",
-    "ios": "rm -rf ios && expo run:ios"
+    "ios": "rm -rf ios && expo run:ios",
+    "lint": "eslint .",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "expo": "^53.0.0",
