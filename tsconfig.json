@@ -1,29 +1,15 @@
 {
   "compilerOptions": {
-    "baseUrl": "./",
-    "paths": {
-      "react-native-cloud-storage": ["./src/index"]
-    },
-    "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
-    "esModuleInterop": true,
-    "verbatimModuleSyntax": true,
-    "forceConsistentCasingInFileNames": true,
-    "jsx": "react",
     "lib": ["esnext"],
     "module": "esnext",
-    "moduleResolution": "node",
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
-    "noImplicitUseStrict": false,
-    "noStrictGenericChecks": false,
-    "noUncheckedIndexedAccess": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "resolveJsonModule": true,
+    "moduleResolution": "bundler",
+    "jsx": "react-native",
+    "target": "es2019",
+    "declaration": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "esnext"
-  },
-  "exclude": ["docs"]
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "noEmit": true
+  }
 }

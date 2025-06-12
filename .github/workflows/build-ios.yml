@@ -5,36 +5,37 @@ on:
       - master
     paths:
       - '.github/workflows/build-ios.yml'
-      - 'ios/**'
-      - '*.podspec'
-      - 'example/ios/**'
+      - '**/ios/**'
+      - '**/*.podspec'
   pull_request:
     paths:
       - '.github/workflows/build-ios.yml'
-      - 'ios/**'
-      - '*.podspec'
-      - 'example/ios/**'
+      - '**/ios/**'
+      - '**/*.podspec'
 jobs:
   build:
     name: Build iOS example app
-    runs-on: macOS-latest
+    runs-on: macOS-15
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup
         uses: ./.github/actions/setup
-      - name: Install pods
-        run: yarn example pods
       - name: Install xcpretty
         run: gem install xcpretty
+      - name: Build package
+        run: yarn package build
       - name: Build app
-        run: "set -o pipefail && xcodebuild \
+        run: "rm -rf ios && \
+          npx expo prebuild -p ios && \
+          cd ios && \
+          set -o pipefail && xcodebuild \
           CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ \
           -derivedDataPath build -UseModernBuildSystem=YES \
-          -workspace CloudStorageExample.xcworkspace \
-          -scheme CloudStorageExample \
+          -workspace RNCloudStorage.xcworkspace \
+          -scheme RNCloudStorage \
           -sdk iphonesimulator \
           -configuration Debug \
-          -destination 'platform=iOS Simulator,name=iPhone 14 Pro' \
+          -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
           build \
           CODE_SIGNING_ALLOWED=NO | xcpretty"
-        working-directory: example/ios
+        working-directory: apps/example

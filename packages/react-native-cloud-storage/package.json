@@ -1,0 +1,126 @@
+{
+  "name": "react-native-cloud-storage",
+  "version": "2.2.2",
+  "description": "☁️ Save to & read from iCloud and Google Drive using React Native",
+  "main": "dist/commonjs/index",
+  "module": "dist/module/index",
+  "types": "dist/typescript/index.d.ts",
+  "react-native": "src/index",
+  "source": "src/index",
+  "files": [
+    "src",
+    "dist",
+    "android",
+    "ios",
+    "cpp",
+    "*.podspec",
+    "app.plugin.js",
+    "!dist/typescript/example",
+    "!ios/build",
+    "!android/build",
+    "!android/gradle",
+    "!android/gradlew",
+    "!android/gradlew.bat",
+    "!android/local.properties",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__",
+    "!**/.*"
+  ],
+  "keywords": [
+    "react-native",
+    "ios",
+    "android",
+    "icloud",
+    "google-drive",
+    "file-system"
+  ],
+  "scripts": {
+    "clean": "del-cli android/build ios/build dist",
+    "build": "yarn clean && bob build && rm -f dist/commonjs/package.json",
+    "test": "jest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write . && ./scripts/swiftformat.sh",
+    "release": "release-it",
+    "prepack": "cp ../../README.md ./README.md",
+    "postpack": "rm ./README.md"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kuatsu/react-native-cloud-storage.git"
+  },
+  "author": "Kuatsu App Agency <hello@kuatsu.de>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kuatsu/react-native-cloud-storage/issues"
+  },
+  "homepage": "https://github.com/kuatsu/react-native-cloud-storage#readme",
+  "packageManager": "yarn@3.6.1",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "@expo/config-plugins": "^10.0.2",
+    "@release-it/conventional-changelog": "^5.0.0",
+    "@types/react": "~19.0.10",
+    "react": "19.0.0",
+    "react-native": "0.79.3",
+    "react-native-builder-bob": "^0.30.2",
+    "release-it": "^15.0.0",
+    "typescript": "~5.8.3"
+  },
+  "peerDependencies": {
+    "expo": ">=48.0.0",
+    "react": "*",
+    "react-native": "*"
+  },
+  "peerDependenciesMeta": {
+    "expo": {
+      "optional": true
+    }
+  },
+  "jest": {
+    "preset": "react-native",
+    "modulePathIgnorePatterns": [
+      "<rootDir>/dist/"
+    ]
+  },
+  "release-it": {
+    "git": {
+      "commitMessage": "chore: release ${version}",
+      "tagName": "v${version}"
+    },
+    "npm": {
+      "publish": true,
+      "versionArgs": [
+        "--workspaces-update=false"
+      ]
+    },
+    "github": {
+      "release": true
+    },
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "preset": {
+          "name": "angular"
+        },
+        "infile": "CHANGELOG.md"
+      }
+    }
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "dist",
+    "targets": [
+      "commonjs",
+      "module",
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json"
+        }
+      ]
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "react-native-cloud-storage-example",
+  "version": "0.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start",
+    "android": "rm -rf android && expo run:android",
+    "ios": "rm -rf ios && expo run:ios",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "expo": "^53.0.0",
+    "expo-status-bar": "~2.2.3",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-native": "0.79.3",
+    "react-native-cloud-storage": "*",
+    "react-native-safe-area-context": "5.4.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@types/react": "~19.0.10",
+    "pod-install": "^0.2.2",
+    "typescript": "~5.8.3"
+  },
+  "private": true
+}
