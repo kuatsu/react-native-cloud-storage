@@ -15,7 +15,7 @@ on:
 jobs:
   build:
     name: Build iOS example app
-    runs-on: macOS-latest
+    runs-on: macOS-15
     steps:
       - uses: actions/checkout@v4
       - name: Setup
@@ -35,7 +35,7 @@ jobs:
           -scheme RNCloudStorage \
           -sdk iphonesimulator \
           -configuration Debug \
-          -destination 'platform=iOS Simulator,name=iPhone 14 Pro' \
+          -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
           build \
           CODE_SIGNING_ALLOWED=NO | xcpretty"
         working-directory: apps/example
