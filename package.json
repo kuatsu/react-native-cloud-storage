@@ -1,185 +1,38 @@
 {
-  "name": "react-native-cloud-storage",
-  "version": "2.2.2",
-  "description": "Save to & read from iCloud and Google Drive using React Native",
-  "main": "lib/commonjs/index",
-  "module": "lib/module/index",
-  "types": "lib/typescript/index.d.ts",
-  "react-native": "src/index",
-  "source": "src/index",
-  "files": [
-    "src",
-    "lib",
-    "android",
-    "ios",
-    "cpp",
-    "*.podspec",
-    "app.plugin.js",
-    "!lib/typescript/example",
-    "!ios/build",
-    "!android/build",
-    "!android/gradle",
-    "!android/gradlew",
-    "!android/gradlew.bat",
-    "!android/local.properties",
-    "!**/__tests__",
-    "!**/__fixtures__",
-    "!**/__mocks__",
-    "!**/.*"
-  ],
+  "name": "react-native-cloud-storage-monorepo",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "test": "jest",
+    "build": "yarn workspaces foreach -A -p run build",
+    "lint": "yarn workspaces foreach -A -p run lint",
+    "test": "yarn workspaces foreach -A -p run test",
+    "format": "yarn workspaces foreach -A -p run format",
+    "typecheck": "yarn workspaces foreach -A -p run typecheck",
     "example": "yarn workspace react-native-cloud-storage-example",
     "docs": "yarn workspace react-native-cloud-storage-docs",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint \"**/*.{js,ts,tsx}\"",
-    "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
-    "prepare": "yarn clean && bob build && rm -f lib/commonjs/package.json",
-    "release": "release-it",
-    "check": "yarn lint && scripts/swiftformat.sh"
-  },
-  "keywords": [
-    "react-native",
-    "ios",
-    "android"
-  ],
-  "repository": "https://github.com/Kuatsu/react-native-cloud-storage",
-  "author": "Kuatsu App Agency <hello@kuatsu.de> (https://github.com/Kuatsu)",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Kuatsu/react-native-cloud-storage/issues"
-  },
-  "homepage": "https://github.com/Kuatsu/react-native-cloud-storage#readme",
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
-  },
-  "devDependencies": {
-    "@commitlint/config-conventional": "^17.0.2",
-    "@evilmartians/lefthook": "^1.5.0",
-    "@expo/config-plugins": "^7.2.5",
-    "@react-native-community/eslint-config": "^3.2.0",
-    "@react-native/eslint-config": "0.74.87",
-    "@release-it/conventional-changelog": "^5.0.0",
-    "@types/jest": "^28.1.2",
-    "@types/react": "^18.2.6",
-    "commitlint": "^17.0.2",
-    "del-cli": "^5.0.0",
-    "eslint": "^8.4.1",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "jest": "^28.1.1",
-    "pod-install": "^0.2.2",
-    "prettier": "^2.0.5",
-    "react": "18.2.0",
-    "react-native": "0.74.5",
-    "react-native-builder-bob": "^0.30.2",
-    "release-it": "^15.0.0",
-    "typescript": "^5.0.2"
-  },
-  "peerDependencies": {
-    "expo": ">=48.0.0",
-    "react": "*",
-    "react-native": "*"
-  },
-  "peerDependenciesMeta": {
-    "expo": {
-      "optional": true
-    }
-  },
-  "workspaces": [
-    "example",
-    "docs"
-  ],
-  "engines": {
-    "node": ">= 18.0.0"
+    "package": "yarn workspace react-native-cloud-storage",
+    "prepare": "husky"
   },
   "packageManager": "yarn@3.6.1",
-  "jest": {
-    "preset": "react-native",
-    "modulePathIgnorePatterns": [
-      "<rootDir>/example/node_modules",
-      "<rootDir>/lib/"
-    ]
+  "devDependencies": {
+    "@commitlint/cli": "^19.7.1",
+    "@commitlint/config-conventional": "^17.0.2",
+    "@eslint/compat": "^1.3.0",
+    "@eslint/js": "^9.21.0",
+    "@react-native/eslint-config": "0.79.3",
+    "@types/jest": "^28.1.2",
+    "del-cli": "^5.0.0",
+    "eslint": "^9.21.0",
+    "eslint-plugin-unicorn": "^57.0.0",
+    "husky": "^9.1.7",
+    "jest": "^28.1.1",
+    "lint-staged": "^15.4.3",
+    "prettier": "^2.0.5",
+    "typescript": "^5.0.2",
+    "typescript-eslint": "^8.24.1"
   },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
-  },
-  "release-it": {
-    "git": {
-      "commitMessage": "chore: release ${version}",
-      "tagName": "v${version}"
-    },
-    "npm": {
-      "publish": true
-    },
-    "github": {
-      "release": true
-    },
-    "plugins": {
-      "@release-it/conventional-changelog": {
-        "preset": "angular"
-      }
-    }
-  },
-  "eslintConfig": {
-    "root": true,
-    "extends": [
-      "@react-native-community",
-      "prettier"
-    ],
-    "rules": {
-      "react-native/no-inline-styles": "off",
-      "prettier/prettier": [
-        "error",
-        {
-          "printWidth": 120,
-          "tabWidth": 2,
-          "useTabs": false,
-          "semi": true,
-          "singleQuote": true,
-          "quoteProps": "consistent",
-          "jsxSingleQuote": false,
-          "trailingComma": "es5",
-          "bracketSpacing": true,
-          "bracketSameLine": true,
-          "arrowParens": "always",
-          "endOfLine": "lf"
-        }
-      ]
-    }
-  },
-  "eslintIgnore": [
-    "node_modules/",
-    "lib/"
-  ],
-  "prettier": {
-    "printWidth": 120,
-    "tabWidth": 2,
-    "useTabs": false,
-    "semi": true,
-    "singleQuote": true,
-    "quoteProps": "consistent",
-    "jsxSingleQuote": false,
-    "trailingComma": "es5",
-    "bracketSpacing": true,
-    "bracketSameLine": true,
-    "arrowParens": "always",
-    "endOfLine": "lf"
-  },
-  "react-native-builder-bob": {
-    "source": "src",
-    "output": "lib",
-    "targets": [
-      "commonjs",
-      "module",
-      [
-        "typescript",
-        {
-          "project": "tsconfig.build.json"
-        }
-      ]
-    ]
-  }
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
 }

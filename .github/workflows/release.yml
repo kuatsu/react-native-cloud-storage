@@ -12,32 +12,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup
         uses: ./.github/actions/setup
 
-      - name: Setup Mint package manager
-        uses: irgaly/setup-mint@v1
-
-      - name: Cache Mint packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.mint
-          key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
-          restore-keys: |
-            ${{ runner.os }}-mint-
-
       - name: Install SwiftFormat
-        run: |
-          mint install nicklockwood/SwiftFormat
-          echo "$HOME/.mint/bin" >> $GITHUB_PATH
+        uses: ./.github/actions/install-swiftformat
 
       - name: Lint files
         run: yarn lint
 
-      - name: Run SwiftFormat
-        run: swiftformat --verbose ios
+      - name: Format code
+        run: yarn format
 
       - name: Verify formatted code is unchanged
         run: git diff --exit-code HEAD
@@ -49,20 +36,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup
         uses: ./.github/actions/setup
 
-      - name: Run unit tests
-        run: yarn test --maxWorkers=2 --coverage
+      - name: Run tests
+        run: yarn test
 
   build-release:
     runs-on: ubuntu-latest
     needs: [lint, test]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -70,7 +57,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Build package
-        run: yarn prepare
+        run: yarn package build
 
       - name: Set NPM token & GitHub config
         run: |
@@ -95,9 +82,9 @@ jobs:
       - name: Release
         run: |
           if [ -n "${{ inputs.release_type }}" ]; then
-            yarn release --increment ${{ inputs.release_type }}
+            yarn package release --increment ${{ inputs.release_type }}
           else
-            yarn release
+            yarn package release
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.CICD_PAT }}

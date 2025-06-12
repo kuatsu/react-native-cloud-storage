@@ -1,0 +1,22 @@
+name: Install SwiftFormat
+description: Installs SwiftFormat using Mint and caches it
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Mint package manager
+      uses: irgaly/setup-mint@v1
+
+    - name: Cache Mint packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.mint
+        key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
+        restore-keys: |
+          ${{ runner.os }}-mint-
+
+    - name: Install SwiftFormat
+      shell: bash
+      run: |
+        mint install nicklockwood/SwiftFormat
+        echo "$HOME/.mint/bin" >> $GITHUB_PATH

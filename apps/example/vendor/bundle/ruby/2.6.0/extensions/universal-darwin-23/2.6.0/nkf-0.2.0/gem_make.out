@@ -1,0 +1,12 @@
+current directory: /Users/max/Projects/react-native-cloud-storage/example/vendor/bundle/ruby/2.6.0/gems/nkf-0.2.0/ext/nkf
+/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/ruby -I /System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/ruby/2.6.0 -r ./siteconf20240926-82775-ra1gdn.rb extconf.rb
+creating Makefile
+
+current directory: /Users/max/Projects/react-native-cloud-storage/example/vendor/bundle/ruby/2.6.0/gems/nkf-0.2.0/ext/nkf
+make "DESTDIR=" clean
+
+current directory: /Users/max/Projects/react-native-cloud-storage/example/vendor/bundle/ruby/2.6.0/gems/nkf-0.2.0/ext/nkf
+make "DESTDIR="
+make: *** No rule to make target `/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/include/ruby-2.6.0/universal-darwin23/ruby/config.h', needed by `nkf.o'.  Stop.
+
+make failed, exit code 2
