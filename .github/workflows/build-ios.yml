@@ -35,7 +35,7 @@ jobs:
           -scheme RNCloudStorage \
           -sdk iphonesimulator \
           -configuration Debug \
-          -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+          -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
           build \
           CODE_SIGNING_ALLOWED=NO | xcpretty"
         working-directory: apps/example
