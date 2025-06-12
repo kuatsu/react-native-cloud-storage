@@ -1,6 +1,6 @@
 #import <React/RCTBridgeModule.h>
 
-@interface RCT_EXTERN_MODULE(CloudStorage, NSObject)
+@interface RCT_EXTERN_MODULE(CloudStorageCloudKit, NSObject)
 
 RCT_EXTERN_METHOD(fileExists:(NSString *)path withScope:(NSString *)scope withResolver:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(appendToFile:(NSString *)path withData:(NSString *)data withScope:(NSString *)scope withResolver:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)

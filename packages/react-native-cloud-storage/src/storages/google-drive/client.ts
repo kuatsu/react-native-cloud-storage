@@ -1,4 +1,4 @@
-import { type CloudStorageProviderOptions, type DeepRequired } from '../types/main';
+import { type CloudStorageProviderOptions, type DeepRequired } from '../../types/main';
 import {
   MimeTypes,
   type GoogleDriveFile,

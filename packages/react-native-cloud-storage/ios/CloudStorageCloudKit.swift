@@ -1,7 +1,7 @@
 import Foundation
 
-@objc(CloudStorage)
-class CloudStorage: NSObject {
+@objc(CloudStorageCloudKit)
+class CloudStorageCloudKit: NSObject {
   @objc(fileExists:withScope:withResolver:withRejecter:)
   func fileExists(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {

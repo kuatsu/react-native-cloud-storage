@@ -1,5 +1,5 @@
 import type { CloudStorageScope } from '../types/main';
-import RNCloudStorage from '../native-instance';
+import RNCloudStorage from '../cloud-storage';
 import { useCallback, useEffect, useState } from 'react';
 
 /**

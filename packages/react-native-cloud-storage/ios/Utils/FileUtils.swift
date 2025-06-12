@@ -129,4 +129,8 @@ enum FileUtils {
   static func sanitizePath(path: String) -> String {
     path.replacingOccurrences(of: "^/+", with: "", options: .regularExpression)
   }
+
+  static var temporaryDirectory: URL {
+    fileManager.temporaryDirectory
+  }
 }
