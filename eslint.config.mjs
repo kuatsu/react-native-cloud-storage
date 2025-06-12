@@ -1,8 +1,7 @@
-// TODO: enable unicorn
 import globals from 'globals';
 import pluginJs from '@eslint/js';
 import tseslint from 'typescript-eslint';
-// import eslintPluginUnicorn from 'eslint-plugin-unicorn';
+import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
@@ -13,7 +12,7 @@ export default [
   },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
-  // eslintPluginUnicorn.configs.recommended,
+  eslintPluginUnicorn.configs.recommended,
   {
     rules: {
       '@typescript-eslint/no-unused-vars': [
@@ -24,7 +23,8 @@ export default [
           caughtErrorsIgnorePattern: '^_',
         },
       ],
-      /*'unicorn/no-null': 'off',
+      'unicorn/no-null': 'off',
+      'unicorn/no-nested-ternary': 'off',
       'unicorn/no-abusive-eslint-disable': 'off',
       'unicorn/prefer-top-level-await': 'off',
       'unicorn/prevent-abbreviations': [
@@ -36,7 +36,7 @@ export default [
             Props: true,
           },
         },
-      ],*/
+      ],
     },
   },
 ];

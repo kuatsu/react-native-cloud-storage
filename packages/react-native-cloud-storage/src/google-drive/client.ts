@@ -33,7 +33,7 @@ export default class GoogleDriveApiClient {
   }
 
   private buildQueryString(query: object): string {
-    let res = Object.entries(query)
+    let result = Object.entries(query)
       .filter(([, value]) => value !== undefined)
       .map(([key, value]) => {
         if (typeof value === 'boolean') return `${encodeURIComponent(key)}=${value ? 'true' : 'false'}`;
@@ -41,10 +41,10 @@ export default class GoogleDriveApiClient {
       })
       .join('&');
 
-    if (res) {
-      res = `?${res}`;
+    if (result) {
+      result = `?${result}`;
     }
-    return res;
+    return result;
   }
 
   private async request<T extends object | string | void = void>(
@@ -85,7 +85,7 @@ export default class GoogleDriveApiClient {
           typeof json.error.message === 'string'
             ? json.error.message
             : `Request failed with status ${response.status}`;
-      } catch (_e: unknown) {
+      } catch {
         errorMessage = `Request failed with status ${response.status}`;
       }
       throw new GoogleDriveHttpError(errorMessage, response.status, json);
@@ -102,13 +102,15 @@ export default class GoogleDriveApiClient {
 
   private buildMultiPartBody(metadata: object, media: { mimeType: string; body: string }): string {
     const body: string[] = [];
-    body.push(`--${MULTIPART_BOUNDARY}\r\n`);
-    body.push(`Content-Type: ${MimeTypes.JSON}; charset=UTF-8\r\n\r\n`);
-    body.push(`${JSON.stringify(metadata)}\r\n`);
-    body.push(`--${MULTIPART_BOUNDARY}\r\n`);
-    body.push(`Content-Type: ${media.mimeType}\r\n\r\n`);
-    body.push(`${media.body}\r\n`);
-    body.push(`--${MULTIPART_BOUNDARY}--`);
+    body.push(
+      `--${MULTIPART_BOUNDARY}\r\n`,
+      `Content-Type: ${MimeTypes.JSON}; charset=UTF-8\r\n\r\n`,
+      `${JSON.stringify(metadata)}\r\n`,
+      `--${MULTIPART_BOUNDARY}\r\n`,
+      `Content-Type: ${media.mimeType}\r\n\r\n`,
+      `${media.body}\r\n`,
+      `--${MULTIPART_BOUNDARY}--`
+    );
 
     return body.join('');
   }

@@ -1,5 +1,5 @@
 import type { RNCloudStorageConfigPluginOptions } from './types';
-import withRNCloudStorageIos from './withRNCloudStorageIos';
+import withRNCloudStorageIos from './ios';
 import type { ConfigPlugin } from '@expo/config-plugins';
 
 // Android config plugin not needed as there's no native code to configure.

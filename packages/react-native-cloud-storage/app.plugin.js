@@ -1,1 +1,1 @@
-module.exports = require('./dist/commonjs/expo-plugin/withRNCloudStorage.js');
+module.exports = require('./dist/commonjs/expo-plugin/index.js');

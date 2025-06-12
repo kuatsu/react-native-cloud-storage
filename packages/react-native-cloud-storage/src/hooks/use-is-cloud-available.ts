@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import RNCloudStorage from '../RNCloudStorage';
+import RNCloudStorage from '../native-instance';
 
 /**
  * A hook that tests whether or not the cloud storage is available.

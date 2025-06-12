@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-require-imports,unicorn/prefer-module */
 import React, { ReactNode } from 'react';
 import clsx from 'clsx';
 import styles from './styles.module.css';
@@ -60,8 +60,8 @@ export default function HomepageFeatures(): ReactNode {
     <section className={styles.features}>
       <div className="container">
         <div className="row">
-          {FeatureList.map((props, idx) => (
-            <Feature key={idx} {...props} />
+          {FeatureList.map((props, index) => (
+            <Feature key={index} {...props} />
           ))}
         </div>
       </div>

@@ -8,7 +8,7 @@ import {
 import type NativeRNCloudStorage from './types/native';
 import { isProviderSupported } from './utils/helpers';
 import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
-import CloudStorageError from './utils/CloudStorageError';
+import CloudStorageError from './utils/cloud-storage-error';
 import { CloudStorageErrorCode } from './types/native';
 import GoogleDrive from './google-drive';
 
@@ -21,13 +21,13 @@ const LINKING_ERROR =
 // proxy NativeModules.CloudStorage to catch any errors thrown by the native module and wrap them in a CloudStorageError
 const nativeIosInstance = NativeModules.CloudStorage
   ? new Proxy(NativeModules.CloudStorage, {
-      get(target: NativeRNCloudStorage, prop: keyof NativeRNCloudStorage) {
-        const originalFunction = target[prop];
+      get(target: NativeRNCloudStorage, property: keyof NativeRNCloudStorage) {
+        const originalFunction = target[property];
         if (typeof originalFunction === 'function') {
-          return async (...args: unknown[]) => {
+          return async (...arguments_: unknown[]) => {
             try {
               // @ts-expect-error - we can't know the types of the functions and their arguments
-              return await originalFunction(...args);
+              return await originalFunction(...arguments_);
             } catch (error: unknown) {
               if (typeof error !== 'object' || error === null) {
                 throw new CloudStorageError('Unknown error', CloudStorageErrorCode.UNKNOWN, error);
@@ -97,7 +97,7 @@ export default class RNCloudStorage {
 
   private get nativeInstance(): NativeRNCloudStorage {
     switch (this.provider.provider) {
-      case CloudStorageProvider.ICloud:
+      case CloudStorageProvider.ICloud: {
         return (
           nativeIosInstance ??
           new Proxy(
@@ -109,8 +109,10 @@ export default class RNCloudStorage {
             }
           )
         );
-      default:
+      }
+      default: {
         return new GoogleDrive(this.provider.options as DeepRequired<CloudStorageProviderOptions['googledrive']>);
+      }
     }
   }
 
@@ -120,10 +122,12 @@ export default class RNCloudStorage {
    */
   static getDefaultProvider(): CloudStorageProvider {
     switch (Platform.OS) {
-      case 'ios':
+      case 'ios': {
         return CloudStorageProvider.ICloud;
-      default:
+      }
+      default: {
         return CloudStorageProvider.GoogleDrive;
+      }
     }
   }
 
@@ -132,7 +136,7 @@ export default class RNCloudStorage {
    * @returns An array of supported CloudStorageProviders.
    */
   static getSupportedProviders(): CloudStorageProvider[] {
-    return Object.values(CloudStorageProvider).filter(isProviderSupported);
+    return Object.values(CloudStorageProvider).filter((provider) => isProviderSupported(provider));
   }
 
   /**
@@ -159,18 +163,18 @@ export default class RNCloudStorage {
 
     // Emit an event to notify useIsCloudAvailable() hook consumers of the new cloud availability status
     this.nativeInstance.isCloudAvailable().then((available) => {
-      this.cloudAvailabilityListeners.forEach((listener) => {
+      for (const listener of this.cloudAvailabilityListeners) {
         listener(available);
-      });
+      }
     });
 
     if (provider === CloudStorageProvider.ICloud) {
       // Listen to native cloud availability change events
       const eventEmitter = new NativeEventEmitter(NativeModules.CloudStorageEventEmitter);
       eventEmitter.addListener('RNCloudStorage.cloud.availability-changed', (event: { available: boolean }) => {
-        this.cloudAvailabilityListeners.forEach((listener) => {
+        for (const listener of this.cloudAvailabilityListeners) {
           listener(event.available);
-        });
+        }
       });
     }
   }
@@ -196,11 +200,11 @@ export default class RNCloudStorage {
 
     if (this.provider.provider === CloudStorageProvider.GoogleDrive && 'accessToken' in newOptions) {
       // Emit an event to notify useIsCloudAvailable() hook consumers of the new cloud availability status
-      this.cloudAvailabilityListeners.forEach((listener) => {
+      for (const listener of this.cloudAvailabilityListeners) {
         listener(
           !!(newOptions as Required<CloudStorageProviderOptions[CloudStorageProvider.GoogleDrive]>).accessToken?.length
         );
-      });
+      }
     }
   }
 
