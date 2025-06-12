@@ -22,6 +22,8 @@ jobs:
         uses: ./.github/actions/setup
       - name: Install xcpretty
         run: gem install xcpretty
+      - name: Build package
+        run: yarn package build
       - name: Build app
         run: "rm -rf ios && \
           npx expo prebuild -p ios && \
