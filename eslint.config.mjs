@@ -2,9 +2,7 @@
 import globals from 'globals';
 import pluginJs from '@eslint/js';
 import tseslint from 'typescript-eslint';
-import eslintPluginReactNative from 'eslint-plugin-react-native';
 // import eslintPluginUnicorn from 'eslint-plugin-unicorn';
-import { fixupPluginRules } from '@eslint/compat';
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
@@ -16,18 +14,6 @@ export default [
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   // eslintPluginUnicorn.configs.recommended,
-  {
-    name: 'eslint-plugin-react-native',
-    plugins: {
-      'react-native': fixupPluginRules({
-        rules: eslintPluginReactNative.rules,
-      }),
-    },
-    rules: {
-      ...eslintPluginReactNative.configs.all.rules,
-      'react-native/no-inline-styles': 'off',
-    },
-  },
   {
     rules: {
       '@typescript-eslint/no-unused-vars': [

@@ -2,20 +2,20 @@
   "name": "react-native-cloud-storage",
   "version": "2.2.2",
   "description": "☁️ Save to & read from iCloud and Google Drive using React Native",
-  "main": "lib/commonjs/index",
-  "module": "lib/module/index",
-  "types": "lib/typescript/index.d.ts",
+  "main": "dist/commonjs/index",
+  "module": "dist/module/index",
+  "types": "dist/typescript/index.d.ts",
   "react-native": "src/index",
   "source": "src/index",
   "files": [
     "src",
-    "lib",
+    "dist",
     "android",
     "ios",
     "cpp",
     "*.podspec",
     "app.plugin.js",
-    "!lib/typescript/example",
+    "!dist/typescript/example",
     "!ios/build",
     "!android/build",
     "!android/gradle",
@@ -36,8 +36,8 @@
     "file-system"
   ],
   "scripts": {
-    "clean": "del-cli android/build ios/build lib",
-    "build": "yarn clean && bob build && rm -f lib/commonjs/package.json",
+    "clean": "del-cli android/build ios/build dist",
+    "build": "yarn clean && bob build && rm -f dist/commonjs/package.json",
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/**/*.ts",
@@ -68,7 +68,7 @@
     "react-native": "0.74.5",
     "react-native-builder-bob": "^0.30.2",
     "release-it": "^15.0.0",
-    "typescript": "^5.0.2"
+    "typescript": "~5.8.3"
   },
   "peerDependencies": {
     "expo": ">=48.0.0",
@@ -84,7 +84,7 @@
     "preset": "react-native",
     "modulePathIgnorePatterns": [
       "<rootDir>/example/node_modules",
-      "<rootDir>/lib/"
+      "<rootDir>/dist/"
     ]
   },
   "release-it": {
@@ -112,7 +112,7 @@
   },
   "react-native-builder-bob": {
     "source": "src",
-    "output": "lib",
+    "output": "dist",
     "targets": [
       "commonjs",
       "module",
