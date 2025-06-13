@@ -69,6 +69,16 @@ sealed class CloudStorageError(
         message = "File not downloadable at path $path"
     )
 
+    data class InvalidUrl(val url: String) : CloudStorageError(
+        code = "ERR_INVALID_URL",
+        message = "Invalid URL provided: $url"
+    )
+
+    data class NetworkError(val errorMessage: String) : CloudStorageError(
+        code = "ERR_NETWORK_ERROR",
+        message = errorMessage
+    )
+
     data class Unknown(val errorMessage: String = "An unknown error occurred") : CloudStorageError(
         code = "ERR_UNKNOWN",
         message = errorMessage

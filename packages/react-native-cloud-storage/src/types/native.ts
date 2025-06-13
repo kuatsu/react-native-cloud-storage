@@ -25,11 +25,19 @@ export enum NativeCloudStorageErrorCode {
   UNKNOWN = 'ERR_UNKNOWN',
   FILE_NOT_DOWNLOADABLE = 'ERR_FILE_NOT_DOWNLOADABLE',
   ACCESS_TOKEN_MISSING = 'ERR_ACCESS_TOKEN_MISSING',
+  INVALID_URL = 'ERR_INVALID_URL',
+  NETWORK_ERROR = 'ERR_NETWORK_ERROR',
 }
 
 export interface NativeLocalFileSystem {
   createTemporaryFile: (filename: string, data: string) => Promise<string>;
   readFile: (path: string) => Promise<string>;
+  downloadFile: (remoteUri: string, localPath: string, options?: { headers?: Record<string, string> }) => Promise<void>;
+  uploadFile: (
+    localPath: string,
+    remoteUri: string,
+    options?: { headers?: Record<string, string>; httpMethod?: 'PUT' | 'POST' }
+  ) => Promise<void>;
 }
 
 export interface NativeStorage {
@@ -39,9 +47,12 @@ export interface NativeStorage {
   createDirectory: (path: string, scope: NativeStorageScope) => Promise<void>;
   listFiles: (path: string, scope: NativeStorageScope) => Promise<string[]>;
   readFile: (path: string, scope: NativeStorageScope) => Promise<string>;
-  downloadFile: (path: string, scope: NativeStorageScope) => Promise<void>;
   deleteFile: (path: string, scope: NativeStorageScope) => Promise<void>;
   deleteDirectory: (path: string, recursively: boolean, scope: NativeStorageScope) => Promise<void>;
   statFile: (path: string, scope: NativeStorageScope) => Promise<NativeStorageFileStat>;
+  // TODO: downloadFile: (remotePath: string, localPath: string, scope: NativeStorageScope) => Promise<void>;
+  // TODO: uploadFile: (remotePath: string, localPath: string, scope: NativeStorageScope) => Promise<void>;
   isCloudAvailable: () => Promise<boolean>;
+  // TODO: rename to triggerSync
+  downloadFile: (path: string, scope: NativeStorageScope) => Promise<void>;
 }

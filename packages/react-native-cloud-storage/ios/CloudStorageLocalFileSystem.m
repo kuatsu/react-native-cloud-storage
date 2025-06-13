@@ -4,6 +4,8 @@
 
 RCT_EXTERN_METHOD(readFile:(NSString *)path withResolver:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(createTemporaryFile:(NSString *)filename withData:(NSString *)data withResolver:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(downloadFile:(NSString *)remoteUri withLocalPath:(NSString *)localPath withOptions:(NSDictionary *)options withResolver:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(uploadFile:(NSString *)localPath withRemoteUri:(NSString *)remoteUri withOptions:(NSDictionary *)options withResolver:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
 
 + (BOOL)requiresMainQueueSetup
 {

@@ -8,6 +8,14 @@
 
 import Foundation
 
+// MARK: - UploadType
+
+@frozen
+enum UploadType: String {
+  case multipart
+  case binary
+}
+
 // MARK: - DirectoryScope
 
 @frozen

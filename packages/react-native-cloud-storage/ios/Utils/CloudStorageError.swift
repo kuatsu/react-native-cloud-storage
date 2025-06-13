@@ -23,6 +23,8 @@ enum CloudStorageError: Error {
   case statError(path: String)
   case unknown(message: String = "An unknown error occurred")
   case fileNotDownloadable(path: String)
+  case invalidUrl(url: String)
+  case networkError(message: String)
 
   var code: String {
     switch self {
@@ -40,6 +42,8 @@ enum CloudStorageError: Error {
     case .statError: "ERR_STAT_ERROR"
     case .unknown: "ERR_UNKNOWN"
     case .fileNotDownloadable: "ERR_FILE_NOT_DOWNLOADABLE"
+    case .invalidUrl: "ERR_INVALID_URL"
+    case .networkError: "ERR_NETWORK_ERROR"
     }
   }
 
@@ -73,6 +77,10 @@ enum CloudStorageError: Error {
       message
     case let .fileNotDownloadable(path):
       "File not downloadable at path \(path)"
+    case let .invalidUrl(url):
+      "Invalid URL provided: \(url)"
+    case let .networkError(message):
+      message
     }
   }
 }

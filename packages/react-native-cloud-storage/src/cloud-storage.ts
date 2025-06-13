@@ -11,7 +11,6 @@ import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
 import GoogleDrive from './storages/google-drive';
 import { NativeCloudKit } from './storages/cloudkit';
 import { DEFAULT_PROVIDER_OPTIONS, LINKING_ERROR } from './utils/constants';
-import { localFileSystem } from './utils/local-fs';
 
 export default class RNCloudStorage {
   private static defaultInstance: RNCloudStorage;
