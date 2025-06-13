@@ -66,7 +66,7 @@ class CloudStorageCloudKit: NSObject {
   func downloadFile(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
       let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
-      return try CloudKitUtils.downloadFile(fileUrl: fileUrl)
+      return try CloudKitUtils.triggerSync(fileUrl: fileUrl)
     }
   }
 
@@ -92,6 +92,16 @@ class CloudStorageCloudKit: NSObject {
       let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
       return try FileUtils.statFile(fileUrl: fileUrl).toDictionary()
     }
+  }
+
+  @objc(downloadFile:withLocalPath:withScope:withResolver:withRejecter:)
+  func downloadFile(remotePath _: String, localPath _: String, scope _: String, resolve _: @escaping RCTPromiseResolveBlock, reject _: @escaping RCTPromiseRejectBlock) {
+    // TODO: implement
+  }
+
+  @objc(uploadFile:withRemotePath:withScope:withResolver:withRejecter:)
+  func uploadFile(localPath _: String, remotePath _: String, scope _: String, resolve _: @escaping RCTPromiseResolveBlock, reject _: @escaping RCTPromiseRejectBlock) {
+    // TODO: implement
   }
 
   @objc(isCloudAvailable:withRejecter:)

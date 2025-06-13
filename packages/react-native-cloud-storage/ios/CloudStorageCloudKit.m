@@ -12,6 +12,8 @@ RCT_EXTERN_METHOD(downloadFile:(NSString *)path withScope:(NSString *)scope with
 RCT_EXTERN_METHOD(deleteFile:(NSString *)path withScope:(NSString *)scope withResolver:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(deleteDirectory:(NSString *)path withRecursive:(BOOL)recursive withScope:(NSString *)scope withResolver:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(statFile:(NSString *)path withScope:(NSString *)scope withResolver:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(downloadFile:(NSString *)remotePath withLocalPath:(NSString *)localPath withScope:(NSString *)scope withResolver:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(uploadFile:(NSString *)localPath withRemotePath:(NSString *)remotePath withScope:(NSString *)scope withResolver:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(isCloudAvailable:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
 
 + (BOOL)requiresMainQueueSetup

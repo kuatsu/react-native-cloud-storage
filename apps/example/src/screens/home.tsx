@@ -181,7 +181,7 @@ const HomeView = () => {
   const handleDownload = async () => {
     setLoading(true);
     try {
-      await cloudStorage.downloadFile(parentDirectory + '/' + filename);
+      await cloudStorage.triggerSync(parentDirectory + '/' + filename);
       Alert.alert('File download', 'File downloaded successfully.');
     } catch (error) {
       console.warn(error);

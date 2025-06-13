@@ -39,19 +39,37 @@ export const useCloudFile = (path: string, scope?: CloudStorageScope, cloudStora
     setContent(null);
   }, [path, scope, instance]);
 
-  const download = useCallback(async () => {
-    await instance.downloadFile(path, scope);
+  const sync = useCallback(async () => {
+    await instance.triggerSync(path, scope);
   }, [path, scope, instance]);
 
   return {
+    /**
+     * The content of the file.
+     */
     content,
+    /**
+     * Reads the file from the cloud.
+     */
     read,
+    /**
+     * Writes new content to the file.
+     */
     write,
+    /**
+     * Deletes the file.
+     */
     remove,
     /**
-     * Downloads the file from iCloud to the device. Needed if the file hasn't been synced yet. Has no effect on
-     * Google Drive.
+     * Triggers synchronization for the file. Needed if the file hasn't been synced yet from iCloud.
+     * Has no effect on Google Drive.
      */
-    download,
+    sync,
+    /**
+     * Triggers synchronization for the file. Needed if the file hasn't been synced yet from iCloud.
+     * Has no effect on Google Drive.
+     * @deprecated Use `sync` instead.
+     */
+    download: sync,
   };
 };

@@ -239,13 +239,38 @@ export default class RNCloudStorage {
   }
 
   /**
-   * Downloads the file at the given path. Does not have any effect on Google Drive.
-   * @param path The file to trigger the download for.
+   * Triggers synchronization for the file at the given path. Does not have any effect on Google Drive.
+   * @param path The file to trigger synchronization for.
    * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
-   * @returns A promise that resolves once the download has been triggered.
+   * @returns A promise that resolves once the synchronization has been triggered.
    */
-  downloadFile(path: string, scope?: CloudStorageScope): Promise<void> {
-    return this.nativeStorage.downloadFile(path, scope ?? this.provider.options.scope);
+  triggerSync(path: string, scope?: CloudStorageScope): Promise<void> {
+    return this.nativeStorage.triggerSync(path, scope ?? this.provider.options.scope);
+  }
+
+  /**
+   * Triggers synchronization for the file at the given path. Does not have any effect on Google Drive.
+   * @param path The file to trigger synchronization for.
+   * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
+   * @returns A promise that resolves once the synchronization has been triggered.
+   * @deprecated Use `triggerSync` instead.
+   */
+  downloadFile(path: string, scope?: CloudStorageScope): Promise<void>;
+  /**
+   * Downloads the cloud file at the given remote path to the given local path.
+   * @param remotePath The remote path of the file to download from the cloud.
+   * @param localPath The local path to download the cloud file to.
+   * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
+   */
+  downloadFile(remotePath: string, localPath: string, scope?: CloudStorageScope): Promise<void>;
+  downloadFile(remotePathOrPath: string, localPathOrScope?: string, scope?: CloudStorageScope): Promise<void> {
+    if (typeof scope === 'string') {
+      // TODO: implement download
+      return Promise.reject(new Error('Not implemented'));
+    } else {
+      // deprecated `triggerSync` call
+      return this.triggerSync(remotePathOrPath, scope);
+    }
   }
 
   /**
@@ -400,13 +425,38 @@ export default class RNCloudStorage {
   }
 
   /**
-   * Downloads the file at the given path in the provider of the default static instance. Does not have any effect on Google Drive.
-   * @param path The file to trigger the download for.
+   * Triggers synchronization for the file at the given path in the provider of the default static instance. Does not have any effect on Google Drive.
+   * @param path The file to trigger synchronization for.
    * @param scope The directory scope the path is in. Defaults to the default scope set for the default static instance.
-   * @returns A promise that resolves once the download has been triggered.
+   * @returns A promise that resolves once the synchronization has been triggered.
    */
-  static downloadFile(path: string, scope?: CloudStorageScope): Promise<void> {
-    return RNCloudStorage.getDefaultInstance().downloadFile(path, scope);
+  static triggerSync(path: string, scope?: CloudStorageScope): Promise<void> {
+    return RNCloudStorage.getDefaultInstance().triggerSync(path, scope);
+  }
+
+  /**
+   * Triggers synchronization for the file at the given path in the provider of the default static instance. Does not have any effect on Google Drive.
+   * @param path The file to trigger synchronization for.
+   * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
+   * @returns A promise that resolves once the synchronization has been triggered.
+   * @deprecated Use `triggerSync` instead.
+   */
+  static downloadFile(path: string, scope?: CloudStorageScope): Promise<void>;
+  /**
+   * Downloads the cloud file at the given remote path to the given local path.
+   * @param remotePath The remote path of the file to download from the cloud.
+   * @param localPath The local path to download the cloud file to.
+   * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
+   */
+  static downloadFile(remotePath: string, localPath: string, scope?: CloudStorageScope): Promise<void>;
+  static downloadFile(remotePathOrPath: string, localPathOrScope?: string, scope?: CloudStorageScope): Promise<void> {
+    if (typeof scope === 'string') {
+      // TODO: implement download
+      return Promise.reject(new Error('Not implemented'));
+    } else {
+      // deprecated `triggerSync` call
+      return RNCloudStorage.getDefaultInstance().triggerSync(remotePathOrPath, scope);
+    }
   }
 
   /**

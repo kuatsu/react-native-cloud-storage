@@ -53,9 +53,8 @@ export interface NativeStorage {
   deleteFile: (path: string, scope: NativeStorageScope) => Promise<void>;
   deleteDirectory: (path: string, recursively: boolean, scope: NativeStorageScope) => Promise<void>;
   statFile: (path: string, scope: NativeStorageScope) => Promise<NativeStorageFileStat>;
-  // TODO: downloadFile: (remotePath: string, localPath: string, scope: NativeStorageScope) => Promise<void>;
-  // TODO: uploadFile: (remotePath: string, localPath: string, scope: NativeStorageScope) => Promise<void>;
+  downloadFile: (remotePath: string, localPath: string, scope: NativeStorageScope) => Promise<void>;
+  uploadFile: (remotePath: string, localPath: string, scope: NativeStorageScope) => Promise<void>;
   isCloudAvailable: () => Promise<boolean>;
-  // TODO: rename to triggerSync, deprecate downloadFile
-  downloadFile: (path: string, scope: NativeStorageScope) => Promise<void>;
+  triggerSync: (path: string, scope: NativeStorageScope) => Promise<void>;
 }

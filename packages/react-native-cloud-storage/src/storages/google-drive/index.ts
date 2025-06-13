@@ -354,8 +354,8 @@ export default class GoogleDrive implements NativeStorage {
     return content;
   }
 
-  async downloadFile(_path: string, _scope: NativeStorageScope): Promise<void> {
-    // Downloading files from Google Drive is not necessary / possible, as they need to be downloaded on every read operation via the API anyway
+  async triggerSync(_path: string, _scope: NativeStorageScope): Promise<void> {
+    // Triggering file synchronization in Google Drive is not necessary / possible, as they need to be downloaded on every read operation via the API anyway
     return;
   }
 
@@ -396,5 +396,13 @@ export default class GoogleDrive implements NativeStorage {
       isDirectory: file.mimeType === MimeTypes.FOLDER,
       isFile: file.mimeType !== MimeTypes.FOLDER,
     };
+  }
+
+  async downloadFile(remotePath: string, localPath: string, scope: NativeStorageScope): Promise<void> {
+    // TODO: implement
+  }
+
+  async uploadFile(localPath: string, remotePath: string, scope: NativeStorageScope): Promise<void> {
+    // TODO: implement
   }
 }
