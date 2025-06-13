@@ -5,12 +5,13 @@ import {
   type CloudStorageProviderOptions,
   type DeepRequired,
 } from './types/main';
-import type { NativeStorage } from './types/native';
+import { NativeCloudStorageErrorCode, type NativeStorage } from './types/native';
 import { isProviderSupported } from './utils/helpers';
 import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
 import GoogleDrive from './storages/google-drive';
 import { NativeCloudKit } from './storages/cloudkit';
 import { DEFAULT_PROVIDER_OPTIONS, LINKING_ERROR } from './utils/constants';
+import CloudStorageError from './utils/cloud-storage-error';
 
 export default class RNCloudStorage {
   private static defaultInstance: RNCloudStorage;
@@ -249,6 +250,18 @@ export default class RNCloudStorage {
   }
 
   /**
+   * Uploads the file at the given local path to the given path, creating it if it doesn't exist or overwriting it if it does.
+   * @param path The remote path to upload to.
+   * @param localPath The local path of the file to upload.
+   * @param options The options for the upload. Must contain a `mimeType` property.
+   * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
+   * @returns A promise that resolves when the file has been uploaded.
+   */
+  uploadFile(path: string, localPath: string, options: { mimeType: string }, scope?: CloudStorageScope): Promise<void> {
+    return this.nativeStorage.uploadFile(path, localPath, options.mimeType, scope ?? this.provider.options.scope, true);
+  }
+
+  /**
    * Triggers synchronization for the file at the given path. Does not have any effect on Google Drive.
    * @param path The file to trigger synchronization for.
    * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
@@ -265,8 +278,10 @@ export default class RNCloudStorage {
   downloadFile(remotePath: string, localPath: string, scope?: CloudStorageScope): Promise<void>;
   downloadFile(remotePathOrPath: string, localPathOrScope?: string, scope?: CloudStorageScope): Promise<void> {
     if (typeof scope === 'string') {
-      // TODO: implement download
-      return Promise.reject(new Error('Not implemented'));
+      if (!localPathOrScope) {
+        throw new CloudStorageError('Invalid arguments provided to downloadFile', NativeCloudStorageErrorCode.UNKNOWN);
+      }
+      return this.nativeStorage.downloadFile(remotePathOrPath, localPathOrScope, scope);
     } else {
       // deprecated `triggerSync` call
       return this.triggerSync(remotePathOrPath, scope);
@@ -435,6 +450,23 @@ export default class RNCloudStorage {
   }
 
   /**
+   * Uploads the file at the given local path to the given path in the provider of the default static instance, creating it if it doesn't exist or overwriting it if it does.
+   * @param path The remote path to upload to.
+   * @param localPath The local path of the file to upload.
+   * @param options The options for the upload. Must contain a `mimeType` property.
+   * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
+   * @returns A promise that resolves when the file has been uploaded.
+   */
+  static uploadFile(
+    path: string,
+    localPath: string,
+    options: { mimeType: string },
+    scope?: CloudStorageScope
+  ): Promise<void> {
+    return RNCloudStorage.getDefaultInstance().uploadFile(path, localPath, options, scope);
+  }
+
+  /**
    * Triggers synchronization for the file at the given path in the provider of the default static instance. Does not have any effect on Google Drive.
    * @param path The file to trigger synchronization for.
    * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
@@ -451,8 +483,10 @@ export default class RNCloudStorage {
   static downloadFile(remotePath: string, localPath: string, scope?: CloudStorageScope): Promise<void>;
   static downloadFile(remotePathOrPath: string, localPathOrScope?: string, scope?: CloudStorageScope): Promise<void> {
     if (typeof scope === 'string') {
-      // TODO: implement download
-      return Promise.reject(new Error('Not implemented'));
+      if (!localPathOrScope) {
+        throw new CloudStorageError('Invalid arguments provided to downloadFile', NativeCloudStorageErrorCode.UNKNOWN);
+      }
+      return RNCloudStorage.getDefaultInstance().downloadFile(remotePathOrPath, localPathOrScope, scope);
     } else {
       // deprecated `triggerSync` call
       return RNCloudStorage.getDefaultInstance().triggerSync(remotePathOrPath, scope);

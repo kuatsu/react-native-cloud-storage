@@ -10,7 +10,7 @@ import GoogleDriveApiClient, { GoogleDriveHttpError } from './client';
 import { type CloudStorageProviderOptions, type DeepRequired } from '../../types/main';
 
 /**
- * A proxy class that wraps the Google Drive API client implementation to match the native iOS interface.
+ * A JavaScript-based implementation of the Google Drive API that implements the cloud storage interface.
  */
 export default class GoogleDrive implements NativeStorage {
   private drive: GoogleDriveApiClient;
@@ -398,11 +398,70 @@ export default class GoogleDrive implements NativeStorage {
     };
   }
 
-  async downloadFile(remotePath: string, localPath: string, scope: NativeStorageScope): Promise<void> {
+  async downloadFile(_path: string, _localPath: string, _scope: NativeStorageScope): Promise<void> {
     // TODO: implement
   }
 
-  async uploadFile(localPath: string, remotePath: string, scope: NativeStorageScope): Promise<void> {
-    // TODO: implement
+  async uploadFile(
+    path: string,
+    localPath: string,
+    mimeType: string,
+    scope: NativeStorageScope,
+    overwrite: boolean
+  ): Promise<void> {
+    let fileId: string | undefined;
+
+    if (overwrite) {
+      try {
+        fileId = await this.getFileId(path, scope);
+      } catch (error: unknown) {
+        if (error instanceof CloudStorageError && error.code === NativeCloudStorageErrorCode.FILE_NOT_FOUND) {
+          /* File doesn't exist -> we'll create it below */
+        } else {
+          throw error;
+        }
+      }
+    } else {
+      try {
+        await this.getFileId(path, scope);
+        throw new CloudStorageError(`File ${path} already exists`, NativeCloudStorageErrorCode.FILE_ALREADY_EXISTS);
+      } catch (error: unknown) {
+        if (error instanceof CloudStorageError && error.code === NativeCloudStorageErrorCode.FILE_NOT_FOUND) {
+          /* not found -> ok, we'll create */
+        } else if (error instanceof CloudStorageError) {
+          throw error;
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    if (fileId) {
+      // Overwrite existing file
+      await this.drive.updateFile(fileId, {
+        mimeType,
+        localPath,
+      });
+    } else {
+      // Need to create a new file first
+      const files = await this.drive.listFiles(this.getRootDirectory(scope));
+      const { directories, filename } = this.resolvePathToDirectories(path);
+      const parentDirectoryId = this.findParentDirectoryId(files, directories);
+
+      await this.drive.createFile(
+        {
+          name: filename,
+          parents: parentDirectoryId
+            ? [parentDirectoryId]
+            : scope === 'app_data'
+            ? [this.getRootDirectory(scope)]
+            : undefined,
+        },
+        {
+          mimeType,
+          localPath,
+        }
+      );
+    }
   }
 }

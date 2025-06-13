@@ -48,7 +48,8 @@ class CloudStorageLocalFileSystem: NSObject {
       return
     }
 
-    let localUrl = URL(fileURLWithPath: localPath)
+    let sanitizedPath = sanitizePath(localPath)
+    let localUrl = URL(fileURLWithPath: sanitizedPath)
 
     let configuration = URLSessionConfiguration.default
     if let headers = options?["headers"] as? [String: String] {
@@ -98,7 +99,8 @@ class CloudStorageLocalFileSystem: NSObject {
       return
     }
 
-    let localUrl = URL(fileURLWithPath: localPath)
+    let sanitizedPath = sanitizePath(localPath)
+    let localUrl = URL(fileURLWithPath: sanitizedPath)
 
     guard let uploadTypeString = options["uploadType"] as? String,
           let uploadType = UploadType(rawValue: uploadTypeString) else {
@@ -163,14 +165,14 @@ class CloudStorageLocalFileSystem: NSObject {
       let task = URLSession.shared.dataTask(with: request) { _, response, error in
         if let error {
           let nsError = error as NSError
-          let cloudError = CloudStorageError.networkError(message: "Upload error for path \(localPath): \(nsError.localizedDescription)")
+          let cloudError = CloudStorageError.networkError(message: "Upload error for path \(sanitizedPath): \(nsError.localizedDescription)")
           reject(cloudError.code, cloudError.message, nsError)
           return
         }
 
         guard let httpResponse = response as? HTTPURLResponse, (200 ... 299).contains(httpResponse.statusCode) else {
           let httpResponse = response as? HTTPURLResponse
-          let message = "Upload failed for path \(localPath) with status code: \(httpResponse?.statusCode ?? -1)"
+          let message = "Upload failed for path \(sanitizedPath) with status code: \(httpResponse?.statusCode ?? -1)"
           let cloudError = CloudStorageError.networkError(message: message)
           reject(cloudError.code, cloudError.message, nil)
           return
@@ -181,9 +183,16 @@ class CloudStorageLocalFileSystem: NSObject {
       task.resume()
     } catch {
       let nsError = error as NSError
-      let cloudError = CloudStorageError.readError(path: localPath)
+      let cloudError = CloudStorageError.readError(path: sanitizedPath)
       reject(cloudError.code, cloudError.message, nsError)
     }
+  }
+
+  private func sanitizePath(_ path: String) -> String {
+    if path.hasPrefix("file://") {
+      return String(path.dropFirst("file://".count))
+    }
+    return path
   }
 
   private func getMimeType(for url: URL) -> String? {

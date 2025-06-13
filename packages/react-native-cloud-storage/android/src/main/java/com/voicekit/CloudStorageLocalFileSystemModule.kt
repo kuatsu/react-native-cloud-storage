@@ -29,7 +29,8 @@ class CloudStorageLocalFileSystemModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun createFile(path: String, data: String, promise: Promise) {
     try {
-      val file = File(path)
+      val sanitizedPath = FileUtils.sanitizePath(path)
+      val file = File(sanitizedPath)
       val parentDir = file.parentFile
       if (parentDir != null && !parentDir.exists()) {
         val error = CloudStorageError.DirectoryNotFound(parentDir.path)
@@ -49,7 +50,8 @@ class CloudStorageLocalFileSystemModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun readFile(path: String, promise: Promise) {
     try {
-      val file = File(path)
+      val sanitizedPath = FileUtils.sanitizePath(path)
+      val file = File(sanitizedPath)
       val content = FileUtils.readFile(file)
       promise.resolve(content)
     } catch (e: CloudStorageError) {
@@ -100,7 +102,8 @@ class CloudStorageLocalFileSystemModule(reactContext: ReactApplicationContext) :
         }
 
         try {
-          val localFile = File(localPath)
+          val sanitizedPath = FileUtils.sanitizePath(localPath)
+          val localFile = File(sanitizedPath)
           val parentDir = localFile.parentFile
           if (parentDir != null && !parentDir.exists()) {
             parentDir.mkdirs()
@@ -111,7 +114,8 @@ class CloudStorageLocalFileSystemModule(reactContext: ReactApplicationContext) :
           sink.close()
           promise.resolve(null)
         } catch (e: Exception) {
-          val error = CloudStorageError.WriteError(localPath)
+          val sanitizedPath = FileUtils.sanitizePath(localPath)
+          val error = CloudStorageError.WriteError(sanitizedPath)
           promise.reject(error.code, error.message, e)
         } finally {
           response.body?.close()
@@ -122,9 +126,15 @@ class CloudStorageLocalFileSystemModule(reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun uploadFile(localPath: String, remoteUri: String, options: ReadableMap, promise: Promise) {
-    val localFile = File(localPath)
+    val sanitizedPath = try {
+      FileUtils.sanitizePath(localPath)
+    } catch (e: CloudStorageError) {
+      promise.reject(e.code, e.message, e)
+      return
+    }
+    val localFile = File(sanitizedPath)
     if (!localFile.exists()) {
-      promise.reject(CloudStorageError.FileNotFound(localPath).code, CloudStorageError.FileNotFound(localPath).message)
+      promise.reject(CloudStorageError.FileNotFound(sanitizedPath).code, CloudStorageError.FileNotFound(sanitizedPath).message)
       return
     }
 
@@ -198,14 +208,14 @@ class CloudStorageLocalFileSystemModule(reactContext: ReactApplicationContext) :
 
     client.newCall(request).enqueue(object : Callback {
       override fun onFailure(call: Call, e: IOException) {
-        val errorMessage = "Upload error for path $localPath: ${e.message ?: "Unknown upload error"}"
+        val errorMessage = "Upload error for path $sanitizedPath: ${e.message ?: "Unknown upload error"}"
         val error = CloudStorageError.NetworkError(errorMessage)
         promise.reject(error.code, error.message, e)
       }
 
       override fun onResponse(call: Call, response: Response) {
         if (!response.isSuccessful) {
-          val errorMessage = "Upload error for path $localPath: HTTP ${response.code}: ${response.message}"
+          val errorMessage = "Upload error for path $sanitizedPath: HTTP ${response.code}: ${response.message}"
           val error = CloudStorageError.NetworkError(errorMessage)
           promise.reject(error.code, error.message)
         } else {

@@ -27,4 +27,11 @@ object FileUtils {
       throw CloudStorageError.ReadError(file.path)
     }
   }
+
+  fun sanitizePath(path: String): String {
+    // Remove the "file://" prefix
+    val sanitizedPath = path.removePrefix("file://")
+
+    return canonicalPath
+  }
 }

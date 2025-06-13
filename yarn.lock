@@ -10061,6 +10061,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-document-picker@npm:~13.1.5":
+  version: 13.1.5
+  resolution: "expo-document-picker@npm:13.1.5"
+  peerDependencies:
+    expo: "*"
+  checksum: d64ef95c64ce7de5c73225725f8dc954a66f8b68843b20e694fe013e7d96cf554674d27744b1cd44110ca9965e153d2d7e018b2996fdbb33b205e395f5ec93c0
+  languageName: node
+  linkType: hard
+
 "expo-file-system@npm:~18.1.10":
   version: 18.1.10
   resolution: "expo-file-system@npm:18.1.10"
@@ -18552,6 +18561,8 @@ __metadata:
     "@babel/core": ^7.25.2
     "@types/react": ~19.0.10
     expo: ^53.0.0
+    expo-document-picker: ~13.1.5
+    expo-file-system: ~18.1.10
     expo-status-bar: ~2.2.3
     pod-install: ^0.2.2
     react: 19.0.0

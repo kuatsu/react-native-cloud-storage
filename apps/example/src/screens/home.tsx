@@ -9,6 +9,7 @@ import {
   CloudStorageScope,
   useIsCloudAvailable,
 } from 'react-native-cloud-storage';
+import * as DocumentPicker from 'expo-document-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Card from '../components/card';
 import Button from '../components/button';
@@ -143,7 +144,41 @@ const HomeView = () => {
     }
   };
 
+  const handleUploadFile = async () => {
+    const result = await DocumentPicker.getDocumentAsync({
+      base64: false,
+      copyToCacheDirectory: true,
+    });
+    if (!result.canceled && result.assets[0]) {
+      setLoading(true);
+      try {
+        const asset = result.assets[0];
+        console.log('Uploading file', asset);
+        await cloudStorage.uploadFile(parentDirectory + '/' + filename, asset.uri, {
+          mimeType: asset.mimeType ?? 'application/octet-stream',
+        });
+        Alert.alert('File uploaded', 'File uploaded successfully.');
+      } catch (error) {
+        console.warn(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   const handleRead = readFile;
+
+  const handleStatFile = async () => {
+    setLoading(true);
+    try {
+      const stats = await cloudStorage.stat(parentDirectory + '/' + filename);
+      Alert.alert('File stats', JSON.stringify(stats, null, 2));
+    } catch (error) {
+      console.warn(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDeleteFile = async () => {
     setLoading(true);
@@ -259,8 +294,9 @@ const HomeView = () => {
       <Card title="File Operations">
         <Text style={{ fontWeight: 'bold' }}>Filename of working file</Text>
         <TextInput placeholder="Filename" value={filename} onChangeText={setFilename} style={styles.input} />
-        {provider === CloudStorageProvider.ICloud && <Button title="Download file" onPress={handleDownload} />}
+        {provider === CloudStorageProvider.ICloud && <Button title="Trigger sync" onPress={handleDownload} />}
         <Button title="Read file" onPress={handleRead} />
+        <Button title="Stat file" onPress={handleStatFile} />
         <Button title="Delete file" onPress={handleDeleteFile} />
         <TextInput
           placeholder="File contents (read/write)"
@@ -276,6 +312,7 @@ const HomeView = () => {
           style={styles.input}
         />
         <Button title="Append to file" onPress={handleAppend} />
+        <Button title="Choose file to upload" onPress={handleUploadFile} />
         <Text style={styles.smallText}>
           The filename will be prefixed with the parent directory. If the file does not exist, it will be created. If it
           does exist, it will be overwritten.

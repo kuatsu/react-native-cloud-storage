@@ -39,7 +39,19 @@ export interface NativeLocalFileSystem {
   uploadFile: (
     localPath: string,
     remoteUri: string,
-    options?: { headers?: Record<string, string>; httpMethod?: 'PUT' | 'POST' }
+    options?: {
+      headers?: Record<string, string>;
+      method?: 'PUT' | 'POST' | 'PATCH';
+    } & (
+      | {
+          uploadType?: 'binary';
+        }
+      | {
+          uploadType?: 'multipart';
+          fieldName?: string;
+          parameters?: Record<string, string>;
+        }
+    )
   ) => Promise<void>;
 }
 
@@ -53,8 +65,14 @@ export interface NativeStorage {
   deleteFile: (path: string, scope: NativeStorageScope) => Promise<void>;
   deleteDirectory: (path: string, recursively: boolean, scope: NativeStorageScope) => Promise<void>;
   statFile: (path: string, scope: NativeStorageScope) => Promise<NativeStorageFileStat>;
-  downloadFile: (remotePath: string, localPath: string, scope: NativeStorageScope) => Promise<void>;
-  uploadFile: (remotePath: string, localPath: string, scope: NativeStorageScope) => Promise<void>;
+  downloadFile: (path: string, localPath: string, scope: NativeStorageScope) => Promise<void>;
+  uploadFile: (
+    path: string,
+    localPath: string,
+    mimeType: string,
+    scope: NativeStorageScope,
+    overwrite: boolean
+  ) => Promise<void>;
   isCloudAvailable: () => Promise<boolean>;
   triggerSync: (path: string, scope: NativeStorageScope) => Promise<void>;
 }
