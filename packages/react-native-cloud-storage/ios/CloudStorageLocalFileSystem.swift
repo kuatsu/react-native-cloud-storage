@@ -5,10 +5,28 @@ import MobileCoreServices
 
 @objc(CloudStorageLocalFileSystem)
 class CloudStorageLocalFileSystem: NSObject {
-  @objc(createTemporaryFile:withData:withResolver:withRejecter:)
-  func createTemporaryFile(filename: String, data: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc
+  func constantsToExport() -> [AnyHashable: Any]! {
+    [
+      "temporaryDirectory": FileUtils.temporaryDirectory.path,
+    ]
+  }
+
+  @objc(createFile:withData:withResolver:withRejecter:)
+  func createFile(path: String, data: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
-      let fileUrl = FileUtils.temporaryDirectory.appendingPathComponent(filename)
+      let fileUrl = URL(fileURLWithPath: path)
+      let directoryUrl = fileUrl.deletingLastPathComponent()
+
+      var isDirectory: ObjCBool = false
+      if !FileManager.default.fileExists(atPath: directoryUrl.path, isDirectory: &isDirectory) {
+        throw CloudStorageError.directoryNotFound(path: directoryUrl.path)
+      }
+
+      if !isDirectory.boolValue {
+        throw CloudStorageError.pathIsFile(path: directoryUrl.path)
+      }
+
       try FileUtils.writeFile(fileUrl: fileUrl, content: data)
       return fileUrl.path
     }

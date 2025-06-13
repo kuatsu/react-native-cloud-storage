@@ -22,11 +22,20 @@ class CloudStorageLocalFileSystemModule(reactContext: ReactApplicationContext) :
     return NAME
   }
 
+  override fun getConstants(): Map<String, Any> {
+    return mapOf("temporaryDirectory" to FileUtils.getTemporaryDirectory(reactContext).path)
+  }
+
   @ReactMethod
-  fun createTemporaryFile(filename: String, data: String, promise: Promise) {
+  fun createFile(path: String, data: String, promise: Promise) {
     try {
-      val temporaryDirectory = FileUtils.getTemporaryDirectory(reactContext)
-      val file = File(temporaryDirectory, filename)
+      val file = File(path)
+      val parentDir = file.parentFile
+      if (parentDir != null && !parentDir.exists()) {
+        val error = CloudStorageError.DirectoryNotFound(parentDir.path)
+        promise.reject(error.code, error.message, error)
+        return
+      }
       FileUtils.writeFile(file, data)
       promise.resolve(file.path)
     } catch (e: CloudStorageError) {

@@ -30,7 +30,10 @@ export enum NativeCloudStorageErrorCode {
 }
 
 export interface NativeLocalFileSystem {
-  createTemporaryFile: (filename: string, data: string) => Promise<string>;
+  getConstants: () => {
+    temporaryDirectory: string;
+  };
+  createFile: (path: string, data: string) => Promise<string>;
   readFile: (path: string) => Promise<string>;
   downloadFile: (remoteUri: string, localPath: string, options?: { headers?: Record<string, string> }) => Promise<void>;
   uploadFile: (
@@ -53,6 +56,6 @@ export interface NativeStorage {
   // TODO: downloadFile: (remotePath: string, localPath: string, scope: NativeStorageScope) => Promise<void>;
   // TODO: uploadFile: (remotePath: string, localPath: string, scope: NativeStorageScope) => Promise<void>;
   isCloudAvailable: () => Promise<boolean>;
-  // TODO: rename to triggerSync
+  // TODO: rename to triggerSync, deprecate downloadFile
   downloadFile: (path: string, scope: NativeStorageScope) => Promise<void>;
 }
