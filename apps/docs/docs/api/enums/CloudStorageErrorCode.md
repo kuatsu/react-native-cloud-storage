@@ -35,7 +35,7 @@ enum CloudStorageErrorCode {
 }
 ```
 
-When using pure JavaScript, simply use the appropriate values:
+When using pure JavaScript, simply use the corresponding values:
 
 ```js
 if (e instanceof CloudStorageError && e.code === 'FILE_NOT_FOUND') {

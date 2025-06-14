@@ -21,7 +21,7 @@ enum CloudStorageProvider {
 }
 ```
 
-When using pure JavaScript, simply use the appropriate values:
+When using pure JavaScript, simply use the corresponding values:
 
 ```js
 CloudStorage.setProvider('googledrive');
