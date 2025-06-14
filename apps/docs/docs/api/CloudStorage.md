@@ -148,6 +148,18 @@ Appends the data to the file at the given path. Creates the file if it doesn't e
 
 **Returns**: A `Promise` that resolves to `void` once the data has been appended.
 
+### `downloadFile(path, localPath, scope)`
+
+Downloads the file at the given path to the given local path.
+
+**Parameters**:
+
+- `path` (`string`): Required. The path of the file to download.
+- `localPath` (`string`): Required. The local path to download the file to, including the filename of the downloaded file.
+- `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Optional. The storage scope (documents/app data) to use. Defaults to [`CloudStorageScope.AppData`](./enums/CloudStorageScope), unless the default scope has been changed via [`setProviderOptions()`](#setprovideroptionsoptions).
+
+**Returns**: A `Promise` that resolves to `void` once the file has been downloaded.
+
 ### `exists(path, scope)`
 
 Tests whether or not the file or directory at the given path exists.

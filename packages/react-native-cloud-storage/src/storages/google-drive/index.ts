@@ -398,8 +398,20 @@ export default class GoogleDrive implements NativeStorage {
     };
   }
 
-  async downloadFile(_path: string, _localPath: string, _scope: NativeStorageScope): Promise<void> {
-    // TODO: implement
+  async downloadFile(path: string, localPath: string, scope: NativeStorageScope): Promise<void> {
+    const fileId = await this.getFileId(path, scope, 'directory');
+
+    try {
+      await this.drive.downloadFile(fileId, localPath);
+    } catch (error: unknown) {
+      if (error instanceof CloudStorageError) throw error;
+
+      throw new CloudStorageError(
+        `Could not download file ${path} to ${localPath}`,
+        NativeCloudStorageErrorCode.UNKNOWN,
+        error
+      );
+    }
   }
 
   async uploadFile(

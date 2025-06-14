@@ -9,7 +9,9 @@ import {
   CloudStorageScope,
   useIsCloudAvailable,
 } from 'react-native-cloud-storage';
+import * as FileSystem from 'expo-file-system';
 import * as DocumentPicker from 'expo-document-picker';
+import * as Crypto from 'expo-crypto';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Card from '../components/card';
 import Button from '../components/button';
@@ -152,10 +154,9 @@ const HomeView = () => {
     if (!result.canceled && result.assets[0]) {
       setLoading(true);
       try {
-        const asset = result.assets[0];
-        console.log('Uploading file', asset);
-        await cloudStorage.uploadFile(parentDirectory + '/' + filename, asset.uri, {
-          mimeType: asset.mimeType ?? 'application/octet-stream',
+        const file = result.assets[0];
+        await cloudStorage.uploadFile(parentDirectory + '/' + filename, file.uri, {
+          mimeType: file.mimeType ?? 'application/octet-stream',
         });
         Alert.alert('File uploaded', 'File uploaded successfully.');
       } catch (error) {
@@ -163,6 +164,21 @@ const HomeView = () => {
       } finally {
         setLoading(false);
       }
+    }
+  };
+
+  const handleDownloadFile = async () => {
+    setLoading(true);
+    try {
+      const directory = FileSystem.cacheDirectory;
+      if (!directory) throw new Error('Could not get cache directory');
+      const newFilename = directory + (await Crypto.randomUUID());
+      await cloudStorage.downloadFile(parentDirectory + '/' + filename, newFilename);
+      Alert.alert('File downloaded', `File downloaded to ${newFilename}`);
+    } catch (error) {
+      console.warn(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -313,6 +329,7 @@ const HomeView = () => {
         />
         <Button title="Append to file" onPress={handleAppend} />
         <Button title="Choose file to upload" onPress={handleUploadFile} />
+        <Button title="Download file to cache directory" onPress={handleDownloadFile} />
         <Text style={styles.smallText}>
           The filename will be prefixed with the parent directory. If the file does not exist, it will be created. If it
           does exist, it will be overwritten.

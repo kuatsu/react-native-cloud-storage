@@ -237,7 +237,12 @@ export default class GoogleDriveApiClient {
     }
   }
 
-  public async downloadFile(_fileId: string, _localPath: string): Promise<void> {
-    // TODO: implement
+  public async downloadFile(fileId: string, localPath: string): Promise<void> {
+    const remoteUri = `${BASE_URL}/files/${fileId}?alt=media`;
+    await localFileSystem.downloadFile(remoteUri, localPath, {
+      headers: {
+        Authorization: `Bearer ${this.options.accessToken}`,
+      },
+    });
   }
 }

@@ -62,8 +62,8 @@ class CloudStorageCloudKit: NSObject {
     }
   }
 
-  @objc(downloadFile:withScope:withResolver:withRejecter:)
-  func downloadFile(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(triggerSync:withScope:withResolver:withRejecter:)
+  func triggerSync(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
       let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
       return try CloudKitUtils.triggerSync(fileUrl: fileUrl)
@@ -95,10 +95,32 @@ class CloudStorageCloudKit: NSObject {
   }
 
   @objc(downloadFile:withLocalPath:withScope:withResolver:withRejecter:)
-  func downloadFile(path _: String, localPath _: String, scope _: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  func downloadFile(path: String, localPath: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
-      // TODO: implement
-      nil
+      let sourceUrl = try CloudKitUtils.getFileURL(path: path, scope: scope, true)
+
+      let sourceStat = try FileUtils.statFile(fileUrl: sourceUrl)
+      if sourceStat.isDirectory {
+        throw CloudStorageError.pathIsDirectory(path: path)
+      }
+
+      let destinationUrl = URL(fileURLWithPath: localPath)
+      let destinationDirectoryUrl = destinationUrl.deletingLastPathComponent()
+
+      if try !FileUtils.checkFileExists(fileUrl: destinationDirectoryUrl) {
+        throw CloudStorageError.directoryNotFound(path: destinationDirectoryUrl.path)
+      }
+
+      let destDirStat = try FileUtils.statFile(fileUrl: destinationDirectoryUrl)
+      if !destDirStat.isDirectory {
+        throw CloudStorageError.pathIsFile(path: destinationDirectoryUrl.path)
+      }
+
+      if try FileUtils.checkFileExists(fileUrl: destinationUrl) {
+        throw CloudStorageError.fileAlreadyExists(path: localPath)
+      }
+
+      return try FileUtils.copyFile(from: sourceUrl, to: destinationUrl)
     }
   }
 
