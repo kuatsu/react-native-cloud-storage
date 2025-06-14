@@ -288,15 +288,20 @@ export default class RNCloudStorage {
    */
   downloadFile(remotePath: string, localPath: string, scope?: CloudStorageScope): Promise<void>;
   downloadFile(remotePathOrPath: string, localPathOrScope?: string, scope?: CloudStorageScope): Promise<void> {
-    if (typeof scope === 'string') {
-      if (!localPathOrScope) {
-        throw new CloudStorageError('Invalid arguments provided to downloadFile', NativeCloudStorageErrorCode.UNKNOWN);
-      }
-      return this.nativeStorage.downloadFile(remotePathOrPath, localPathOrScope, scope);
-    } else {
+    if (
+      !localPathOrScope ||
+      (!scope &&
+        typeof localPathOrScope === 'string' &&
+        Object.values(CloudStorageScope).includes(localPathOrScope as CloudStorageScope))
+    ) {
       // deprecated `triggerSync` call
       return this.triggerSync(remotePathOrPath, scope);
     }
+
+    if (!localPathOrScope) {
+      throw new CloudStorageError('Invalid arguments provided to downloadFile', NativeCloudStorageErrorCode.UNKNOWN);
+    }
+    return this.nativeStorage.downloadFile(remotePathOrPath, localPathOrScope, scope ?? this.provider.options.scope);
   }
 
   /**
