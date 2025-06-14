@@ -21,12 +21,12 @@ enum CloudKitUtils {
   }
 
   /**
-     Downloads a file from iCloud.
+     Syncs a file from iCloud to the device.
 
-     - Parameter fileUrl: The URL of the file to download.
-     - Throws: An NSError if the file is not downloadable or the download failed.
+     - Parameter fileUrl: The URL of the file to sync.
+     - Throws: An NSError if the file is not downloadable or the sync failed.
    */
-  static func downloadFile(fileUrl: URL) throws {
+  static func triggerSync(fileUrl: URL) throws {
     let isDownloadable = fileManager.isUbiquitousItem(at: fileUrl)
 
     if !isDownloadable {

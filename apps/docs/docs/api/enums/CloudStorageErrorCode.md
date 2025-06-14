@@ -30,10 +30,12 @@ enum CloudStorageErrorCode {
   UNKNOWN = 'ERR_UNKNOWN',
   FILE_NOT_DOWNLOADABLE = 'ERR_FILE_NOT_DOWNLOADABLE',
   ACCESS_TOKEN_MISSING = 'ERR_ACCESS_TOKEN_MISSING',
+  INVALID_URL = 'ERR_INVALID_URL',
+  NETWORK_ERROR = 'ERR_NETWORK_ERROR',
 }
 ```
 
-When using pure JavaScript, simply use the appropriate values:
+When using pure JavaScript, simply use the corresponding values:
 
 ```js
 if (e instanceof CloudStorageError && e.code === 'FILE_NOT_FOUND') {

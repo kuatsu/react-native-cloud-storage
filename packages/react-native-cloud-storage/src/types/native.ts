@@ -1,6 +1,6 @@
-export type NativeRNCloudCloudStorageScope = 'documents' | 'app_data';
+export type NativeStorageScope = 'documents' | 'app_data';
 
-export interface NativeRNCloudCloudStorageFileStat {
+export interface NativeStorageFileStat {
   size: number;
   birthtimeMs: number;
   mtimeMs: number;
@@ -8,7 +8,7 @@ export interface NativeRNCloudCloudStorageFileStat {
   isFile: boolean;
 }
 
-export enum CloudStorageErrorCode {
+export enum NativeCloudStorageErrorCode {
   INVALID_SCOPE = 'ERR_INVALID_SCOPE',
   FILE_NOT_FOUND = 'ERR_FILE_NOT_FOUND',
   PATH_IS_FILE = 'ERR_PATH_IS_FILE',
@@ -25,18 +25,54 @@ export enum CloudStorageErrorCode {
   UNKNOWN = 'ERR_UNKNOWN',
   FILE_NOT_DOWNLOADABLE = 'ERR_FILE_NOT_DOWNLOADABLE',
   ACCESS_TOKEN_MISSING = 'ERR_ACCESS_TOKEN_MISSING',
+  INVALID_URL = 'ERR_INVALID_URL',
+  NETWORK_ERROR = 'ERR_NETWORK_ERROR',
 }
 
-export default interface NativeRNCloudStorage {
-  fileExists: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<boolean>;
-  appendToFile: (path: string, data: string, scope: NativeRNCloudCloudStorageScope) => Promise<void>;
-  createFile: (path: string, data: string, scope: NativeRNCloudCloudStorageScope, overwrite: boolean) => Promise<void>;
-  createDirectory: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<void>;
-  listFiles: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<string[]>;
-  readFile: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<string>;
-  downloadFile: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<void>;
-  deleteFile: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<void>;
-  deleteDirectory: (path: string, recursively: boolean, scope: NativeRNCloudCloudStorageScope) => Promise<void>;
-  statFile: (path: string, scope: NativeRNCloudCloudStorageScope) => Promise<NativeRNCloudCloudStorageFileStat>;
+export interface NativeLocalFileSystem {
+  getConstants: () => {
+    temporaryDirectory: string;
+  };
+  createFile: (path: string, data: string) => Promise<string>;
+  readFile: (path: string) => Promise<string>;
+  downloadFile: (remoteUri: string, localPath: string, options?: { headers?: Record<string, string> }) => Promise<void>;
+  uploadFile: (
+    localPath: string,
+    remoteUri: string,
+    options?: {
+      headers?: Record<string, string>;
+      method?: 'PUT' | 'POST' | 'PATCH';
+    } & (
+      | {
+          uploadType?: 'binary';
+        }
+      | {
+          uploadType?: 'multipart';
+          fieldName?: string;
+          parameters?: Record<string, string>;
+        }
+    )
+  ) => Promise<void>;
+}
+
+export interface NativeStorage {
+  fileExists: (path: string, scope: NativeStorageScope) => Promise<boolean>;
+  appendToFile: (path: string, data: string, scope: NativeStorageScope) => Promise<void>;
+  createFile: (path: string, data: string, scope: NativeStorageScope, overwrite: boolean) => Promise<void>;
+  createDirectory: (path: string, scope: NativeStorageScope) => Promise<void>;
+  listFiles: (path: string, scope: NativeStorageScope) => Promise<string[]>;
+  readFile: (path: string, scope: NativeStorageScope) => Promise<string>;
+  deleteFile: (path: string, scope: NativeStorageScope) => Promise<void>;
+  deleteDirectory: (path: string, recursively: boolean, scope: NativeStorageScope) => Promise<void>;
+  statFile: (path: string, scope: NativeStorageScope) => Promise<NativeStorageFileStat>;
+  downloadFile: (remotePath: string, localPath: string, scope: NativeStorageScope) => Promise<void>;
+  uploadFile: (
+    remotePath: string,
+    localPath: string,
+    mimeType: string,
+    scope: NativeStorageScope,
+    overwrite: boolean
+  ) => Promise<void>;
   isCloudAvailable: () => Promise<boolean>;
+  triggerSync: (path: string, scope: NativeStorageScope) => Promise<void>;
 }

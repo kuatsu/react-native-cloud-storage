@@ -8,9 +8,15 @@
 
 import Foundation
 
+// MARK: - UploadType
+
+enum UploadType: String {
+  case multipart
+  case binary
+}
+
 // MARK: - DirectoryScope
 
-@frozen
 enum DirectoryScope: String {
   case appData = "app_data"
   case documents

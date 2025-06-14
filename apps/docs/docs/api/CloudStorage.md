@@ -14,9 +14,9 @@ import { CloudStorage } from 'react-native-cloud-storage';
 
 ## Definitions
 
-### `path`
+### `path` / `remotePath` / `localPath`
 
-When a method takes a `path` parameter, you should provide a full path with a leading slash, but no trailing slashes:
+When a method takes a `path`, `remotePath` or `localPath` parameter, you should provide a full path on the remote cloud storage or local file system respectively with a leading slash, but no trailing slashes:
 
 - ❌ `some/file.txt`
 - ❌ `file:///some/file.txt`
@@ -148,16 +148,17 @@ Appends the data to the file at the given path. Creates the file if it doesn't e
 
 **Returns**: A `Promise` that resolves to `void` once the data has been appended.
 
-### `downloadFile(path, scope)`
+### `downloadFile(path, localPath, scope)`
 
-When a file has been uploaded to iCloud, it is not immediately synced across devices. In this case, those files will have an `.icloud` extension, so trying to read them will fail. This method will download the file from iCloud so you can safely process it afterwards. If it has already been downloaded, this will not do anything and immediately return. Does not have any effect on Google Drive.
+Downloads the file at the given path to the given local path.
 
 **Parameters**:
 
-- `path` (`string`): Required. The path including the filename to download.
+- `path` (`string`): Required. The path of the file to download.
+- `localPath` (`string`): Required. The local path to download the file to, including the filename of the downloaded file.
 - `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Optional. The storage scope (documents/app data) to use. Defaults to [`CloudStorageScope.AppData`](./enums/CloudStorageScope), unless the default scope has been changed via [`setProviderOptions()`](#setprovideroptionsoptions).
 
-**Returns**: A `Promise` that resolves to `void` once the download has been triggered.
+**Returns**: A `Promise` that resolves to `void` once the file has been downloaded.
 
 ### `exists(path, scope)`
 
@@ -234,6 +235,17 @@ Gets several file statistics of the file at the given path.
 
 **Returns**: A `Promise` that resolves to [`CloudStorageFileStat`](./interfaces/CloudStorageFileStat) object containing the statistics.
 
+### `triggerSync(path, scope)`
+
+When a file has been uploaded to iCloud, it is not immediately synced across devices. In this case, those files will have an `.icloud` extension, so trying to read them will fail. This method will download the file from iCloud so you can safely process it afterwards. If it has already been synced, this will not do anything and immediately return. Does not have any effect on Google Drive.
+
+**Parameters**:
+
+- `path` (`string`): Required. The path including the filename to download.
+- `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Optional. The storage scope (documents/app data) to use. Defaults to [`CloudStorageScope.AppData`](./enums/CloudStorageScope), unless the default scope has been changed via [`setProviderOptions()`](#setprovideroptionsoptions).
+
+**Returns**: A `Promise` that resolves to `void` once the download has been triggered.
+
 ### `unlink(path, scope)`
 
 Deletes the file at the given path.
@@ -244,6 +256,19 @@ Deletes the file at the given path.
 - `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Optional. The storage scope (documents/app data) to use. Defaults to [`CloudStorageScope.AppData`](./enums/CloudStorageScope), unless the default scope has been changed via [`setProviderOptions()`](#setprovideroptionsoptions).
 
 **Returns**: A `Promise` that resolves to `void` once the file has been deleted.
+
+### `uploadFile(path, localPath, options, scope)`
+
+Uploads the file at the given local path to the given path, creating it if it doesn't exist or overwriting it if it does.
+
+**Parameters**:
+
+- `path` (`string`): Required. The remote path to upload to.
+- `localPath` (`string`): Required. The local path of the file to upload.
+- `options` (`{ mimeType: string }`): Required. The options for the upload. Must contain a `mimeType` property.
+- `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Optional. The storage scope (documents/app data) to use. Defaults to [`CloudStorageScope.AppData`](./enums/CloudStorageScope), unless the default scope has been changed via [`setProviderOptions()`](#setprovideroptionsoptions).
+
+**Returns**: A `Promise` that resolves to `void` once the file has been uploaded.
 
 ### `writeFile(path, data, scope)`
 

@@ -95,6 +95,21 @@ enum FileUtils {
   }
 
   /**
+    Copies a file from a source to a destination.
+
+    - Parameter sourceUrl: The URL of the file to copy from.
+    - Parameter destinationUrl: The URL to copy the file to.
+    - Throws: An NSError if the file couldn't be copied.
+   */
+  static func copyFile(from sourceUrl: URL, to destinationUrl: URL) throws {
+    do {
+      try fileManager.copyItem(at: sourceUrl, to: destinationUrl)
+    } catch {
+      throw CloudStorageError.writeError(path: destinationUrl.path)
+    }
+  }
+
+  /**
      Gets the stats of a file.
 
      - Parameter fileUrl: The URL of the file to get the stats of.
@@ -128,5 +143,9 @@ enum FileUtils {
 
   static func sanitizePath(path: String) -> String {
     path.replacingOccurrences(of: "^/+", with: "", options: .regularExpression)
+  }
+
+  static var temporaryDirectory: URL {
+    fileManager.temporaryDirectory
   }
 }

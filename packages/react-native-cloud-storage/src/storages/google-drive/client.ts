@@ -1,4 +1,4 @@
-import { type CloudStorageProviderOptions, type DeepRequired } from '../types/main';
+import { type CloudStorageProviderOptions, type DeepRequired } from '../../types/main';
 import {
   MimeTypes,
   type GoogleDriveFile,
@@ -6,6 +6,7 @@ import {
   type GoogleDriveListOperationQueryParameters,
   type GoogleDriveListOperationResponse,
 } from './types';
+import { localFileSystem } from '../../utils/local-fs';
 
 const BASE_URL = 'https://www.googleapis.com/drive/v3';
 const BASE_UPLOAD_URL = 'https://www.googleapis.com/upload/drive/v3';
@@ -160,20 +161,42 @@ export default class GoogleDriveApiClient {
 
   public async createFile(
     metadata: { name: string; parents?: string[] },
-    media: { mimeType: string; body: string }
+    media: { mimeType: string; body: string } | { mimeType: string; localPath: string }
   ): Promise<void> {
-    const multipartRequestBody = this.buildMultiPartBody(metadata, media);
+    if ('body' in media) {
+      const multipartRequestBody = this.buildMultiPartBody(metadata, media);
 
-    await this.request(`/files`, {
-      queryParameters: { uploadType: 'multipart' },
-      method: 'POST',
-      headers: {
-        'Content-Type': `multipart/related; boundary=${MULTIPART_BOUNDARY}`,
-        'Content-Length': multipartRequestBody.length.toString(),
-      },
-      body: multipartRequestBody,
-      baseUrl: BASE_UPLOAD_URL,
-    });
+      await this.request(`/files`, {
+        queryParameters: { uploadType: 'multipart' },
+        method: 'POST',
+        headers: {
+          'Content-Type': `multipart/related; boundary=${MULTIPART_BOUNDARY}`,
+          'Content-Length': multipartRequestBody.length.toString(),
+        },
+        body: multipartRequestBody,
+        baseUrl: BASE_UPLOAD_URL,
+      });
+    } else {
+      // First, create an empty file with the required metadata
+      const file = await this.request<{ id: string }>(`/files`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': MimeTypes.JSON,
+        },
+        body: JSON.stringify({ ...metadata, mimeType: media.mimeType }),
+      });
+
+      // Then, upload the binary content via the native helper module
+      const remoteUri = `${BASE_UPLOAD_URL}/files/${file.id}?uploadType=media`;
+      await localFileSystem.uploadFile(media.localPath, remoteUri, {
+        method: 'PATCH',
+        uploadType: 'binary',
+        headers: {
+          'Authorization': `Bearer ${this.options.accessToken}`,
+          'Content-Type': media.mimeType,
+        },
+      });
+    }
   }
 
   public async createDirectory(metadata: { name: string; parents?: string[] }): Promise<void> {
@@ -186,16 +209,40 @@ export default class GoogleDriveApiClient {
     });
   }
 
-  public async updateFile(fileId: string, media: { mimeType: string; body: string }): Promise<void> {
-    await this.request(`/files/${fileId}`, {
-      queryParameters: { uploadType: 'media' },
-      method: 'PATCH',
+  public async updateFile(
+    fileId: string,
+    media: { mimeType: string; body: string } | { mimeType: string; localPath: string }
+  ): Promise<void> {
+    if ('body' in media) {
+      await this.request(`/files/${fileId}`, {
+        queryParameters: { uploadType: 'media' },
+        method: 'PATCH',
+        headers: {
+          'Content-Type': media.mimeType,
+          'Content-Length': media.body.length.toString(),
+        },
+        body: media.body,
+        baseUrl: BASE_UPLOAD_URL,
+      });
+    } else {
+      const remoteUri = `${BASE_UPLOAD_URL}/files/${fileId}?uploadType=media`;
+      await localFileSystem.uploadFile(media.localPath, remoteUri, {
+        method: 'PATCH',
+        uploadType: 'binary',
+        headers: {
+          'Authorization': `Bearer ${this.options.accessToken}`,
+          'Content-Type': media.mimeType,
+        },
+      });
+    }
+  }
+
+  public async downloadFile(fileId: string, localPath: string): Promise<void> {
+    const remoteUri = `${BASE_URL}/files/${fileId}?alt=media`;
+    await localFileSystem.downloadFile(remoteUri, localPath, {
       headers: {
-        'Content-Type': media.mimeType,
-        'Content-Length': media.body.length.toString(),
+        Authorization: `Bearer ${this.options.accessToken}`,
       },
-      body: media.body,
-      baseUrl: BASE_UPLOAD_URL,
     });
   }
 }

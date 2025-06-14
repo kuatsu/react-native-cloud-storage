@@ -1,7 +1,7 @@
 import Foundation
 
-@objc(CloudStorage)
-class CloudStorage: NSObject {
+@objc(CloudStorageCloudKit)
+class CloudStorageCloudKit: NSObject {
   @objc(fileExists:withScope:withResolver:withRejecter:)
   func fileExists(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
@@ -62,11 +62,11 @@ class CloudStorage: NSObject {
     }
   }
 
-  @objc(downloadFile:withScope:withResolver:withRejecter:)
-  func downloadFile(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(triggerSync:withScope:withResolver:withRejecter:)
+  func triggerSync(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
       let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
-      return try CloudKitUtils.downloadFile(fileUrl: fileUrl)
+      return try CloudKitUtils.triggerSync(fileUrl: fileUrl)
     }
   }
 
@@ -91,6 +91,61 @@ class CloudStorage: NSObject {
     withPromise(resolve: resolve, reject: reject) {
       let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
       return try FileUtils.statFile(fileUrl: fileUrl).toDictionary()
+    }
+  }
+
+  @objc(downloadFile:withLocalPath:withScope:withResolver:withRejecter:)
+  func downloadFile(remotePath: String, localPath: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    withPromise(resolve: resolve, reject: reject) {
+      let sourceUrl = try CloudKitUtils.getFileURL(path: remotePath, scope: scope, true)
+
+      let sourceStat = try FileUtils.statFile(fileUrl: sourceUrl)
+      if sourceStat.isDirectory {
+        throw CloudStorageError.pathIsDirectory(path: remotePath)
+      }
+
+      let destinationUrl = URL(fileURLWithPath: localPath)
+      let destinationDirectoryUrl = destinationUrl.deletingLastPathComponent()
+
+      if try !FileUtils.checkFileExists(fileUrl: destinationDirectoryUrl) {
+        throw CloudStorageError.directoryNotFound(path: destinationDirectoryUrl.path)
+      }
+
+      let destDirStat = try FileUtils.statFile(fileUrl: destinationDirectoryUrl)
+      if !destDirStat.isDirectory {
+        throw CloudStorageError.pathIsFile(path: destinationDirectoryUrl.path)
+      }
+
+      if try FileUtils.checkFileExists(fileUrl: destinationUrl) {
+        throw CloudStorageError.fileAlreadyExists(path: localPath)
+      }
+
+      return try FileUtils.copyFile(from: sourceUrl, to: destinationUrl)
+    }
+  }
+
+  @objc(uploadFile:withLocalPath:withMimeType:withScope:withOverwrite:withResolver:withRejecter:)
+  func uploadFile(remotePath: String, localPath: String, mimeType _: String, scope: String, overwrite: Bool, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    withPromise(resolve: resolve, reject: reject) {
+      let destinationUrl = try CloudKitUtils.getFileURL(path: remotePath, scope: scope)
+      let sourceUrl = URL(fileURLWithPath: localPath)
+
+      if try !FileUtils.checkFileExists(fileUrl: sourceUrl) {
+        throw CloudStorageError.fileNotFound(path: localPath)
+      }
+
+      let destinationDirectoryUrl = destinationUrl.deletingLastPathComponent()
+      try FileUtils.createDirectory(directoryUrl: destinationDirectoryUrl)
+
+      if try FileUtils.checkFileExists(fileUrl: destinationUrl) {
+        if overwrite {
+          try FileUtils.deleteFileOrDirectory(fileUrl: destinationUrl)
+        } else {
+          throw CloudStorageError.fileAlreadyExists(path: remotePath)
+        }
+      }
+
+      return try FileUtils.copyFile(from: sourceUrl, to: destinationUrl)
     }
   }
 
