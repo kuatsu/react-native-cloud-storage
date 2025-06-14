@@ -32,6 +32,10 @@ object FileUtils {
     // Remove the "file://" prefix
     val sanitizedPath = path.removePrefix("file://")
 
-    return canonicalPath
+    return try {
+      File(sanitizedPath).canonicalPath
+    } catch (e: IOException) {
+      throw CloudStorageError.InvalidUrl(path)
+    }
   }
 }

@@ -15,7 +15,7 @@ import okio.buffer
 import okio.sink
 import java.net.URLConnection
 
-class CloudStorageLocalFileSystemModule(reactContext: ReactApplicationContext) :
+class CloudStorageLocalFileSystemModule(private val reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
 
   override fun getName(): String {
@@ -164,7 +164,9 @@ class CloudStorageLocalFileSystemModule(reactContext: ReactApplicationContext) :
 
     if (options.hasKey("headers")) {
       options.getMap("headers")?.let { headers ->
-        headers.keySetIterator().forEach { key ->
+        val iterator = headers.keySetIterator()
+        while (iterator.hasNextKey()) {
+          val key = iterator.nextKey()
           requestBuilder.addHeader(key, headers.getString(key)!!)
         }
       }
@@ -194,7 +196,9 @@ class CloudStorageLocalFileSystemModule(reactContext: ReactApplicationContext) :
 
         if (options.hasKey("parameters")) {
           options.getMap("parameters")?.let { parameters ->
-            parameters.keySetIterator().forEach { key ->
+            val paramIterator = parameters.keySetIterator()
+            while (paramIterator.hasNextKey()) {
+              val key = paramIterator.nextKey()
               multipartBodyBuilder.addFormDataPart(key, parameters.getString(key)!!)
             }
           }

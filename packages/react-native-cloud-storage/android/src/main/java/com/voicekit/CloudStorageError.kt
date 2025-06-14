@@ -2,7 +2,7 @@ package com.cloudstorage
 
 sealed class CloudStorageError(
     val code: String,
-    val message: String
+    override val message: String
 ) : Exception(message) {
     data class InvalidScope(val scope: String) : CloudStorageError(
         code = "ERR_INVALID_SCOPE",
