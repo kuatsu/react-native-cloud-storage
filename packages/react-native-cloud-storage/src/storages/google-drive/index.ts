@@ -398,8 +398,8 @@ export default class GoogleDrive implements NativeStorage {
     };
   }
 
-  async downloadFile(path: string, localPath: string, scope: NativeStorageScope): Promise<void> {
-    const fileId = await this.getFileId(path, scope, 'directory');
+  async downloadFile(remotePath: string, localPath: string, scope: NativeStorageScope): Promise<void> {
+    const fileId = await this.getFileId(remotePath, scope, 'directory');
 
     try {
       await this.drive.downloadFile(fileId, localPath);
@@ -407,7 +407,7 @@ export default class GoogleDrive implements NativeStorage {
       if (error instanceof CloudStorageError) throw error;
 
       throw new CloudStorageError(
-        `Could not download file ${path} to ${localPath}`,
+        `Could not download file ${remotePath} to ${localPath}`,
         NativeCloudStorageErrorCode.UNKNOWN,
         error
       );
@@ -415,7 +415,7 @@ export default class GoogleDrive implements NativeStorage {
   }
 
   async uploadFile(
-    path: string,
+    remotePath: string,
     localPath: string,
     mimeType: string,
     scope: NativeStorageScope,
@@ -425,7 +425,7 @@ export default class GoogleDrive implements NativeStorage {
 
     if (overwrite) {
       try {
-        fileId = await this.getFileId(path, scope);
+        fileId = await this.getFileId(remotePath, scope);
       } catch (error: unknown) {
         if (error instanceof CloudStorageError && error.code === NativeCloudStorageErrorCode.FILE_NOT_FOUND) {
           /* File doesn't exist -> we'll create it below */
@@ -435,8 +435,11 @@ export default class GoogleDrive implements NativeStorage {
       }
     } else {
       try {
-        await this.getFileId(path, scope);
-        throw new CloudStorageError(`File ${path} already exists`, NativeCloudStorageErrorCode.FILE_ALREADY_EXISTS);
+        await this.getFileId(remotePath, scope);
+        throw new CloudStorageError(
+          `File ${remotePath} already exists`,
+          NativeCloudStorageErrorCode.FILE_ALREADY_EXISTS
+        );
       } catch (error: unknown) {
         if (error instanceof CloudStorageError && error.code === NativeCloudStorageErrorCode.FILE_NOT_FOUND) {
           /* not found -> ok, we'll create */
@@ -457,7 +460,7 @@ export default class GoogleDrive implements NativeStorage {
     } else {
       // Need to create a new file first
       const files = await this.drive.listFiles(this.getRootDirectory(scope));
-      const { directories, filename } = this.resolvePathToDirectories(path);
+      const { directories, filename } = this.resolvePathToDirectories(remotePath);
       const parentDirectoryId = this.findParentDirectoryId(files, directories);
 
       await this.drive.createFile(

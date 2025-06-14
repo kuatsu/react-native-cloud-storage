@@ -251,14 +251,25 @@ export default class RNCloudStorage {
 
   /**
    * Uploads the file at the given local path to the given path, creating it if it doesn't exist or overwriting it if it does.
-   * @param path The remote path to upload to.
+   * @param remotePath The remote path to upload to.
    * @param localPath The local path of the file to upload.
    * @param options The options for the upload. Must contain a `mimeType` property.
    * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
    * @returns A promise that resolves when the file has been uploaded.
    */
-  uploadFile(path: string, localPath: string, options: { mimeType: string }, scope?: CloudStorageScope): Promise<void> {
-    return this.nativeStorage.uploadFile(path, localPath, options.mimeType, scope ?? this.provider.options.scope, true);
+  uploadFile(
+    remotePath: string,
+    localPath: string,
+    options: { mimeType: string },
+    scope?: CloudStorageScope
+  ): Promise<void> {
+    return this.nativeStorage.uploadFile(
+      remotePath,
+      localPath,
+      options.mimeType,
+      scope ?? this.provider.options.scope,
+      true
+    );
   }
 
   /**
@@ -451,19 +462,19 @@ export default class RNCloudStorage {
 
   /**
    * Uploads the file at the given local path to the given path in the provider of the default static instance, creating it if it doesn't exist or overwriting it if it does.
-   * @param path The remote path to upload to.
+   * @param remotePath The remote path to upload to.
    * @param localPath The local path of the file to upload.
    * @param options The options for the upload. Must contain a `mimeType` property.
    * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
    * @returns A promise that resolves when the file has been uploaded.
    */
   static uploadFile(
-    path: string,
+    remotePath: string,
     localPath: string,
     options: { mimeType: string },
     scope?: CloudStorageScope
   ): Promise<void> {
-    return RNCloudStorage.getDefaultInstance().uploadFile(path, localPath, options, scope);
+    return RNCloudStorage.getDefaultInstance().uploadFile(remotePath, localPath, options, scope);
   }
 
   /**

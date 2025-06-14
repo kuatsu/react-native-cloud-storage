@@ -155,7 +155,7 @@ const HomeView = () => {
       setLoading(true);
       try {
         const file = result.assets[0];
-        await cloudStorage.uploadFile(parentDirectory + '/' + filename, file.uri, {
+        await cloudStorage.uploadFile(parentDirectory + '/' + filename, file.uri.replace(/^file:\/\//, ''), {
           mimeType: file.mimeType ?? 'application/octet-stream',
         });
         Alert.alert('File uploaded', 'File uploaded successfully.');
@@ -172,7 +172,7 @@ const HomeView = () => {
     try {
       const directory = FileSystem.cacheDirectory;
       if (!directory) throw new Error('Could not get cache directory');
-      const newFilename = directory + (await Crypto.randomUUID());
+      const newFilename = directory.replace(/^file:\/\//, '') + (await Crypto.randomUUID());
       await cloudStorage.downloadFile(parentDirectory + '/' + filename, newFilename);
       Alert.alert('File downloaded', `File downloaded to ${newFilename}`);
     } catch (error) {

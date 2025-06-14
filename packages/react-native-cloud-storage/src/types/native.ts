@@ -65,9 +65,9 @@ export interface NativeStorage {
   deleteFile: (path: string, scope: NativeStorageScope) => Promise<void>;
   deleteDirectory: (path: string, recursively: boolean, scope: NativeStorageScope) => Promise<void>;
   statFile: (path: string, scope: NativeStorageScope) => Promise<NativeStorageFileStat>;
-  downloadFile: (path: string, localPath: string, scope: NativeStorageScope) => Promise<void>;
+  downloadFile: (remotePath: string, localPath: string, scope: NativeStorageScope) => Promise<void>;
   uploadFile: (
-    path: string,
+    remotePath: string,
     localPath: string,
     mimeType: string,
     scope: NativeStorageScope,

@@ -14,9 +14,9 @@ import { CloudStorage } from 'react-native-cloud-storage';
 
 ## Definitions
 
-### `path`
+### `path` / `remotePath` / `localPath`
 
-When a method takes a `path` parameter, you should provide a full path with a leading slash, but no trailing slashes:
+When a method takes a `path`, `remotePath` or `localPath` parameter, you should provide a full path on the remote cloud storage or local file system respectively with a leading slash, but no trailing slashes:
 
 - ❌ `some/file.txt`
 - ❌ `file:///some/file.txt`

@@ -95,13 +95,13 @@ class CloudStorageCloudKit: NSObject {
   }
 
   @objc(downloadFile:withLocalPath:withScope:withResolver:withRejecter:)
-  func downloadFile(path: String, localPath: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  func downloadFile(remotePath: String, localPath: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
-      let sourceUrl = try CloudKitUtils.getFileURL(path: path, scope: scope, true)
+      let sourceUrl = try CloudKitUtils.getFileURL(path: remotePath, scope: scope, true)
 
       let sourceStat = try FileUtils.statFile(fileUrl: sourceUrl)
       if sourceStat.isDirectory {
-        throw CloudStorageError.pathIsDirectory(path: path)
+        throw CloudStorageError.pathIsDirectory(path: remotePath)
       }
 
       let destinationUrl = URL(fileURLWithPath: localPath)
@@ -125,9 +125,9 @@ class CloudStorageCloudKit: NSObject {
   }
 
   @objc(uploadFile:withLocalPath:withMimeType:withScope:withOverwrite:withResolver:withRejecter:)
-  func uploadFile(path: String, localPath: String, mimeType _: String, scope: String, overwrite: Bool, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  func uploadFile(remotePath: String, localPath: String, mimeType _: String, scope: String, overwrite: Bool, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
-      let destinationUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
+      let destinationUrl = try CloudKitUtils.getFileURL(path: remotePath, scope: scope)
       let sourceUrl = URL(fileURLWithPath: localPath)
 
       if try !FileUtils.checkFileExists(fileUrl: sourceUrl) {
@@ -141,7 +141,7 @@ class CloudStorageCloudKit: NSObject {
         if overwrite {
           try FileUtils.deleteFileOrDirectory(fileUrl: destinationUrl)
         } else {
-          throw CloudStorageError.fileAlreadyExists(path: path)
+          throw CloudStorageError.fileAlreadyExists(path: remotePath)
         }
       }
 
