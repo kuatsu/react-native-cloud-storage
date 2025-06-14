@@ -148,13 +148,13 @@ Appends the data to the file at the given path. Creates the file if it doesn't e
 
 **Returns**: A `Promise` that resolves to `void` once the data has been appended.
 
-### `downloadFile(path, localPath, scope)`
+### `downloadFile(remotePath, localPath, scope)`
 
-Downloads the file at the given path to the given local path.
+Downloads the file at the given remote path to the given local path.
 
 **Parameters**:
 
-- `path` (`string`): Required. The path of the file to download.
+- `remotePath` (`string`): Required. The remote path of the file to download.
 - `localPath` (`string`): Required. The local path to download the file to, including the filename of the downloaded file.
 - `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Optional. The storage scope (documents/app data) to use. Defaults to [`CloudStorageScope.AppData`](./enums/CloudStorageScope), unless the default scope has been changed via [`setProviderOptions()`](#setprovideroptionsoptions).
 
@@ -257,13 +257,13 @@ Deletes the file at the given path.
 
 **Returns**: A `Promise` that resolves to `void` once the file has been deleted.
 
-### `uploadFile(path, localPath, options, scope)`
+### `uploadFile(remotePath, localPath, options, scope)`
 
-Uploads the file at the given local path to the given path, creating it if it doesn't exist or overwriting it if it does.
+Uploads the file at the given local path to the given remote path, creating it if it doesn't exist or overwriting it if it does.
 
 **Parameters**:
 
-- `path` (`string`): Required. The remote path to upload to.
+- `remotePath` (`string`): Required. The remote path to upload to.
 - `localPath` (`string`): Required. The local path of the file to upload.
 - `options` (`{ mimeType: string }`): Required. The options for the upload. Must contain a `mimeType` property.
 - `scope` ([`CloudStorageScope`](./enums/CloudStorageScope)): Optional. The storage scope (documents/app data) to use. Defaults to [`CloudStorageScope.AppData`](./enums/CloudStorageScope), unless the default scope has been changed via [`setProviderOptions()`](#setprovideroptionsoptions).
