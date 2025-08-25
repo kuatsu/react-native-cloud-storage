@@ -67,15 +67,25 @@ export default class GoogleDrive implements NativeStorage {
   /**
    * Optimized method to find a directory by name and parent ID using API queries
    */
-  private async findDirectoryByNameAndParent(name: string, parentId: string, scope: NativeStorageScope): Promise<GoogleDriveFile[]> {
-    const query = `name='${name.replaceAll("'", String.raw`\'`)}' and '${parentId}' in parents and mimeType='${MimeTypes.FOLDER}' and trashed=false`;
+  private async findDirectoryByNameAndParent(
+    name: string,
+    parentId: string,
+    scope: NativeStorageScope
+  ): Promise<GoogleDriveFile[]> {
+    const query = `name='${name.replaceAll("'", String.raw`\'`)}' and '${parentId}' in parents and mimeType='${
+      MimeTypes.FOLDER
+    }' and trashed=false`;
     return await this.drive.listFiles(this.getRootDirectory(scope), query);
   }
 
   /**
    * Optimized method to find a file by name and parent ID using API queries
    */
-  private async findFileByNameAndParent(name: string, parentId: string, scope: NativeStorageScope): Promise<GoogleDriveFile[]> {
+  private async findFileByNameAndParent(
+    name: string,
+    parentId: string,
+    scope: NativeStorageScope
+  ): Promise<GoogleDriveFile[]> {
     const query = `name='${name.replaceAll("'", String.raw`\'`)}' and '${parentId}' in parents and trashed=false`;
     return await this.drive.listFiles(this.getRootDirectory(scope), query);
   }
@@ -108,10 +118,10 @@ export default class GoogleDrive implements NativeStorage {
     }
 
     let currentParentId = scope === 'app_data' ? 'appDataFolder' : 'root';
-    
+
     for (const directoryName of directoryTree) {
       const directories = await this.findDirectoryByNameAndParent(directoryName, currentParentId, scope);
-      
+
       if (directories.length === 0) {
         return null; // Directory not found
       } else if (directories.length === 1) {
@@ -154,26 +164,29 @@ export default class GoogleDrive implements NativeStorage {
 
       const { directories, filename } = this.resolvePathToDirectories(path);
       const parentDirectoryId = await this.findParentDirectoryIdOptimized(directories, scope);
-      
+
       if (parentDirectoryId === null) {
-        throw new CloudStorageError(`Parent directory not found for path ${path}`, NativeCloudStorageErrorCode.DIRECTORY_NOT_FOUND);
+        throw new CloudStorageError(
+          `Parent directory not found for path ${path}`,
+          NativeCloudStorageErrorCode.DIRECTORY_NOT_FOUND
+        );
       }
 
       const files = await this.findFileByNameAndParent(filename, parentDirectoryId, scope);
       this.checkIfMultipleFilesWithSameName(path, files);
-      
+
       if (files.length === 0) {
         throw new CloudStorageError(`File not found`, NativeCloudStorageErrorCode.FILE_NOT_FOUND);
       }
 
       const file = files[0]!;
-      
+
       if (file.mimeType === MimeTypes.FOLDER && throwIf === 'directory') {
         throw new CloudStorageError(`Path ${path} is a directory`, NativeCloudStorageErrorCode.PATH_IS_DIRECTORY);
       } else if (file.mimeType !== MimeTypes.FOLDER && throwIf === 'file') {
         throw new CloudStorageError(`Path ${path} is a file`, NativeCloudStorageErrorCode.FILE_NOT_FOUND);
       }
-      
+
       return file.id;
     } catch (error: unknown) {
       if (error instanceof GoogleDriveHttpError && error.json?.error?.status === 'UNAUTHENTICATED') {
@@ -225,7 +238,7 @@ export default class GoogleDrive implements NativeStorage {
     } else {
       const { directories, filename } = this.resolvePathToDirectories(path);
       const parentDirectoryId = await this.findParentDirectoryIdOptimized(directories, scope);
-      
+
       if (parentDirectoryId === null) {
         throw new CloudStorageError(
           `Parent directory not found for path ${path}`,
@@ -279,7 +292,7 @@ export default class GoogleDrive implements NativeStorage {
     } else {
       const { directories, filename } = this.resolvePathToDirectories(path);
       const parentDirectoryId = await this.findParentDirectoryIdOptimized(directories, scope);
-      
+
       if (parentDirectoryId === null) {
         throw new CloudStorageError(
           `Parent directory not found for path ${path}`,
@@ -334,7 +347,7 @@ export default class GoogleDrive implements NativeStorage {
 
     const { directories, filename } = this.resolvePathToDirectories(path);
     const parentDirectoryId = await this.findParentDirectoryIdOptimized(directories, scope);
-    
+
     if (parentDirectoryId === null) {
       throw new CloudStorageError(
         `Parent directory not found for path ${path}`,
@@ -461,7 +474,7 @@ export default class GoogleDrive implements NativeStorage {
       // Need to create a new file first
       const { directories, filename } = this.resolvePathToDirectories(remotePath);
       const parentDirectoryId = await this.findParentDirectoryIdOptimized(directories, scope);
-      
+
       if (parentDirectoryId === null) {
         throw new CloudStorageError(
           `Parent directory not found for path ${remotePath}`,

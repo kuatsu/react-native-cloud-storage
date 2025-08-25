@@ -2,7 +2,7 @@ import Foundation
 
 @objc(CloudStorageEventEmitter)
 class CloudStorageEventEmitter: RCTEventEmitter {
-  public static var shared: CloudStorageEventEmitter!
+  static var shared: CloudStorageEventEmitter!
 
   override init() {
     super.init()
