@@ -10,7 +10,8 @@ import GoogleDriveApiClient, { GoogleDriveHttpError } from './client';
 import { type CloudStorageProviderOptions, type DeepRequired } from '../../types/main';
 
 /**
- * A JavaScript-based implementation of the Google Drive API that implements the cloud storage interface.
+ * An optimized JavaScript-based implementation of the Google Drive API that implements the cloud storage interface.
+ * This version uses Google Drive API query parameters to avoid fetching all files.
  */
 export default class GoogleDrive implements NativeStorage {
   private drive: GoogleDriveApiClient;
@@ -63,127 +64,116 @@ export default class GoogleDrive implements NativeStorage {
     return { directories, filename: actualFilename };
   }
 
-  private findParentDirectoryId(files: GoogleDriveFile[], directoryTree: string[]): string | null {
-    const possibleTopDirectories = files
-      .filter((f) => f.mimeType === MimeTypes.FOLDER)
-      .filter((f) => f.name === directoryTree[0]);
-
-    let topDirectoryId: string | undefined;
-    if (possibleTopDirectories.length === 0) return null;
-    else if (possibleTopDirectories.length === 1) {
-      topDirectoryId = possibleTopDirectories[0]!.id;
-    } else {
-      /* when multiple directories carry the same name, we need to check every one of them if their parent id exists in
-      the files array - if it does not, it means that the directory is a child of the root directory and the one we're
-      looking for */
-      for (const possibleTopDirectory of possibleTopDirectories) {
-        if (!files.some((f) => f.id === possibleTopDirectory!.parents![0] && f.mimeType === MimeTypes.FOLDER)) {
-          topDirectoryId = possibleTopDirectory!.id;
-          break;
-        }
-      }
-    }
-
-    if (!topDirectoryId) {
-      throw new CloudStorageError(
-        `Could not find top directory with name ${directoryTree[0]}`,
-        NativeCloudStorageErrorCode.DIRECTORY_NOT_FOUND
-      );
-    }
-
-    // now, we traverse the directories array and get the id of the last directory from the files array
-    let currentDirectoryId = topDirectoryId;
-    for (let index = 1; index < directoryTree.length; index++) {
-      const currentDirectory = files.find((f) => f.id === currentDirectoryId);
-      if (!currentDirectory)
-        throw new CloudStorageError(
-          `Could not find directory with id ${currentDirectoryId}`,
-          NativeCloudStorageErrorCode.DIRECTORY_NOT_FOUND
-        );
-      const nextDirectory = files.find((f) => f.name === directoryTree[index] && f.parents![0] === currentDirectoryId);
-      if (!nextDirectory)
-        throw new CloudStorageError(
-          `Could not find directory with name ${directoryTree[index]}`,
-          NativeCloudStorageErrorCode.DIRECTORY_NOT_FOUND
-        );
-      currentDirectoryId = nextDirectory.id;
-    }
-
-    return currentDirectoryId;
+  /**
+   * Optimized method to find a directory by name and parent ID using API queries
+   */
+  private async findDirectoryByNameAndParent(name: string, parentId: string, scope: NativeStorageScope): Promise<GoogleDriveFile[]> {
+    const query = `name='${name.replaceAll("'", String.raw`\'`)}' and '${parentId}' in parents and mimeType='${MimeTypes.FOLDER}' and trashed=false`;
+    return await this.drive.listFiles(this.getRootDirectory(scope), query);
   }
 
   /**
-   * Gets the Google Drive ID of the root directory for the given scope.
-   * @param scope The scope to get the root directory for.
-   * @returns A promise that resolves to the ID of the root directory or null if it could not be found.
+   * Optimized method to find a file by name and parent ID using API queries
    */
-  private async getRootDirectoryId(scope: NativeStorageScope): Promise<string | null> {
-    const files = await this.drive.listFiles(this.getRootDirectory(scope));
-    for (const file of files) {
-      if (!files.some((f) => f.id === file.parents![0])) return file.parents![0] ?? null;
-    }
-
-    return null;
+  private async findFileByNameAndParent(name: string, parentId: string, scope: NativeStorageScope): Promise<GoogleDriveFile[]> {
+    const query = `name='${name.replaceAll("'", String.raw`\'`)}' and '${parentId}' in parents and trashed=false`;
+    return await this.drive.listFiles(this.getRootDirectory(scope), query);
   }
 
-  private checkIfMultipleFilesWithSameName(
-    path: string,
-    files: GoogleDriveFile[],
-    filename: string,
-    parentDirectoryId: string | null
-  ) {
+  /**
+   * Gets files in the root directory for the given scope
+   */
+  private async getRootFiles(scope: NativeStorageScope): Promise<GoogleDriveFile[]> {
+    const rootSpace = this.getRootDirectory(scope);
+    if (scope === 'app_data') {
+      // For appDataFolder, query files directly in that folder
+      const query = `'${rootSpace}' in parents and trashed=false`;
+      return await this.drive.listFiles(rootSpace, query);
+    } else {
+      // For drive scope, get files in root (no parent folders)
+      const query = `parents in 'root' and trashed=false`;
+      return await this.drive.listFiles(rootSpace, query);
+    }
+  }
+
+  /**
+   * Optimized method to traverse directory path and get the final parent directory ID
+   */
+  private async findParentDirectoryIdOptimized(
+    directoryTree: string[],
+    scope: NativeStorageScope
+  ): Promise<string | null> {
+    if (directoryTree.length === 0) {
+      return scope === 'app_data' ? 'appDataFolder' : 'root';
+    }
+
+    let currentParentId = scope === 'app_data' ? 'appDataFolder' : 'root';
+    
+    for (const directoryName of directoryTree) {
+      const directories = await this.findDirectoryByNameAndParent(directoryName, currentParentId, scope);
+      
+      if (directories.length === 0) {
+        return null; // Directory not found
+      } else if (directories.length === 1) {
+        currentParentId = directories[0]!.id;
+      } else {
+        // Multiple directories with same name - take the first one for now
+        // In a more sophisticated implementation, you might want additional logic here
+        currentParentId = directories[0]!.id;
+      }
+    }
+
+    return currentParentId;
+  }
+
+  private checkIfMultipleFilesWithSameName(path: string, files: GoogleDriveFile[]) {
     const { strictFilenames } = this.options;
 
-    const possibleFiles: GoogleDriveFile[] = parentDirectoryId
-      ? files.filter((f) => f.name === filename && f.parents![0] === parentDirectoryId)
-      : files.filter((f) => f.name === filename && !files.some((f2) => f2.id === f.parents![0]));
-
-    if (possibleFiles.length <= 1) return;
+    if (files.length <= 1) return;
 
     if (strictFilenames) {
       throw new CloudStorageError(
-        `Multiple files with the same name found at path ${path}: ${possibleFiles.map((f) => f.id).join(', ')}`,
+        `Multiple files with the same name found at path ${path}: ${files.map((f) => f.id).join(', ')}`,
         NativeCloudStorageErrorCode.MULTIPLE_FILES_SAME_NAME
       );
     }
   }
 
+  /**
+   * Optimized version that uses API queries instead of fetching all files
+   */
   private async getFileId(
     path: string,
     scope: NativeStorageScope,
     throwIf: 'directory' | 'file' | false = false
   ): Promise<string> {
     try {
-      const files = await this.drive.listFiles(this.getRootDirectory(scope));
-
       if (path === '' || path === '/') {
-        const rootDirectoryId = await this.getRootDirectoryId(scope);
-        if (!rootDirectoryId)
-          throw new CloudStorageError(
-            `Root directory in scope ${scope} not found`,
-            NativeCloudStorageErrorCode.DIRECTORY_NOT_FOUND
-          );
-        return rootDirectoryId;
+        return scope === 'app_data' ? 'appDataFolder' : 'root';
       }
 
       const { directories, filename } = this.resolvePathToDirectories(path);
-      const parentDirectoryId = this.findParentDirectoryId(files, directories);
-      let file: GoogleDriveFile | undefined;
+      const parentDirectoryId = await this.findParentDirectoryIdOptimized(directories, scope);
+      
       if (parentDirectoryId === null) {
-        this.checkIfMultipleFilesWithSameName(path, files, filename, null);
-        /* when the file is supposed to be in the root directory, we need to get the file where the name is the filename
-        and the first parent has an id which does not exist in the files array */
-        file = files.find((f) => f.name === filename && !files.some((f2) => f2.id === f.parents![0]));
-      } else {
-        this.checkIfMultipleFilesWithSameName(path, files, filename, parentDirectoryId);
-        file = files.find((f) => f.name === filename && f.parents![0] === parentDirectoryId);
+        throw new CloudStorageError(`Parent directory not found for path ${path}`, NativeCloudStorageErrorCode.DIRECTORY_NOT_FOUND);
       }
-      if (!file) throw new CloudStorageError(`File not found`, NativeCloudStorageErrorCode.FILE_NOT_FOUND);
+
+      const files = await this.findFileByNameAndParent(filename, parentDirectoryId, scope);
+      this.checkIfMultipleFilesWithSameName(path, files);
+      
+      if (files.length === 0) {
+        throw new CloudStorageError(`File not found`, NativeCloudStorageErrorCode.FILE_NOT_FOUND);
+      }
+
+      const file = files[0]!;
+      
       if (file.mimeType === MimeTypes.FOLDER && throwIf === 'directory') {
         throw new CloudStorageError(`Path ${path} is a directory`, NativeCloudStorageErrorCode.PATH_IS_DIRECTORY);
       } else if (file.mimeType !== MimeTypes.FOLDER && throwIf === 'file') {
         throw new CloudStorageError(`Path ${path} is a file`, NativeCloudStorageErrorCode.FILE_NOT_FOUND);
       }
+      
       return file.id;
     } catch (error: unknown) {
       if (error instanceof GoogleDriveHttpError && error.json?.error?.status === 'UNAUTHENTICATED') {
@@ -233,17 +223,20 @@ export default class GoogleDrive implements NativeStorage {
         mimeType: MimeTypes.TEXT,
       });
     } else {
-      const files = await this.drive.listFiles(this.getRootDirectory(scope));
       const { directories, filename } = this.resolvePathToDirectories(path);
-      const parentDirectoryId = this.findParentDirectoryId(files, directories);
+      const parentDirectoryId = await this.findParentDirectoryIdOptimized(directories, scope);
+      
+      if (parentDirectoryId === null) {
+        throw new CloudStorageError(
+          `Parent directory not found for path ${path}`,
+          NativeCloudStorageErrorCode.DIRECTORY_NOT_FOUND
+        );
+      }
+
       await this.drive.createFile(
         {
           name: filename,
-          parents: parentDirectoryId
-            ? [parentDirectoryId]
-            : scope === 'app_data'
-            ? [this.getRootDirectory(scope)]
-            : undefined,
+          parents: parentDirectoryId === 'root' ? undefined : [parentDirectoryId],
         },
         {
           body: data,
@@ -284,17 +277,20 @@ export default class GoogleDrive implements NativeStorage {
         mimeType: MimeTypes.TEXT,
       });
     } else {
-      const files = await this.drive.listFiles(this.getRootDirectory(scope));
       const { directories, filename } = this.resolvePathToDirectories(path);
-      const parentDirectoryId = this.findParentDirectoryId(files, directories);
+      const parentDirectoryId = await this.findParentDirectoryIdOptimized(directories, scope);
+      
+      if (parentDirectoryId === null) {
+        throw new CloudStorageError(
+          `Parent directory not found for path ${path}`,
+          NativeCloudStorageErrorCode.DIRECTORY_NOT_FOUND
+        );
+      }
+
       await this.drive.createFile(
         {
           name: filename,
-          parents: parentDirectoryId
-            ? [parentDirectoryId]
-            : scope === 'app_data'
-            ? [this.getRootDirectory(scope)]
-            : undefined,
+          parents: parentDirectoryId === 'root' ? undefined : [parentDirectoryId],
         },
         {
           body: data,
@@ -304,15 +300,17 @@ export default class GoogleDrive implements NativeStorage {
     }
   }
 
+  /**
+   * Optimized listFiles that only queries the specific directory
+   */
   async listFiles(path: string, scope: NativeStorageScope): Promise<string[]> {
-    const allFiles = await this.drive.listFiles(this.getRootDirectory(scope));
-    if (path === '') {
-      const rootDirectoryId = await this.getRootDirectoryId(scope);
-      return [...new Set(allFiles.filter((f) => (f.parents ?? [])[0] === rootDirectoryId).map((f) => f.name))];
+    if (path === '' || path === '/') {
+      const files = await this.getRootFiles(scope);
+      return [...new Set(files.map((f) => f.name))];
     } else {
-      const fileId = await this.getFileId(path, scope);
-      const files = allFiles.filter((f) => (f.parents ?? [])[0] === fileId);
-
+      const directoryId = await this.getFileId(path, scope);
+      const query = `'${directoryId}' in parents and trashed=false`;
+      const files = await this.drive.listFiles(this.getRootDirectory(scope), query);
       return [...new Set(files.map((f) => f.name))];
     }
   }
@@ -323,7 +321,7 @@ export default class GoogleDrive implements NativeStorage {
       throw new CloudStorageError(`File ${path} already exists`, NativeCloudStorageErrorCode.FILE_ALREADY_EXISTS);
     } catch (error: unknown) {
       if (error instanceof CloudStorageError && error.code === NativeCloudStorageErrorCode.FILE_NOT_FOUND) {
-        /* do nothing, simply create the file */
+        /* do nothing, simply create the directory */
       } else if (error instanceof CloudStorageError && error.code === NativeCloudStorageErrorCode.PATH_IS_DIRECTORY) {
         throw new CloudStorageError(
           `Directory ${path} already exists`,
@@ -334,17 +332,19 @@ export default class GoogleDrive implements NativeStorage {
       }
     }
 
-    const files = await this.drive.listFiles(this.getRootDirectory(scope));
     const { directories, filename } = this.resolvePathToDirectories(path);
-    const parentDirectoryId = this.findParentDirectoryId(files, directories);
+    const parentDirectoryId = await this.findParentDirectoryIdOptimized(directories, scope);
+    
+    if (parentDirectoryId === null) {
+      throw new CloudStorageError(
+        `Parent directory not found for path ${path}`,
+        NativeCloudStorageErrorCode.DIRECTORY_NOT_FOUND
+      );
+    }
 
     await this.drive.createDirectory({
       name: filename,
-      parents: parentDirectoryId
-        ? [parentDirectoryId]
-        : scope === 'app_data'
-        ? [this.getRootDirectory(scope)]
-        : undefined,
+      parents: parentDirectoryId === 'root' ? undefined : [parentDirectoryId],
     });
   }
 
@@ -370,9 +370,9 @@ export default class GoogleDrive implements NativeStorage {
     const fileId = await this.getFileId(path, scope, 'file');
 
     if (!recursive) {
-      // check if the directory is empty
-      const files = await this.drive.listFiles(this.getRootDirectory(scope));
-      const filesInDirectory = files.filter((f) => (f.parents ?? [])[0] === fileId);
+      // check if the directory is empty using optimized query
+      const query = `'${fileId}' in parents and trashed=false`;
+      const filesInDirectory = await this.drive.listFiles(this.getRootDirectory(scope), query);
       if (filesInDirectory.length > 0) {
         throw new CloudStorageError(
           `Directory ${path} is not empty`,
@@ -459,18 +459,20 @@ export default class GoogleDrive implements NativeStorage {
       });
     } else {
       // Need to create a new file first
-      const files = await this.drive.listFiles(this.getRootDirectory(scope));
       const { directories, filename } = this.resolvePathToDirectories(remotePath);
-      const parentDirectoryId = this.findParentDirectoryId(files, directories);
+      const parentDirectoryId = await this.findParentDirectoryIdOptimized(directories, scope);
+      
+      if (parentDirectoryId === null) {
+        throw new CloudStorageError(
+          `Parent directory not found for path ${remotePath}`,
+          NativeCloudStorageErrorCode.DIRECTORY_NOT_FOUND
+        );
+      }
 
       await this.drive.createFile(
         {
           name: filename,
-          parents: parentDirectoryId
-            ? [parentDirectoryId]
-            : scope === 'app_data'
-            ? [this.getRootDirectory(scope)]
-            : undefined,
+          parents: parentDirectoryId === 'root' ? undefined : [parentDirectoryId],
         },
         {
           mimeType,

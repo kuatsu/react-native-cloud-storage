@@ -116,7 +116,7 @@ export default class GoogleDriveApiClient {
     return body.join('');
   }
 
-  public async listFiles(space: GoogleDriveFileSpace): Promise<GoogleDriveFile[]> {
+  public async listFiles(space: GoogleDriveFileSpace, query?: string): Promise<GoogleDriveFile[]> {
     const files: GoogleDriveFile[] = [];
     let pageToken: string | undefined;
     const fields = ['id', 'kind', 'mimeType', 'name', 'parents', 'spaces', 'size', 'createdTime', 'modifiedTime'];
@@ -125,6 +125,7 @@ export default class GoogleDriveApiClient {
         fields: `files(${fields.join(',')}),nextPageToken`,
         spaces: space,
         pageToken,
+        q: query,
       };
       const response = await this.request<GoogleDriveListOperationResponse>(`/files`, {
         queryParameters,
