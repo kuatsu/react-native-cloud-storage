@@ -107,6 +107,6 @@ enum CloudKitUtils {
   }
 
   static var documentsDirectory: URL? {
-    fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
+    fileManager.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents")
   }
 }
