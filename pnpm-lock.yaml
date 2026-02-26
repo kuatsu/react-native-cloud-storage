@@ -118,8 +118,8 @@ importers:
         specifier: 0.83.2
         version: 0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0)
       react-native-cloud-storage:
-        specifier: '*'
-        version: 2.3.0(expo@55.0.2)(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
+        specifier: workspace:*
+        version: link:../../packages/react-native-cloud-storage
       react-native-safe-area-context:
         specifier: 5.6.2
         version: 5.6.2(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
@@ -7763,16 +7763,6 @@ packages:
     resolution: {integrity: sha512-7w+oNNNkY+cR7Z3GgKaDWg7CeSxpv1ZUox42Ji/rViAxygMmtSPBe5I3K723OjGJXhvJCyUK5RRvzefNPw7Amg==}
     engines: {node: '>= 18.0.0'}
     hasBin: true
-
-  react-native-cloud-storage@2.3.0:
-    resolution: {integrity: sha512-Bt+vnHO5Ae/ITMpZfySOxSVQckPKMb8ZQ0IXsSR7+y+AnShtlTbQ08qEYlHCXOp6+NGAhGD5ushqYO4nrd18tg==}
-    peerDependencies:
-      expo: '>=48.0.0'
-      react: '*'
-      react-native: '*'
-    peerDependenciesMeta:
-      expo:
-        optional: true
 
   react-native-edge-to-edge@1.6.0:
     resolution: {integrity: sha512-2WCNdE3Qd6Fwg9+4BpbATUxCLcouF6YRY7K+J36KJ4l3y+tWN6XCqAC4DuoGblAAbb2sLkhEDp4FOlbOIot2Og==}
@@ -19742,13 +19732,6 @@ snapshots:
       - supports-color
       - typescript
       - utf-8-validate
-
-  react-native-cloud-storage@2.3.0(expo@55.0.2)(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0):
-    dependencies:
-      react: 19.2.0
-      react-native: 0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0)
-    optionalDependencies:
-      expo: 55.0.2(@babel/core@7.29.0)(@expo/dom-webview@55.0.3)(react-dom@19.2.0(react@19.2.0))(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)(typescript@5.9.3)
 
   react-native-edge-to-edge@1.6.0(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0):
     dependencies:
