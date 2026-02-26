@@ -3,7 +3,7 @@ const path = require('path');
 
 // Find the project and workspace directories
 const projectRoot = __dirname;
-// This can be replaced with `find-yarn-workspace-root`
+// This can be replaced with a workspace root lookup helper
 const monorepoRoot = path.resolve(projectRoot, '../..');
 
 const config = getDefaultConfig(projectRoot);

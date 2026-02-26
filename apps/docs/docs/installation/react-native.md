@@ -9,7 +9,7 @@ First, install the library using your favorite package manager:
 ```sh
 npm install react-native-cloud-storage
 # or
-yarn add react-native-cloud-storage
+pnpm add react-native-cloud-storage
 ```
 
 After installing the library itself, you will need to install the native iOS module (linking is done by React Native's autolinking) and configure iCloud within the native iOS files. First, install the pods:

@@ -23,7 +23,7 @@ jobs:
       - name: Install xcpretty
         run: gem install xcpretty
       - name: Build package
-        run: yarn package build
+        run: pnpm package build
       - name: Build app
         run: "rm -rf ios && \
           npx expo prebuild -p ios && \

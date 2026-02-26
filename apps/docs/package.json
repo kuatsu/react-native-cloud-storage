@@ -43,9 +43,6 @@
       "last 5 safari version"
     ]
   },
-  "installConfig": {
-    "hoistingLimits": "workspaces"
-  },
   "engines": {
     "node": ">=18.0"
   }

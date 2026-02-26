@@ -37,7 +37,7 @@
   ],
   "scripts": {
     "clean": "del-cli android/build ios/build dist",
-    "build": "yarn clean && bob build && rm -f dist/commonjs/package.json",
+    "build": "pnpm clean && bob build && rm -f dist/commonjs/package.json",
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/**/*.ts",
@@ -56,7 +56,7 @@
     "url": "https://github.com/kuatsu/react-native-cloud-storage/issues"
   },
   "homepage": "https://github.com/kuatsu/react-native-cloud-storage#readme",
-  "packageManager": "yarn@3.6.1",
+  "packageManager": "pnpm@10.28.2",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
