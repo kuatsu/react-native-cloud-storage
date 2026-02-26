@@ -1,8 +1,9 @@
 package com.cloudstorage
 
-import com.facebook.react.bridge.*
-import java.io.File
-import java.io.IOException
+import com.facebook.react.bridge.Promise
+import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.module.annotations.ReactModule
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -13,21 +14,19 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.Response
 import okio.buffer
 import okio.sink
+import java.io.File
+import java.io.IOException
 import java.net.URLConnection
 
-class CloudStorageLocalFileSystemModule(private val reactContext: ReactApplicationContext) :
-  ReactContextBaseJavaModule(reactContext) {
+@ReactModule(name = CloudStorageLocalFileSystemModule.NAME)
+class CloudStorageLocalFileSystemModule(reactContext: ReactApplicationContext) :
+  NativeCloudStorageLocalFileSystemSpec(reactContext) {
 
-  override fun getName(): String {
-    return NAME
+  override fun getTypedExportedConstants(): Map<String, Any> {
+    return mapOf("temporaryDirectory" to FileUtils.getTemporaryDirectory(reactApplicationContext).path)
   }
 
-  override fun getConstants(): Map<String, Any> {
-    return mapOf("temporaryDirectory" to FileUtils.getTemporaryDirectory(reactContext).path)
-  }
-
-  @ReactMethod
-  fun createFile(path: String, data: String, promise: Promise) {
+  override fun createFile(path: String, data: String, promise: Promise) {
     try {
       val sanitizedPath = FileUtils.sanitizePath(path)
       val file = File(sanitizedPath)
@@ -47,8 +46,7 @@ class CloudStorageLocalFileSystemModule(private val reactContext: ReactApplicati
     }
   }
 
-  @ReactMethod
-  fun readFile(path: String, promise: Promise) {
+  override fun readFile(path: String, promise: Promise) {
     try {
       val sanitizedPath = FileUtils.sanitizePath(path)
       val file = File(sanitizedPath)
@@ -62,8 +60,7 @@ class CloudStorageLocalFileSystemModule(private val reactContext: ReactApplicati
     }
   }
 
-  @ReactMethod
-  fun downloadFile(remoteUri: String, localPath: String, options: ReadableMap?, promise: Promise) {
+  override fun downloadFile(remoteUri: String, localPath: String, options: ReadableMap?, promise: Promise) {
     val client = OkHttpClient()
     val requestBuilder = Request.Builder()
 
@@ -124,8 +121,7 @@ class CloudStorageLocalFileSystemModule(private val reactContext: ReactApplicati
     })
   }
 
-  @ReactMethod
-  fun uploadFile(localPath: String, remoteUri: String, options: ReadableMap, promise: Promise) {
+  override fun uploadFile(localPath: String, remoteUri: String, options: ReadableMap, promise: Promise) {
     val sanitizedPath = try {
       FileUtils.sanitizePath(localPath)
     } catch (e: CloudStorageError) {
@@ -231,6 +227,6 @@ class CloudStorageLocalFileSystemModule(private val reactContext: ReactApplicati
   }
 
   companion object {
-    const val NAME = "CloudStorageLocalFileSystem"
+    const val NAME = NativeCloudStorageLocalFileSystemSpec.NAME
   }
 }

@@ -9,7 +9,7 @@ import {
   CloudStorageScope,
   useIsCloudAvailable,
 } from 'react-native-cloud-storage';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as DocumentPicker from 'expo-document-picker';
 import * as Crypto from 'expo-crypto';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -172,7 +172,7 @@ const HomeView = () => {
     try {
       const directory = FileSystem.cacheDirectory;
       if (!directory) throw new Error('Could not get cache directory');
-      const newFilename = directory.replace(/^file:\/\//, '') + (await Crypto.randomUUID());
+      const newFilename = directory.replace(/^file:\/\//, '') + Crypto.randomUUID();
       await cloudStorage.downloadFile(parentDirectory + '/' + filename, newFilename);
       Alert.alert('File downloaded', `File downloaded to ${newFilename}`);
     } catch (error) {

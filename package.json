@@ -10,7 +10,8 @@
     "package": "pnpm --filter react-native-cloud-storage run",
     "lint": "oxlint .",
     "format": "oxfmt . && cd packages/react-native-cloud-storage && ./scripts/swiftformat.sh",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "pnpm package build"
   },
   "packageManager": "pnpm@10.28.2",
   "devDependencies": {

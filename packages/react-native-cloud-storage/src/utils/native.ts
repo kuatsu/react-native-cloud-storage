@@ -6,7 +6,7 @@ import CloudStorageError from './cloud-storage-error';
  * @param nativeModule The native module to proxy.
  * @returns The proxied native module.
  */
-export const createProxiedNativeModule = <T extends object>(nativeModule: T | undefined): T | null => {
+export const createProxiedNativeModule = <T extends object>(nativeModule: T | null | undefined): T | null => {
   if (!nativeModule) return null;
 
   return new Proxy(nativeModule, {

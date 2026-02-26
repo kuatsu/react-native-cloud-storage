@@ -38,6 +38,10 @@
   "scripts": {
     "clean": "del-cli android/build ios/build dist",
     "build": "pnpm clean && bob build && rm -f dist/commonjs/package.json",
+    "codegen": "pnpm run codegen:clean && pnpm run codegen:ios && pnpm run codegen:android",
+    "codegen:clean": "del-cli android/generated ios/generated",
+    "codegen:ios": "node ../../node_modules/react-native/scripts/generate-codegen-artifacts.js --path . --targetPlatform ios --outputPath ios/generated",
+    "codegen:android": "node ../../node_modules/react-native/scripts/generate-codegen-artifacts.js --path . --targetPlatform android --outputPath android/generated",
     "typecheck": "tsc --noEmit",
     "release": "release-it",
     "prepack": "cp ../../README.md ./README.md",
@@ -70,7 +74,7 @@
   "peerDependencies": {
     "expo": ">=48.0.0",
     "react": "*",
-    "react-native": "*"
+    "react-native": ">=0.76"
   },
   "peerDependenciesMeta": {
     "expo": {
@@ -113,5 +117,23 @@
         }
       ]
     ]
+  },
+  "codegenConfig": {
+    "name": "CloudStorageSpec",
+    "type": "modules",
+    "jsSrcsDir": "src/specs",
+    "android": {
+      "javaPackageName": "com.cloudstorage"
+    },
+    "ios": {
+      "modules": {
+        "CloudStorageCloudKit": {
+          "className": "RCTCloudStorageCloudKit"
+        },
+        "CloudStorageLocalFileSystem": {
+          "className": "RCTCloudStorageLocalFileSystem"
+        }
+      }
+    }
   }
 }

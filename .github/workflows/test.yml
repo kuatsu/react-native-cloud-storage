@@ -23,6 +23,9 @@ jobs:
       - name: Lint files
         run: pnpm lint
 
+      - name: Typecheck files
+        run: pnpm typecheck
+
       - name: Format code
         run: pnpm format
 
