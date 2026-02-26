@@ -30,4 +30,4 @@ export interface Spec extends TurboModule {
   readonly onCloudAvailabilityChanged: CodegenTypes.EventEmitter<CloudAvailabilityChangedEvent>;
 }
 
-export default TurboModuleRegistry.getEnforcing<Spec>('CloudStorageCloudKit');
+export default TurboModuleRegistry.get<Spec>('CloudStorageCloudKit');

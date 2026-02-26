@@ -1,10 +1,10 @@
-import { NativeModules } from 'react-native';
+import NativeCloudStorageLocalFileSystem from '../specs/NativeCloudStorageLocalFileSystem';
 import { NativeLocalFileSystem as TNativeLocalFileSystem } from '../types/native';
 import { createProxiedNativeModule } from '../utils/native';
 import { LINKING_ERROR } from './constants';
 
 const NativeLocalFileSystem = createProxiedNativeModule<TNativeLocalFileSystem>(
-  NativeModules.CloudStorageLocalFileSystem
+  NativeCloudStorageLocalFileSystem as unknown as TNativeLocalFileSystem | null
 );
 
 export const localFileSystem =

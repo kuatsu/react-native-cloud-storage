@@ -7,9 +7,9 @@ import {
 } from './types/main';
 import { NativeCloudStorageErrorCode, type NativeStorage, type NativeStorageScope } from './types/native';
 import { isProviderSupported } from './utils/helpers';
-import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
+import { Platform, type EventSubscription } from 'react-native';
 import GoogleDrive from './storages/google-drive';
-import { NativeCloudKit } from './storages/cloudkit';
+import { NativeCloudKit, NativeCloudKitModule, type NativeCloudStorageCloudKitTurboModule } from './storages/cloudkit';
 import { DEFAULT_PROVIDER_OPTIONS, LINKING_ERROR } from './utils/constants';
 import CloudStorageError from './utils/cloud-storage-error';
 
@@ -20,6 +20,7 @@ export default class RNCloudStorage {
     options: (typeof DEFAULT_PROVIDER_OPTIONS)[keyof typeof DEFAULT_PROVIDER_OPTIONS];
   };
   private cloudAvailabilityListeners: ((available: boolean) => void)[] = [];
+  private cloudAvailabilitySubscription: EventSubscription | null = null;
 
   //#region Constructor and configuration
   /**
@@ -97,6 +98,49 @@ export default class RNCloudStorage {
     return this.provider.provider;
   }
 
+  private notifyCloudAvailabilityListeners(available: boolean): void {
+    for (const listener of this.cloudAvailabilityListeners) {
+      listener(available);
+    }
+  }
+
+  private refreshCloudAvailability(): void {
+    this.nativeStorage
+      .isCloudAvailable()
+      .then((available) => {
+        this.notifyCloudAvailabilityListeners(available);
+      })
+      .catch(() => {
+        // ignore errors when refreshing availability after provider changes
+      });
+  }
+
+  private getNativeCloudKitModule(): NativeCloudStorageCloudKitTurboModule | null {
+    return this.provider.provider === CloudStorageProvider.ICloud ? NativeCloudKitModule : null;
+  }
+
+  private removeCloudAvailabilitySubscription(): void {
+    this.cloudAvailabilitySubscription?.remove();
+    this.cloudAvailabilitySubscription = null;
+  }
+
+  private configureCloudAvailabilitySubscription(): void {
+    this.removeCloudAvailabilitySubscription();
+
+    if (this.cloudAvailabilityListeners.length === 0) {
+      return;
+    }
+
+    const nativeCloudKitModule = this.getNativeCloudKitModule();
+    if (!nativeCloudKitModule) {
+      return;
+    }
+
+    this.cloudAvailabilitySubscription = nativeCloudKitModule.onCloudAvailabilityChanged((event) => {
+      this.notifyCloudAvailabilityListeners(event.available);
+    });
+  }
+
   /**
    * Sets the current CloudStorageProvider.
    * @param provider The provider to set.
@@ -111,22 +155,8 @@ export default class RNCloudStorage {
       options: DEFAULT_PROVIDER_OPTIONS[provider],
     };
 
-    // Emit an event to notify useIsCloudAvailable() hook consumers of the new cloud availability status
-    this.nativeStorage.isCloudAvailable().then((available) => {
-      for (const listener of this.cloudAvailabilityListeners) {
-        listener(available);
-      }
-    });
-
-    if (provider === CloudStorageProvider.ICloud) {
-      // Listen to native cloud availability change events
-      const eventEmitter = new NativeEventEmitter(NativeModules.CloudStorageEventEmitter);
-      eventEmitter.addListener('RNCloudStorage.cloud.availability-changed', (event: { available: boolean }) => {
-        for (const listener of this.cloudAvailabilityListeners) {
-          listener(event.available);
-        }
-      });
-    }
+    this.refreshCloudAvailability();
+    this.configureCloudAvailabilitySubscription();
   }
 
   /**
@@ -150,20 +180,27 @@ export default class RNCloudStorage {
 
     if (this.provider.provider === CloudStorageProvider.GoogleDrive && 'accessToken' in newOptions) {
       // Emit an event to notify useIsCloudAvailable() hook consumers of the new cloud availability status
-      for (const listener of this.cloudAvailabilityListeners) {
-        listener(
-          !!(newOptions as Required<CloudStorageProviderOptions[CloudStorageProvider.GoogleDrive]>).accessToken?.length
-        );
-      }
+      this.notifyCloudAvailabilityListeners(
+        !!(newOptions as Required<CloudStorageProviderOptions[CloudStorageProvider.GoogleDrive]>).accessToken?.length
+      );
     }
   }
 
   subscribeToCloudAvailability(listener: (available: boolean) => void): void {
     this.cloudAvailabilityListeners.push(listener);
+
+    if (this.cloudAvailabilityListeners.length === 1) {
+      this.configureCloudAvailabilitySubscription();
+      this.refreshCloudAvailability();
+    }
   }
 
   unsubscribeFromCloudAvailability(listener: (available: boolean) => void): void {
     this.cloudAvailabilityListeners = this.cloudAvailabilityListeners.filter((l) => l !== listener);
+
+    if (this.cloudAvailabilityListeners.length === 0) {
+      this.removeCloudAvailabilitySubscription();
+    }
   }
 
   private resolveNativeScope(scope?: CloudStorageScope): NativeStorageScope {

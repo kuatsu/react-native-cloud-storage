@@ -128,10 +128,10 @@
     "ios": {
       "modules": {
         "CloudStorageCloudKit": {
-          "className": "CloudStorageCloudKit"
+          "className": "RCTCloudStorageCloudKit"
         },
         "CloudStorageLocalFileSystem": {
-          "className": "CloudStorageLocalFileSystem"
+          "className": "RCTCloudStorageLocalFileSystem"
         }
       }
     }

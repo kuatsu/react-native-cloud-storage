@@ -1,19 +1,20 @@
 import Foundation
 import MobileCoreServices
+import React
 
 // MARK: - CloudStorageLocalFileSystem
 
 @objc(CloudStorageLocalFileSystem)
-class CloudStorageLocalFileSystem: NSObject {
+public class CloudStorageLocalFileSystem: NSObject {
   @objc
-  func constantsToExport() -> [AnyHashable: Any]! {
+  public func constantsToExport() -> [AnyHashable: Any]! {
     [
       "temporaryDirectory": FileUtils.temporaryDirectory.path,
     ]
   }
 
   @objc(createFile:withData:withResolver:withRejecter:)
-  func createFile(path: String, data: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  public func createFile(path: String, data: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
       let fileUrl = URL(fileURLWithPath: path)
       let directoryUrl = fileUrl.deletingLastPathComponent()
@@ -33,7 +34,7 @@ class CloudStorageLocalFileSystem: NSObject {
   }
 
   @objc(readFile:withResolver:withRejecter:)
-  func readFile(path: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  public func readFile(path: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
       let fileUrl = URL(fileURLWithPath: path)
       return try FileUtils.readFile(fileUrl: fileUrl)
@@ -41,7 +42,7 @@ class CloudStorageLocalFileSystem: NSObject {
   }
 
   @objc(downloadFile:withLocalPath:withOptions:withResolver:withRejecter:)
-  func downloadFile(remoteUri: String, localPath: String, options: [String: Any]?, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  public func downloadFile(remoteUri: String, localPath: String, options: [String: Any]?, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     guard let remoteUrl = URL(string: remoteUri) else {
       let error = CloudStorageError.invalidUrl(url: remoteUri)
       reject(error.code, error.message, nil)
@@ -92,7 +93,7 @@ class CloudStorageLocalFileSystem: NSObject {
   }
 
   @objc(uploadFile:withRemoteUri:withOptions:withResolver:withRejecter:)
-  func uploadFile(localPath: String, remoteUri: String, options: [String: Any], resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  public func uploadFile(localPath: String, remoteUri: String, options: [String: Any], resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     guard let remoteUrl = URL(string: remoteUri) else {
       let error = CloudStorageError.invalidUrl(url: remoteUri)
       reject(error.code, error.message, nil)

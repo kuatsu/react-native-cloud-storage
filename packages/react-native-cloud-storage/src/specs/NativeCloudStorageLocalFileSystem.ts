@@ -25,4 +25,4 @@ export interface Spec extends TurboModule {
   uploadFile(localPath: string, remoteUri: string, options: LocalFileSystemUploadOptions): Promise<void>;
 }
 
-export default TurboModuleRegistry.getEnforcing<Spec>('CloudStorageLocalFileSystem');
+export default TurboModuleRegistry.get<Spec>('CloudStorageLocalFileSystem');
