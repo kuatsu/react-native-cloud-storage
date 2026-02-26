@@ -4,29 +4,24 @@
   "private": true,
   "scripts": {
     "build": "pnpm -r --parallel --if-present run build",
-    "lint": "pnpm -r --parallel --if-present run lint",
     "test": "pnpm -r --parallel --if-present run test",
-    "format": "pnpm -r --parallel --if-present run format",
     "typecheck": "pnpm -r --parallel --if-present run typecheck",
     "example": "pnpm --filter react-native-cloud-storage-example run",
     "docs": "pnpm --filter react-native-cloud-storage-docs run",
     "package": "pnpm --filter react-native-cloud-storage run",
+    "lint": "oxlint .",
+    "format": "oxfmt . && cd packages/react-native-cloud-storage && ./scripts/swiftformat.sh",
     "prepare": "husky"
   },
   "packageManager": "pnpm@10.28.2",
   "devDependencies": {
     "@commitlint/cli": "^19.7.1",
     "@commitlint/config-conventional": "^17.0.2",
-    "@eslint/compat": "^1.3.0",
-    "@eslint/js": "^9.21.0",
     "del-cli": "^5.0.0",
-    "eslint": "^9.21.0",
-    "eslint-plugin-react-native": "^5.0.0",
-    "eslint-plugin-unicorn": "^57.0.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.4.3",
+    "oxlint": "^1.50.0",
     "oxfmt": "^0.35.0",
-    "typescript": "~5.9.3",
-    "typescript-eslint": "^8.56.1"
+    "typescript": "~5.9.3"
   }
 }

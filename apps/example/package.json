@@ -5,9 +5,7 @@
   "scripts": {
     "start": "expo start",
     "android": "rm -rf android && expo run:android",
-    "ios": "rm -rf ios && expo run:ios",
-    "lint": "eslint .",
-    "format": "oxfmt --write ."
+    "ios": "rm -rf ios && expo run:ios"
   },
   "dependencies": {
     "expo": "^55.0.2",

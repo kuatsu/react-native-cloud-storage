@@ -34,7 +34,7 @@ To run the example app on iOS:
 pnpm example ios
 ```
 
-Make sure your code passes TypeScript and ESLint. Run the following to verify:
+Make sure your code passes TypeScript and Oxlint. Run the following to verify:
 
 ```sh
 pnpm typecheck
@@ -72,9 +72,9 @@ Our pre-commit hooks verify that your commit message matches this format when co
 
 ### Linting and tests
 
-[ESLint](https://eslint.org/), [Oxfmt](https://oxc.rs/docs/guide/usage/formatter), [TypeScript](https://www.typescriptlang.org/)
+[Oxlint](https://oxc.rs/docs/guide/usage/linter), [Oxfmt](https://oxc.rs/docs/guide/usage/formatter), [TypeScript](https://www.typescriptlang.org/)
 
-We use [TypeScript](https://www.typescriptlang.org/) for type checking, and [ESLint](https://eslint.org/) with [Oxfmt](https://oxc.rs/docs/guide/usage/formatter) for linting and formatting the code.
+We use [TypeScript](https://www.typescriptlang.org/) for type checking, and [Oxlint](https://oxc.rs/docs/guide/usage/linter) with [Oxfmt](https://oxc.rs/docs/guide/usage/formatter) for linting and formatting the code.
 
 Our pre-commit hooks verify that the linter and tests pass when committing.
 
@@ -94,7 +94,7 @@ The `package.json` file contains various scripts for common tasks:
 
 - `pnpm install`: install all workspace dependencies.
 - `pnpm typecheck`: type-check files with TypeScript.
-- `pnpm lint`: lint files with ESLint.
+- `pnpm lint`: lint files with Oxlint.
 - `pnpm example start`: start the Metro server for the example app.
 - `pnpm example android`: run the example app on Android.
 - `pnpm example ios`: run the example app on iOS.

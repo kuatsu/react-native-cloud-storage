@@ -39,8 +39,6 @@
     "clean": "del-cli android/build ios/build dist",
     "build": "pnpm clean && bob build && rm -f dist/commonjs/package.json",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/**/*.ts",
-    "format": "oxfmt --write . && ./scripts/swiftformat.sh",
     "release": "release-it",
     "prepack": "cp ../../README.md ./README.md",
     "postpack": "rm ./README.md"
