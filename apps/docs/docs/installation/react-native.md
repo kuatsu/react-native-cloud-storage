@@ -4,12 +4,18 @@ sidebar_position: 2
 
 # Install in bare React Native project
 
+:::info
+
+Newer versions of this library are only compatible with the New Architecture. If you're still using the Legacy Architecture, [consider migrating to the New Architecture](https://reactnative.dev/blog/2024/10/23/the-new-architecture-is-here). If you can't migrate yet, you can continue using version 2 of this library, which is compatible with both the New and Legacy Architectures. You can install it using `npm install react-native-cloud-storage@^2` or `yarn add react-native-cloud-storage@^2`.
+
+:::
+
 First, install the library using your favorite package manager:
 
 ```sh
 npm install react-native-cloud-storage
 # or
-pnpm add react-native-cloud-storage
+yarn add react-native-cloud-storage
 ```
 
 After installing the library itself, you will need to install the native iOS module (linking is done by React Native's autolinking) and configure iCloud within the native iOS files. First, install the pods:
