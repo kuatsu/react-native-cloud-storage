@@ -7,7 +7,7 @@
     "android": "rm -rf android && expo run:android",
     "ios": "rm -rf ios && expo run:ios",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "oxfmt --write ."
   },
   "dependencies": {
     "expo": "^55.0.2",

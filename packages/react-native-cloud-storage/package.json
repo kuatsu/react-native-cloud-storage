@@ -41,7 +41,7 @@
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/**/*.ts",
-    "format": "prettier --write . && ./scripts/swiftformat.sh",
+    "format": "oxfmt --write . && ./scripts/swiftformat.sh",
     "release": "release-it",
     "prepack": "cp ../../README.md ./README.md",
     "postpack": "rm ./README.md"

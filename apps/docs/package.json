@@ -14,7 +14,7 @@
     "write-heading-ids": "docusaurus write-heading-ids",
     "typecheck": "tsc",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "oxfmt --write ."
   },
   "dependencies": {
     "@docusaurus/core": "3.9.2",
