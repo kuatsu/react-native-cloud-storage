@@ -173,7 +173,6 @@ export default class RNCloudStorage {
       return resolvedScope;
     }
 
-    // eslint-disable-next-line unicorn/prevent-abbreviations
     const iCloudOptions = this.provider.options as DeepRequired<
       CloudStorageProviderOptions[CloudStorageProvider.ICloud]
     >;
