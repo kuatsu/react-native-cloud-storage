@@ -4,6 +4,8 @@ description: Setup Node.js and install dependencies
 runs:
   using: composite
   steps:
+    - uses: pnpm/action-setup@v4
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
@@ -14,8 +16,6 @@ runs:
     - name: Enable Corepack
       run: corepack enable
       shell: bash
-
-    - uses: pnpm/action-setup@v4
 
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
