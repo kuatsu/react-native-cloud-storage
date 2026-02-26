@@ -1,4 +1,4 @@
 {
   "*.{js,mjs,cjs,jsx,ts,tsx}": ["pnpm exec oxlint --fix", "pnpm exec oxfmt --write"],
-  "*.{json,yml,yaml,md,mdx}": "pnpm exec oxfmt --write"
+  "*.json": "pnpm exec oxfmt --write"
 }
