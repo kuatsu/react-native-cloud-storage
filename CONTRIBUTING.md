@@ -74,7 +74,7 @@ Our pre-commit hooks verify that your commit message matches this format when co
 
 [ESLint](https://eslint.org/), [Oxfmt](https://oxc.rs/docs/guide/usage/formatter), [TypeScript](https://www.typescriptlang.org/)
 
-We use [TypeScript](https://www.typescriptlang.org/) for type checking, [ESLint](https://eslint.org/) with [Oxfmt](https://oxc.rs/docs/guide/usage/formatter) for linting and formatting the code, and [Jest](https://jestjs.io/) for testing.
+We use [TypeScript](https://www.typescriptlang.org/) for type checking, and [ESLint](https://eslint.org/) with [Oxfmt](https://oxc.rs/docs/guide/usage/formatter) for linting and formatting the code.
 
 Our pre-commit hooks verify that the linter and tests pass when committing.
 
@@ -95,7 +95,6 @@ The `package.json` file contains various scripts for common tasks:
 - `pnpm install`: install all workspace dependencies.
 - `pnpm typecheck`: type-check files with TypeScript.
 - `pnpm lint`: lint files with ESLint.
-- `pnpm test`: run unit tests with Jest.
 - `pnpm example start`: start the Metro server for the example app.
 - `pnpm example android`: run the example app on Android.
 - `pnpm example ios`: run the example app on iOS.

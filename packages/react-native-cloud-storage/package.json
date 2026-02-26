@@ -38,7 +38,6 @@
   "scripts": {
     "clean": "del-cli android/build ios/build dist",
     "build": "pnpm clean && bob build && rm -f dist/commonjs/package.json",
-    "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/**/*.ts",
     "format": "oxfmt --write . && ./scripts/swiftformat.sh",
@@ -79,12 +78,6 @@
     "expo": {
       "optional": true
     }
-  },
-  "jest": {
-    "preset": "react-native",
-    "modulePathIgnorePatterns": [
-      "<rootDir>/dist/"
-    ]
   },
   "release-it": {
     "git": {
