@@ -1,0 +1,39 @@
+name: Build Android
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/build-android.yml'
+      - '**/android/**'
+      - '**/*.gradle'
+      - '**/*.gradle.kts'
+  pull_request:
+    paths:
+      - '.github/workflows/build-android.yml'
+      - '**/android/**'
+      - '**/*.gradle'
+      - '**/*.gradle.kts'
+jobs:
+  build:
+    name: Build Android example app
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup
+        uses: ./.github/actions/setup
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+      - name: Build package
+        run: pnpm package build
+      - name: Build app
+        run: |
+          rm -rf android
+          npx expo prebuild -p android
+          cd android
+          ./gradlew :app:assembleDebug --no-daemon
+        working-directory: apps/example
