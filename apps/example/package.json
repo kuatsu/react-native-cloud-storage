@@ -10,22 +10,22 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "expo": "^53.0.0",
-    "expo-crypto": "~14.1.5",
-    "expo-document-picker": "~13.1.5",
-    "expo-file-system": "~18.1.10",
-    "expo-status-bar": "~2.2.3",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
-    "react-native": "0.79.3",
+    "expo": "^55.0.2",
+    "expo-crypto": "~55.0.8",
+    "expo-document-picker": "~55.0.8",
+    "expo-file-system": "~55.0.9",
+    "expo-status-bar": "~55.0.4",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-native": "0.83.2",
     "react-native-cloud-storage": "*",
-    "react-native-safe-area-context": "5.4.0"
+    "react-native-safe-area-context": "5.6.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
-    "@types/react": "~19.0.10",
+    "@types/react": "~19.2.14",
     "pod-install": "^0.2.2",
-    "typescript": "~5.8.3"
+    "typescript": "~5.9.3"
   },
   "private": true
 }

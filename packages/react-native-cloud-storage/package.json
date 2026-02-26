@@ -63,12 +63,12 @@
   "devDependencies": {
     "@expo/config-plugins": "^10.0.2",
     "@release-it/conventional-changelog": "^5.0.0",
-    "@types/react": "~19.0.10",
-    "react": "19.0.0",
-    "react-native": "0.79.3",
+    "@types/react": "~19.2.14",
+    "react": "19.2.0",
+    "react-native": "0.83.2",
     "react-native-builder-bob": "^0.30.2",
     "release-it": "^15.0.0",
-    "typescript": "~5.8.3"
+    "typescript": "~5.9.3"
   },
   "peerDependencies": {
     "expo": ">=48.0.0",
