@@ -3,9 +3,12 @@ on:
   workflow_dispatch:
     inputs:
       release_type:
-        description: 'Release type (patch, minor, major, or a semver version)'
+        description: "Release type (patch, minor, major, or a semver version)"
         required: false
         type: string
+
+permissions:
+  contents: write
 
 jobs:
   lint:
@@ -84,4 +87,4 @@ jobs:
             pnpm package release
           fi
         env:
-          GITHUB_TOKEN: ${{ secrets.CICD_PAT }}
+          GITHUB_TOKEN: ${{ github.token }}
