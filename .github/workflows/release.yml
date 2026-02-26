@@ -56,11 +56,11 @@ jobs:
       - name: Build package
         run: pnpm package build
 
-      - name: Set NPM token & GitHub config
+      - name: Configure Git and npm
         run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
-          git config user.name "Kuatsu CI/CD"
-          git config user.email "null@kuatsu.de"
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
