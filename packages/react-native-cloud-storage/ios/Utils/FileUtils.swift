@@ -28,8 +28,7 @@ enum FileUtils {
     }
 
     do {
-      let fileContents = try String(contentsOf: fileUrl, encoding: .utf8)
-      return fileContents
+      return try String(contentsOf: fileUrl, encoding: .utf8)
     } catch {
       throw CloudStorageError.readError(path: fileUrl.path)
     }
@@ -73,8 +72,7 @@ enum FileUtils {
    */
   static func listFiles(directoryUrl: URL) throws -> [String] {
     do {
-      let fileUrls = try fileManager.contentsOfDirectory(atPath: directoryUrl.path)
-      return fileUrls
+      return try fileManager.contentsOfDirectory(atPath: directoryUrl.path)
     } catch {
       throw CloudStorageError.readError(path: directoryUrl.path)
     }

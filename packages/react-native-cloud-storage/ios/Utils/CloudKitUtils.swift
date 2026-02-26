@@ -42,10 +42,10 @@ enum CloudKitUtils {
   }
 
   /**
-     Returns the iCloud directory URL for the given scope.
+     Returns the directory URL for the given scope.
 
      - Parameter scope: The scope of the directory.
-     - Returns: The URL of the iCloud directory, or nil if no directory is found.
+     - Returns: The URL of the scope directory, or nil if no directory is found.
    */
   private static func getScopeDirectory(scope: DirectoryScope) -> URL? {
     switch scope {
@@ -53,6 +53,8 @@ enum CloudKitUtils {
       appDataDirectory
     case .documents:
       documentsDirectory
+    case .documentsLegacy:
+      legacyDocumentsDirectory
     }
   }
 
@@ -108,5 +110,9 @@ enum CloudKitUtils {
 
   static var documentsDirectory: URL? {
     fileManager.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents")
+  }
+
+  static var legacyDocumentsDirectory: URL? {
+    fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
   }
 }

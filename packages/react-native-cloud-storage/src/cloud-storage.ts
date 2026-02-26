@@ -5,7 +5,7 @@ import {
   type CloudStorageProviderOptions,
   type DeepRequired,
 } from './types/main';
-import { NativeCloudStorageErrorCode, type NativeStorage } from './types/native';
+import { NativeCloudStorageErrorCode, type NativeStorage, type NativeStorageScope } from './types/native';
 import { isProviderSupported } from './utils/helpers';
 import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
 import GoogleDrive from './storages/google-drive';
@@ -165,6 +165,24 @@ export default class RNCloudStorage {
   unsubscribeFromCloudAvailability(listener: (available: boolean) => void): void {
     this.cloudAvailabilityListeners = this.cloudAvailabilityListeners.filter((l) => l !== listener);
   }
+
+  private resolveNativeScope(scope?: CloudStorageScope): NativeStorageScope {
+    const resolvedScope = scope ?? this.provider.options.scope;
+
+    if (this.provider.provider !== CloudStorageProvider.ICloud || resolvedScope !== CloudStorageScope.Documents) {
+      return resolvedScope;
+    }
+
+    // eslint-disable-next-line unicorn/prevent-abbreviations
+    const iCloudOptions = this.provider.options as DeepRequired<
+      CloudStorageProviderOptions[CloudStorageProvider.ICloud]
+    >;
+    if (iCloudOptions.documentsMode === 'legacy_sandbox') {
+      return 'documents_legacy';
+    }
+
+    return resolvedScope;
+  }
   //#endregion
 
   //#region File system operations
@@ -185,7 +203,7 @@ export default class RNCloudStorage {
    * @returns A promise that resolves when the data has been appended.
    */
   appendFile(path: string, data: string, scope?: CloudStorageScope): Promise<void> {
-    return this.nativeStorage.appendToFile(path, data, scope ?? this.provider.options.scope);
+    return this.nativeStorage.appendToFile(path, data, this.resolveNativeScope(scope));
   }
 
   /**
@@ -195,7 +213,7 @@ export default class RNCloudStorage {
    * @returns A promise that resolves to true if the path exists, false otherwise.
    */
   exists(path: string, scope?: CloudStorageScope): Promise<boolean> {
-    return this.nativeStorage.fileExists(path, scope ?? this.provider.options.scope);
+    return this.nativeStorage.fileExists(path, this.resolveNativeScope(scope));
   }
 
   /**
@@ -206,7 +224,7 @@ export default class RNCloudStorage {
    * @returns A promise that resolves when the file has been written.
    */
   writeFile(path: string, data: string, scope?: CloudStorageScope): Promise<void> {
-    return this.nativeStorage.createFile(path, data, scope ?? this.provider.options.scope, true);
+    return this.nativeStorage.createFile(path, data, this.resolveNativeScope(scope), true);
   }
 
   /**
@@ -216,7 +234,7 @@ export default class RNCloudStorage {
    * @returns A promise that resolves when the directory has been created.
    */
   mkdir(path: string, scope?: CloudStorageScope): Promise<void> {
-    return this.nativeStorage.createDirectory(path, scope ?? this.provider.options.scope);
+    return this.nativeStorage.createDirectory(path, this.resolveNativeScope(scope));
   }
 
   /**
@@ -226,7 +244,7 @@ export default class RNCloudStorage {
    * @returns A promise that resolves to an array of file names, excluding '.' and '..'.
    */
   readdir(path: string, scope?: CloudStorageScope): Promise<string[]> {
-    return this.nativeStorage.listFiles(path, scope ?? this.provider.options.scope);
+    return this.nativeStorage.listFiles(path, this.resolveNativeScope(scope));
   }
 
   /**
@@ -236,7 +254,7 @@ export default class RNCloudStorage {
    * @returns A promise that resolves to the contents of the file.
    */
   readFile(path: string, scope?: CloudStorageScope): Promise<string> {
-    return this.nativeStorage.readFile(path, scope ?? this.provider.options.scope);
+    return this.nativeStorage.readFile(path, this.resolveNativeScope(scope));
   }
 
   /**
@@ -246,7 +264,7 @@ export default class RNCloudStorage {
    * @returns A promise that resolves once the synchronization has been triggered.
    */
   triggerSync(path: string, scope?: CloudStorageScope): Promise<void> {
-    return this.nativeStorage.triggerSync(path, scope ?? this.provider.options.scope);
+    return this.nativeStorage.triggerSync(path, this.resolveNativeScope(scope));
   }
 
   /**
@@ -263,13 +281,7 @@ export default class RNCloudStorage {
     options: { mimeType: string },
     scope?: CloudStorageScope
   ): Promise<void> {
-    return this.nativeStorage.uploadFile(
-      remotePath,
-      localPath,
-      options.mimeType,
-      scope ?? this.provider.options.scope,
-      true
-    );
+    return this.nativeStorage.uploadFile(remotePath, localPath, options.mimeType, this.resolveNativeScope(scope), true);
   }
 
   /**
@@ -301,7 +313,7 @@ export default class RNCloudStorage {
     if (!localPathOrScope) {
       throw new CloudStorageError('Invalid arguments provided to downloadFile', NativeCloudStorageErrorCode.UNKNOWN);
     }
-    return this.nativeStorage.downloadFile(remotePathOrPath, localPathOrScope, scope ?? this.provider.options.scope);
+    return this.nativeStorage.downloadFile(remotePathOrPath, localPathOrScope, this.resolveNativeScope(scope));
   }
 
   /**
@@ -311,7 +323,7 @@ export default class RNCloudStorage {
    * @returns A promise that resolves when the file has been deleted.
    */
   unlink(path: string, scope?: CloudStorageScope): Promise<void> {
-    return this.nativeStorage.deleteFile(path, scope ?? this.provider.options.scope);
+    return this.nativeStorage.deleteFile(path, this.resolveNativeScope(scope));
   }
 
   /**
@@ -322,7 +334,7 @@ export default class RNCloudStorage {
    * @returns A promise that resolves when the directory has been deleted.
    */
   rmdir(path: string, options?: { recursive?: boolean }, scope?: CloudStorageScope): Promise<void> {
-    return this.nativeStorage.deleteDirectory(path, options?.recursive ?? false, scope ?? this.provider.options.scope);
+    return this.nativeStorage.deleteDirectory(path, options?.recursive ?? false, this.resolveNativeScope(scope));
   }
 
   /**
@@ -332,7 +344,7 @@ export default class RNCloudStorage {
    * @returns A promise that resolves to the CloudStorageFileStat object.
    */
   async stat(path: string, scope?: CloudStorageScope): Promise<CloudStorageFileStat> {
-    const native = await this.nativeStorage.statFile(path, scope ?? this.provider.options.scope);
+    const native = await this.nativeStorage.statFile(path, this.resolveNativeScope(scope));
 
     return {
       ...native,

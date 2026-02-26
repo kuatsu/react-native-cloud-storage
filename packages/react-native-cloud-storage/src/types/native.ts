@@ -1,4 +1,4 @@
-export type NativeStorageScope = 'documents' | 'app_data';
+export type NativeStorageScope = 'documents' | 'documents_legacy' | 'app_data';
 
 export interface NativeStorageFileStat {
   size: number;

@@ -8,6 +8,8 @@ export enum CloudStorageScope {
   AppData = 'app_data',
 }
 
+export type ICloudDocumentsMode = 'icloud' | 'legacy_sandbox';
+
 export interface CloudStorageFileStat {
   size: number;
   birthtimeMs: number;
@@ -29,6 +31,13 @@ export interface CloudStorageProviderOptions {
      * The directory scope to use for iCloud operations. Defaults to 'app_data'.
      */
     scope?: CloudStorageScope;
+    /**
+     * The directory mode to use for CloudStorageScope.Documents.
+     * `icloud` uses the user-facing iCloud Documents directory, while
+     * `legacy_sandbox` uses the local app sandbox Documents directory.
+     * Defaults to `icloud`.
+     */
+    documentsMode?: ICloudDocumentsMode;
   };
 
   [CloudStorageProvider.GoogleDrive]: {
