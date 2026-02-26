@@ -15,7 +15,7 @@ on:
 jobs:
   build:
     name: Build iOS example app
-    runs-on: macOS-15
+    runs-on: macOS-26
     steps:
       - uses: actions/checkout@v4
       - name: Setup
