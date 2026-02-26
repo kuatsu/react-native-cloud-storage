@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       release_type:
-        description: "Release type (patch, minor, major, or a semver version)"
+        description: 'Release type (patch, minor, major, or a semver version)'
         required: false
         type: string
 
