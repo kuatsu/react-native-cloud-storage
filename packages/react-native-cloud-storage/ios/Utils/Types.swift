@@ -20,6 +20,7 @@ enum UploadType: String {
 enum DirectoryScope: String {
   case appData = "app_data"
   case documents
+  case documentsLegacy = "documents_legacy"
 }
 
 // MARK: - FileStat

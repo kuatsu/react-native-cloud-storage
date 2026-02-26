@@ -34,6 +34,9 @@ The provider options can be set via [`setProviderOptions()`](../CloudStorage#set
 ### `CloudStorageProvider.ICloud`
 
 - `scope` (`CloudStorageScope`): The directory scope to use. Default: `CloudStorageScope.AppData`.
+- `documentsMode` (`'icloud' | 'legacy_sandbox'`): Defines how `CloudStorageScope.Documents` is resolved. Use `'icloud'` for the iCloud `Documents` folder (default) or `'legacy_sandbox'` to use the local app sandbox `Documents` folder (which was the default before react-native-cloud-storage v3).
+
+If you need to move existing files from legacy sandbox storage into the user-facing iCloud Documents folder, see [this migration guide](../../guides/migrating-icloud-documents).
 
 ### `CloudStorageProvider.GoogleDrive`
 

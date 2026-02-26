@@ -10,6 +10,7 @@ export const LINKING_ERROR =
 export const DEFAULT_PROVIDER_OPTIONS: DeepRequired<CloudStorageProviderOptions> = {
   [CloudStorageProvider.ICloud]: {
     scope: CloudStorageScope.AppData,
+    documentsMode: 'icloud',
   },
   [CloudStorageProvider.GoogleDrive]: {
     scope: CloudStorageScope.AppData,

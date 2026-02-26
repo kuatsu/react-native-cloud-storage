@@ -49,6 +49,9 @@ export default class GoogleDrive implements NativeStorage {
       case 'documents': {
         return 'drive';
       }
+      case 'documents_legacy': {
+        return 'drive';
+      }
       case 'app_data': {
         return 'appDataFolder';
       }
