@@ -116,7 +116,7 @@ export default class GoogleDriveApiClient {
     return body.join('');
   }
 
-  public async listFiles(space: GoogleDriveFileSpace): Promise<GoogleDriveFile[]> {
+  public async listFiles(space: GoogleDriveFileSpace, query?: string): Promise<GoogleDriveFile[]> {
     const files: GoogleDriveFile[] = [];
     let pageToken: string | undefined;
     const fields = ['id', 'kind', 'mimeType', 'name', 'parents', 'spaces', 'size', 'createdTime', 'modifiedTime'];
@@ -125,6 +125,7 @@ export default class GoogleDriveApiClient {
         fields: `files(${fields.join(',')}),nextPageToken`,
         spaces: space,
         pageToken,
+        q: query,
       };
       const response = await this.request<GoogleDriveListOperationResponse>(`/files`, {
         queryParameters,
@@ -135,20 +136,6 @@ export default class GoogleDriveApiClient {
     } while (pageToken);
 
     return files;
-  }
-
-  public async getRootFolderId(): Promise<string> {
-    const response = await this.request<{ rootFolderId?: string }>(`/about`, {
-      queryParameters: {
-        fields: 'rootFolderId',
-      },
-    });
-
-    if (!response.rootFolderId) {
-      throw new Error('Could not determine Google Drive root folder id');
-    }
-
-    return response.rootFolderId;
   }
 
   public async getFile(fileId: string): Promise<GoogleDriveFile> {
