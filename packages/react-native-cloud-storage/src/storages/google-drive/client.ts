@@ -137,6 +137,20 @@ export default class GoogleDriveApiClient {
     return files;
   }
 
+  public async getRootFolderId(): Promise<string> {
+    const response = await this.request<{ rootFolderId?: string }>(`/about`, {
+      queryParameters: {
+        fields: 'rootFolderId',
+      },
+    });
+
+    if (!response.rootFolderId) {
+      throw new Error('Could not determine Google Drive root folder id');
+    }
+
+    return response.rootFolderId;
+  }
+
   public async getFile(fileId: string): Promise<GoogleDriveFile> {
     const queryParameters: GoogleDriveListOperationQueryParameters = {
       fields: ['id', 'kind', 'mimeType', 'name', 'parents', 'spaces', 'size', 'createdTime', 'modifiedTime'].join(','),
