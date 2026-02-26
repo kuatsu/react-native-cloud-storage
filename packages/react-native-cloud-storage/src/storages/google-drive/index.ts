@@ -245,8 +245,8 @@ export default class GoogleDrive implements NativeStorage {
           parents: parentDirectoryId
             ? [parentDirectoryId]
             : scope === 'app_data'
-            ? [this.getRootDirectory(scope)]
-            : undefined,
+              ? [this.getRootDirectory(scope)]
+              : undefined,
         },
         {
           body: data,
@@ -296,8 +296,8 @@ export default class GoogleDrive implements NativeStorage {
           parents: parentDirectoryId
             ? [parentDirectoryId]
             : scope === 'app_data'
-            ? [this.getRootDirectory(scope)]
-            : undefined,
+              ? [this.getRootDirectory(scope)]
+              : undefined,
         },
         {
           body: data,
@@ -346,8 +346,8 @@ export default class GoogleDrive implements NativeStorage {
       parents: parentDirectoryId
         ? [parentDirectoryId]
         : scope === 'app_data'
-        ? [this.getRootDirectory(scope)]
-        : undefined,
+          ? [this.getRootDirectory(scope)]
+          : undefined,
     });
   }
 
@@ -472,8 +472,8 @@ export default class GoogleDrive implements NativeStorage {
           parents: parentDirectoryId
             ? [parentDirectoryId]
             : scope === 'app_data'
-            ? [this.getRootDirectory(scope)]
-            : undefined,
+              ? [this.getRootDirectory(scope)]
+              : undefined,
         },
         {
           mimeType,

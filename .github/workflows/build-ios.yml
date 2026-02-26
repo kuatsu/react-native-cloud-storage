@@ -15,7 +15,7 @@ on:
 jobs:
   build:
     name: Build iOS example app
-    runs-on: macOS-15
+    runs-on: macOS-26
     steps:
       - uses: actions/checkout@v4
       - name: Setup
@@ -23,7 +23,7 @@ jobs:
       - name: Install xcpretty
         run: gem install xcpretty
       - name: Build package
-        run: yarn package build
+        run: pnpm package build
       - name: Build app
         run: "rm -rf ios && \
           npx expo prebuild -p ios && \
@@ -35,7 +35,7 @@ jobs:
           -scheme RNCloudStorage \
           -sdk iphonesimulator \
           -configuration Debug \
-          -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
+          -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
           build \
           CODE_SIGNING_ALLOWED=NO | xcpretty"
         working-directory: apps/example

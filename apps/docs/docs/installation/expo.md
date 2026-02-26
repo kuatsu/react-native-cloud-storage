@@ -15,7 +15,7 @@ First, install the library using your favorite package manager:
 ```sh
 npm install react-native-cloud-storage
 # or
-yarn add react-native-cloud-storage
+pnpm add react-native-cloud-storage
 ```
 
 Because this library includes native code, you will need to use an [Expo development client](https://docs.expo.dev/development/create-development-builds/). In order to make necessary changes to the iOS files, this library provides an Expo config plugin which makes those changes for you upon build. To use it, simply add the library to the `plugins` section of your `app.json`:
