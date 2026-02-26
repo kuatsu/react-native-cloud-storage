@@ -83,7 +83,7 @@ See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the 
 
 ## Example Project
 
-There's an example app available in the `example` directory. To use the Google Drive implementation (for any platforms other than iOS), you'll need to provide a valid access token for the Google Drive API. For testing purposes, you can create one using the [Google OAuth 2.0 Playground](https://developers.google.com/oauthplayground).
+There's an example app available in the `example` directory. To use the Google Drive implementation, you'll need to provide a valid access token for the Google Drive API. For testing purposes, you can create one using the [Google OAuth 2.0 Playground](https://developers.google.com/oauthplayground).
 
 ## License
 
