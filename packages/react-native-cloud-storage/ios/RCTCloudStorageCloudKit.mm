@@ -32,16 +32,12 @@
 {
   if (self = [super init]) {
     _cloudStorageCloudKit = [CloudStorageCloudKit new];
-
-    __weak __typeof__(self) weakSelf = self;
-    _ubiquityIdentityObserver = [[NSNotificationCenter defaultCenter]
-        addObserverForName:NSUbiquityIdentityDidChangeNotification
-                    object:nil
-                     queue:nil
-                usingBlock:^(__unused NSNotification *notification) {
-                  __strong __typeof__(weakSelf) strongSelf = weakSelf;
-                  [strongSelf emitCloudAvailabilityChanged];
-                }];
+    // The ubiquity-identity observer is installed in -setEventEmitterCallback:
+    // rather than here, so it can only fire after the codegen event emitter's
+    // std::function has been bound. Otherwise a notification posted by iOS
+    // between -init and -setEventEmitterCallback: would invoke an empty
+    // std::function and crash the process with std::bad_function_call.
+    // See: https://github.com/kuatsu/react-native-cloud-storage/issues/59
   }
 
   return self;
@@ -58,6 +54,19 @@
 - (void)setEventEmitterCallback:(EventEmitterCallbackWrapper *)eventEmitterCallbackWrapper
 {
   [super setEventEmitterCallback:eventEmitterCallbackWrapper];
+
+  if (_ubiquityIdentityObserver == nil) {
+    __weak __typeof__(self) weakSelf = self;
+    _ubiquityIdentityObserver = [[NSNotificationCenter defaultCenter]
+        addObserverForName:NSUbiquityIdentityDidChangeNotification
+                    object:nil
+                     queue:nil
+                usingBlock:^(__unused NSNotification *notification) {
+                  __strong __typeof__(weakSelf) strongSelf = weakSelf;
+                  [strongSelf emitCloudAvailabilityChanged];
+                }];
+  }
+
   [self emitCloudAvailabilityChanged];
 }
 
