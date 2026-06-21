@@ -298,6 +298,7 @@ export default class RNCloudStorage {
    * @param path The file to trigger synchronization for.
    * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
    * @returns A promise that resolves once the synchronization has been triggered.
+   * @provider icloud
    */
   triggerSync(path: string, scope?: CloudStorageScope): Promise<void> {
     return this.nativeStorage.triggerSync(path, this.resolveNativeScope(scope));
@@ -508,6 +509,7 @@ export default class RNCloudStorage {
    * @param path The file to trigger synchronization for.
    * @param scope The directory scope the path is in. Defaults to the default scope set for the default static instance.
    * @returns A promise that resolves once the synchronization has been triggered.
+   * @provider icloud
    */
   static triggerSync(path: string, scope?: CloudStorageScope): Promise<void> {
     return RNCloudStorage.getDefaultInstance().triggerSync(path, scope);

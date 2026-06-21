@@ -11,6 +11,10 @@ export enum CloudStorageScope {
   AppData = 'app_data',
 }
 
+/**
+ * Controls which on-device directory `CloudStorageScope.Documents` maps to on iCloud.
+ * @provider icloud
+ */
 export type ICloudDocumentsMode = 'icloud' | 'legacy_sandbox';
 
 export interface CloudStorageFileStat {
@@ -24,6 +28,10 @@ export interface CloudStorageFileStat {
 }
 
 export enum CloudStorageProvider {
+  /**
+   * Apple iCloud, backed by CloudKit.
+   * @platform ios
+   */
   ICloud = 'icloud',
   GoogleDrive = 'googledrive',
 }
