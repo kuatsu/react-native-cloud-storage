@@ -2,6 +2,7 @@ import { RootProvider } from 'fumadocs-ui/provider/next';
 import './global.css';
 import { Geist, Geist_Mono } from 'next/font/google';
 import type { Metadata } from 'next';
+import { siteDescription, siteName, siteUrl } from '@/lib/site';
 
 const geist = Geist({
   subsets: ['latin'],
@@ -14,12 +15,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://react-native-cloud-storage.oss.kuatsu.de'),
+  metadataBase: new URL(siteUrl),
   title: {
-    default: 'React Native Cloud Storage',
-    template: '%s | React Native Cloud Storage',
+    default: siteName,
+    template: `%s | ${siteName}`,
   },
-  description: 'iCloud and Google Drive for React Native, simplified.',
+  description: siteDescription,
 };
 
 export default function Layout({ children }: LayoutProps<'/'>) {

@@ -2,6 +2,7 @@ import { getPageImage, source } from '@/lib/source';
 import { notFound } from 'next/navigation';
 import { ImageResponse } from 'next/og';
 import { generate as DefaultImage } from 'fumadocs-ui/og';
+import { siteName } from '@/lib/site';
 
 export const revalidate = false;
 
@@ -11,7 +12,7 @@ export async function GET(_req: Request, { params }: RouteContext<'/og/docs/[...
   if (!page) notFound();
 
   return new ImageResponse(
-    <DefaultImage title={page.data.title} description={page.data.description} site="React Native Cloud Storage" />,
+    <DefaultImage title={page.data.title} description={page.data.description} site={siteName} />,
     {
       width: 1200,
       height: 630,
