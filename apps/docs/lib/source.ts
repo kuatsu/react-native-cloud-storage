@@ -2,12 +2,17 @@ import { docs } from 'fumadocs-mdx:collections/server';
 import { type InferPageType, loader } from 'fumadocs-core/source';
 import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
 import { createApiReferenceTreePlugin } from '@/lib/source/api-reference-tree-plugin';
+import { createBadgeLabelPlugin } from '@/lib/source/badge-label-plugin';
 
 // See https://fumadocs.dev/docs/headless/source-api for more info
 export const source = loader({
   baseUrl: '/docs',
   source: docs.toFumadocsSource(),
-  plugins: [lucideIconsPlugin(), createApiReferenceTreePlugin()],
+  plugins: ({ typedPlugin }) => [
+    lucideIconsPlugin(),
+    createApiReferenceTreePlugin(),
+    typedPlugin(createBadgeLabelPlugin()),
+  ],
 });
 
 export function getPageImage(page: InferPageType<typeof source>) {

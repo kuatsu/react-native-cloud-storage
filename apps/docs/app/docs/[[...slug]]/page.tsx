@@ -5,6 +5,8 @@ import { getMDXComponents } from '@/mdx-components';
 import type { Metadata } from 'next';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { LLMCopyButton, ViewOptions } from '@/components/ai/page-actions';
+import { BadgePills } from '@/components/badges/pills';
+import { readBadgesFromPageData, readTocBadgesFromPageData } from '@/lib/badges';
 import { gitConfig } from '@/lib/layout.shared';
 
 export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
@@ -13,23 +15,32 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   if (!page) notFound();
 
   const MDX = page.data.body;
+  const badges = readBadgesFromPageData(page.data);
+  const tocBadges = readTocBadgesFromPageData(page.data);
+
+  // API pages are generated from the library source, so link "Open in GitHub" to the package source
+  // rather than the (gitignored) generated MDX file.
+  const githubUrl = page.path.startsWith('api/')
+    ? `https://github.com/${gitConfig.user}/${gitConfig.repo}/tree/${gitConfig.branch}/packages/react-native-cloud-storage/src`
+    : `https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/apps/docs/content/docs/${page.path}`;
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
       <DocsTitle>{page.data.title}</DocsTitle>
+      <BadgePills badges={badges} />
       <DocsDescription className="mb-0">{page.data.description}</DocsDescription>
       <div className="flex flex-row gap-2 items-center border-b pb-6">
         <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
-        <ViewOptions
-          markdownUrl={`${page.url}.mdx`}
-          githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/apps/docs/content/docs/${page.path}`}
-        />
+        <ViewOptions markdownUrl={`${page.url}.mdx`} githubUrl={githubUrl} />
       </div>
       <DocsBody>
         <MDX
-          components={getMDXComponents({
-            a: createRelativeLink(source, page),
-          })}
+          components={getMDXComponents(
+            {
+              a: createRelativeLink(source, page),
+            },
+            { tocBadges }
+          )}
         />
       </DocsBody>
     </DocsPage>

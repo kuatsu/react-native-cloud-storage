@@ -19,3 +19,25 @@
 body {
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }
+
+/* Provider/platform badge pills rendered beneath API member headings. */
+.api-member-badge-row {
+  @apply mt-1.5 mb-3 flex flex-wrap gap-1.5;
+}
+
+.api-member-badge {
+  @apply inline-flex items-center rounded-full border border-fd-primary/40 bg-fd-primary/10 px-2 py-0.5 text-[10px] leading-none font-medium text-fd-primary;
+}
+
+/* Provider/platform pill shown next to a single-badge page in the sidebar. */
+.api-sidebar-item-content {
+  @apply flex w-full min-w-0 items-center justify-between gap-2 overflow-hidden;
+}
+
+.api-sidebar-item-label {
+  @apply min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap;
+}
+
+.api-sidebar-badge {
+  @apply inline-flex shrink-0 items-center rounded-full border border-fd-primary/40 bg-fd-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-fd-primary;
+}
