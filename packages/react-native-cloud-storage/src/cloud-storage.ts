@@ -3,6 +3,7 @@ import {
   CloudStorageScope,
   type CloudStorageFileStat,
   type CloudStorageProviderOptions,
+  type CloudStorageProviderOptionsValue,
   type DeepRequired,
 } from './types/main';
 import { NativeCloudStorageErrorCode, type NativeStorage, type NativeStorageScope } from './types/native';
@@ -27,10 +28,7 @@ export default class RNCloudStorage {
    * Creates a new RNCloudStorage instance for the given provider.
    * @param provider The provider to create the instance for. Defaults to the default provider for the current platform.
    */
-  constructor(
-    provider?: CloudStorageProvider,
-    options?: CloudStorageProviderOptions[keyof CloudStorageProviderOptions]
-  ) {
+  constructor(provider?: CloudStorageProvider, options?: CloudStorageProviderOptionsValue) {
     if (provider && !isProviderSupported(provider)) {
       throw new Error(`Provider ${provider} is not supported on the current platform.`);
     }
@@ -163,7 +161,7 @@ export default class RNCloudStorage {
    * Gets the current options for the current provider.
    * @returns The current options for the current provider.
    */
-  getProviderOptions(): CloudStorageProviderOptions[keyof CloudStorageProviderOptions] {
+  getProviderOptions(): CloudStorageProviderOptionsValue {
     return this.provider.options;
   }
 
@@ -171,7 +169,7 @@ export default class RNCloudStorage {
    * Sets the options for the current provider.
    * @param options The options to set for the provider.
    */
-  setProviderOptions(options: CloudStorageProviderOptions[keyof CloudStorageProviderOptions]): void {
+  setProviderOptions(options: CloudStorageProviderOptionsValue): void {
     const newOptions = Object.fromEntries(Object.entries(options).filter(([_, v]) => v !== undefined));
     this.provider.options = {
       ...this.provider.options,
@@ -298,6 +296,7 @@ export default class RNCloudStorage {
    * @param path The file to trigger synchronization for.
    * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
    * @returns A promise that resolves once the synchronization has been triggered.
+   * @provider icloud
    */
   triggerSync(path: string, scope?: CloudStorageScope): Promise<void> {
     return this.nativeStorage.triggerSync(path, this.resolveNativeScope(scope));
@@ -420,7 +419,7 @@ export default class RNCloudStorage {
    * Gets the current options for the provider of the default static instance.
    * @returns The current options for the provider of the default static instance.
    */
-  static getProviderOptions(): CloudStorageProviderOptions[keyof CloudStorageProviderOptions] {
+  static getProviderOptions(): CloudStorageProviderOptionsValue {
     return RNCloudStorage.getDefaultInstance().getProviderOptions();
   }
 
@@ -428,7 +427,7 @@ export default class RNCloudStorage {
    * Sets the options for the provider of the default static instance.
    * @param options The options to set for the provider of the default static instance.
    */
-  static setProviderOptions(options: CloudStorageProviderOptions[keyof CloudStorageProviderOptions]): void {
+  static setProviderOptions(options: CloudStorageProviderOptionsValue): void {
     RNCloudStorage.getDefaultInstance().setProviderOptions(options);
   }
 
@@ -508,6 +507,7 @@ export default class RNCloudStorage {
    * @param path The file to trigger synchronization for.
    * @param scope The directory scope the path is in. Defaults to the default scope set for the default static instance.
    * @returns A promise that resolves once the synchronization has been triggered.
+   * @provider icloud
    */
   static triggerSync(path: string, scope?: CloudStorageScope): Promise<void> {
     return RNCloudStorage.getDefaultInstance().triggerSync(path, scope);

@@ -1,0 +1,56 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+
+:root {
+  --color-fd-primary: #0ea5e9;
+  --color-fd-primary-foreground: #04293a;
+  --color-fd-ring: #0ea5e9;
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+.dark {
+  --color-fd-primary: #38bdf8;
+  --color-fd-primary-foreground: #04293a;
+  --color-fd-ring: #38bdf8;
+}
+
+body {
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Provider/platform badge pills rendered beneath API member headings. */
+.api-member-badge-row {
+  @apply mt-1.5 mb-3 flex flex-wrap gap-1.5;
+}
+
+.api-member-badge {
+  @apply inline-flex items-center rounded-full border border-fd-primary/40 bg-fd-primary/10 px-2 py-0.5 text-[10px] leading-none font-medium text-fd-primary;
+}
+
+/* Provider/platform pill shown next to a single-badge page in the sidebar. */
+.api-sidebar-item-content {
+  @apply flex w-full min-w-0 items-center justify-between gap-2 overflow-hidden;
+}
+
+.api-sidebar-item-label {
+  @apply min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap;
+}
+
+.api-sidebar-badge {
+  @apply inline-flex shrink-0 items-center rounded-full border border-fd-primary/40 bg-fd-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-fd-primary;
+}
+
+/* Overloaded members nest "Parameters"/"Returns"/"Deprecated" as deep (h5/h6) headings, which the
+   prose theme renders too faintly. Keep them looking like section headings. */
+.api-reference-body :is(h5, h6) {
+  @apply mt-6 mb-3 text-base font-semibold text-fd-foreground;
+}
+
+/* TypeDoc renders inline types as a run of separate code spans joined by punctuation, which reads as
+   "pill soup" in the parameter/returns tables. Drop the inline-code chrome inside the API reference
+   so a type expression reads as one continuous monospace string. Fenced code blocks are untouched. */
+.api-reference-body :not(pre) > code {
+  @apply border-0 bg-transparent p-0 font-normal text-fd-foreground;
+}

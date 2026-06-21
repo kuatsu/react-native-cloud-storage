@@ -1,0 +1,19 @@
+{
+  "title": "React Native Cloud Storage",
+  "root": true,
+  "pages": [
+    "index",
+    "---Installation---",
+    "installation/expo",
+    "installation/react-native",
+    "installation/configure-google-drive",
+    "---Guides & Tips---",
+    "guides/quick-start",
+    "guides/using-multiple-providers",
+    "guides/google-drive-files-same-name",
+    "guides/migrating-icloud-documents",
+    "example",
+    "---API Reference---",
+    "api"
+  ]
+}

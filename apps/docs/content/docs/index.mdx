@@ -1,0 +1,50 @@
+---
+title: Introduction
+description: iCloud and Google Drive for React Native.
+---
+
+React Native Cloud Storage allows you to use iCloud (iOS only) and Google Drive as file storage in your React Native app. The API of its core functionality follows the conventions of the Node.js module `fs`. React hooks and other utilities make working with cloud files even easier.
+
+## Features
+
+- **`fs`-like API** — `readFile`, `writeFile`, `appendFile`, `readdir`, `mkdir`, `stat`, `unlink`, and more, modeled on Node's `fs` so there's almost nothing new to learn.
+- **Two providers, one API** — [iCloud](/docs/api/enumerations/CloudStorageProvider) (via a native CloudKit module) and [Google Drive](/docs/installation/configure-google-drive) (via the REST API). Use the platform default or [switch between them at runtime](/docs/guides/using-multiple-providers).
+- **React hooks** — [`useCloudFile`](/docs/api/functions/useCloudFile) and [`useIsCloudAvailable`](/docs/api/functions/useIsCloudAvailable) keep your components in sync with cloud state.
+- **Scopes** — read and write in a hidden, app-private container ([`AppData`](/docs/api/enumerations/CloudStorageScope)) or the user-visible iCloud Drive / Google Drive [`Documents`](/docs/api/enumerations/CloudStorageScope) folder.
+- **Expo config plugin** — configures the native iCloud capability automatically, with no manual Xcode steps.
+- **Built for the New Architecture** — ships as a Turbo Module and is fully typed with TypeScript.
+
+## Quick example
+
+```ts
+import { CloudStorage, CloudStorageScope } from 'react-native-cloud-storage';
+
+// Write a JSON file to the app-private scope (iCloud on iOS, Google Drive elsewhere).
+await CloudStorage.writeFile('/state.json', JSON.stringify({ level: 7 }), CloudStorageScope.AppData);
+
+// Read it back later.
+if (await CloudStorage.exists('/state.json', CloudStorageScope.AppData)) {
+  const json = await CloudStorage.readFile('/state.json', CloudStorageScope.AppData);
+  const { level } = JSON.parse(json);
+}
+```
+
+Prefer hooks? [`useCloudFile`](/docs/api/functions/useCloudFile) wraps this read/write cycle into a single reactive value.
+
+## Provider & platform support
+
+| Provider     | iOS | Android | Notes                                                          |
+| ------------ | :-: | :-----: | ------------------------------------------------------------- |
+| iCloud       | ✅  |    —    | Backed by a native CloudKit module; available out of the box. |
+| Google Drive | ✅  |   ✅    | Backed by the Drive REST API; you provide an access token.    |
+
+By default, the library picks the right provider for each platform: iCloud on iOS, Google Drive everywhere else. You can override this or even use both providers at once.
+
+## Get started
+
+<Cards>
+  <Card title="Install in Expo" href="/docs/installation/expo" description="Add the library to an Expo managed project with the config plugin." />
+  <Card title="Install in bare React Native" href="/docs/installation/react-native" description="Set up the native iCloud capability in a bare project." />
+  <Card title="Configure Google Drive" href="/docs/installation/configure-google-drive" description="Acquire and provide an access token for the Drive API." />
+  <Card title="API Reference" href="/docs/api" description="Browse the full CloudStorage API, hooks, and types." />
+</Cards>

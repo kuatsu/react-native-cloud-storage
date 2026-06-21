@@ -1,4 +1,7 @@
-/* Custom utility type to make properties required, but still allow null if defined */
+/**
+ * Custom utility type to make properties required, but still allow null if defined.
+ * @internal
+ */
 export type DeepRequired<T> = {
   [P in keyof T]-?: T[P] extends object ? DeepRequired<T[P]> : T[P];
 };
@@ -8,6 +11,10 @@ export enum CloudStorageScope {
   AppData = 'app_data',
 }
 
+/**
+ * Controls which on-device directory `CloudStorageScope.Documents` maps to on iCloud.
+ * @provider icloud
+ */
 export type ICloudDocumentsMode = 'icloud' | 'legacy_sandbox';
 
 export interface CloudStorageFileStat {
@@ -21,6 +28,10 @@ export interface CloudStorageFileStat {
 }
 
 export enum CloudStorageProvider {
+  /**
+   * Apple iCloud, backed by CloudKit.
+   * @platform ios
+   */
   ICloud = 'icloud',
   GoogleDrive = 'googledrive',
 }
@@ -59,3 +70,11 @@ export interface CloudStorageProviderOptions {
     timeout?: number;
   };
 }
+
+/**
+ * Options for a single cloud storage provider: the iCloud options when the iCloud provider is used,
+ * or the Google Drive options when the Google Drive provider is used. This is the value type of
+ * {@link CloudStorageProviderOptions} and the shape accepted by `setProviderOptions` and the
+ * `CloudStorage` constructor.
+ */
+export type CloudStorageProviderOptionsValue = CloudStorageProviderOptions[keyof CloudStorageProviderOptions];
