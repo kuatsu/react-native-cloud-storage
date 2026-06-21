@@ -1,5 +1,13 @@
 
 
+## [3.0.1](https://github.com/kuatsu/react-native-cloud-storage/compare/v3.0.0...v3.0.1) (2026-06-21)
+
+
+### Bug Fixes
+
+* **ci:** fix workflow ([cef99fc](https://github.com/kuatsu/react-native-cloud-storage/commit/cef99fc34dea025415f7d148978fcdd2997d89b8))
+* **ios:** install ubiquity observer only after emitter callback is bound ([eb18b00](https://github.com/kuatsu/react-native-cloud-storage/commit/eb18b00c8d69e0b932a3387ed1d2641698a44eda)), closes [#59](https://github.com/kuatsu/react-native-cloud-storage/issues/59) [#59](https://github.com/kuatsu/react-native-cloud-storage/issues/59)
+
 # [3.0.0](https://github.com/kuatsu/react-native-cloud-storage/compare/v2.3.0...v3.0.0) (2026-02-26)
 
 
