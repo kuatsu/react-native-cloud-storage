@@ -1,4 +1,7 @@
-/* Custom utility type to make properties required, but still allow null if defined */
+/**
+ * Custom utility type to make properties required, but still allow null if defined.
+ * @internal
+ */
 export type DeepRequired<T> = {
   [P in keyof T]-?: T[P] extends object ? DeepRequired<T[P]> : T[P];
 };
