@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 import { ArrowRight, Cloud, FolderTree, Github, Layers, Puzzle, Webhook } from 'lucide-react';
@@ -5,46 +6,62 @@ import { gitConfig } from '@/lib/layout.shared';
 
 const githubUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}`;
 
-const codeSample = `import { CloudStorage, CloudStorageScope } from 'react-native-cloud-storage';
+function InlineCode({ children }: { children: ReactNode }) {
+  return (
+    <code className="rounded-md border border-fd-border bg-fd-muted px-1 py-0.5 font-mono text-[0.85em]">
+      {children}
+    </code>
+  );
+}
 
-// Write a file to the cloud — iCloud on iOS, Google Drive elsewhere.
-await CloudStorage.writeFile('/data.json', JSON.stringify(state), CloudStorageScope.AppData);
+const codeSample = `import { CloudStorage } from 'react-native-cloud-storage';
 
-// Read it back — the API mirrors Node's \`fs\`.
-const json = await CloudStorage.readFile('/data.json', CloudStorageScope.AppData);
-const exists = await CloudStorage.exists('/data.json', CloudStorageScope.AppData);`;
+// Write a file to the cloud...
+await CloudStorage.writeFile('/data.json', data.toString());
 
-const features = [
+// ... and read it back!
+const data = await CloudStorage.readFile('/data.json');`;
+
+const features: { icon: typeof FolderTree; title: string; description: ReactNode }[] = [
   {
     icon: FolderTree,
     title: 'fs-like API',
-    description: "Read, write, stat, and list files with an API that follows Node's `fs` conventions.",
+    description: (
+      <>
+        Read, write, stat, and list files with an API that follows Node's <InlineCode>fs</InlineCode> conventions.
+      </>
+    ),
   },
   {
     icon: Cloud,
     title: 'iCloud & Google Drive',
-    description: 'One API, two providers. Default to the right backend per platform, or pick your own.',
+    description: 'One API, two providers. Use the default platform backend, or pick your own.',
   },
   {
     icon: Webhook,
     title: 'React hooks',
-    description: 'useCloudFile and useIsCloudAvailable keep your UI in sync with cloud state.',
+    description: (
+      <>
+        <InlineCode>useCloudFile</InlineCode> and <InlineCode>useIsCloudAvailable</InlineCode> keep your UI in sync with
+        cloud state.
+      </>
+    ),
   },
   {
     icon: Puzzle,
     title: 'Expo config plugin',
-    description: 'Configure the native iCloud capability automatically — no manual Xcode steps, no eject.',
+    description: 'Configure native capabilities automatically in Expo projects.',
   },
 ];
 
 const providers = [
   {
-    name: 'iCloud',
-    scope: 'iOS — backed by CloudKit, available out of the box.',
+    name: 'iCloud (iOS only)',
+    scope: 'Backed by a native CloudKit module.',
   },
   {
     name: 'Google Drive',
-    scope: 'iOS & Android — backed by the Drive REST API with your access token.',
+    scope: 'Backed by the Drive REST API using an access token.',
   },
 ];
 
@@ -58,8 +75,8 @@ export default function HomePage() {
             React Native Cloud Storage
           </p>
           <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">
-            iCloud and Google Drive,
-            <span className="text-fd-primary"> simplified.</span>
+            iCloud and Google Drive for
+            <span className="text-fd-primary"> React Native.</span>
           </h1>
           <p className="max-w-xl text-fd-muted-foreground md:text-lg">
             Use iCloud and Google Drive as file storage in your React Native app, with a single fs-like API, React

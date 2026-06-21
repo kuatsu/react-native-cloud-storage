@@ -1,4 +1,4 @@
-# React Native Cloud Storage — Documentation
+# React Native Cloud Storage Documentation
 
 The documentation site for [`react-native-cloud-storage`](https://github.com/kuatsu/react-native-cloud-storage),
 built with [Fumadocs](https://fumadocs.dev) on Next.js. Deployed to
@@ -36,7 +36,7 @@ sync with `packages/react-native-cloud-storage/src`.
 
 The API reference is generated from the library's TypeScript and TSDoc by TypeDoc
 (`typedoc.config.mts` + `scripts/typedoc-frontmatter.mts`). Provider/platform badges come from
-additive `@platform` / `@provider` TSDoc tags in the library source — never edit the generated MDX.
+additive `@platform` / `@provider` TSDoc tags in the library source; never edit the generated MDX.
 
 ## Deployment
 

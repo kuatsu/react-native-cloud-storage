@@ -17,11 +17,8 @@ export function baseOptions(): BaseLayoutProps {
         text: 'Documentation',
         url: '/docs',
         active: 'nested-url',
-      },
-      {
-        text: 'Latest Release',
-        url: `https://github.com/${gitConfig.user}/${gitConfig.repo}/releases/latest`,
-        external: true,
+        // Show only in the top navbar, not in the docs sidebar.
+        on: 'nav',
       },
     ],
   };
