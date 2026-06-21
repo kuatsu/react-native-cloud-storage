@@ -7,12 +7,13 @@
     "installation/expo",
     "installation/react-native",
     "installation/configure-google-drive",
-    "---API Reference---",
-    "api",
     "---Guides & Tips---",
+    "guides/quick-start",
     "guides/using-multiple-providers",
     "guides/google-drive-files-same-name",
     "guides/migrating-icloud-documents",
-    "example"
+    "example",
+    "---API Reference---",
+    "api"
   ]
 }

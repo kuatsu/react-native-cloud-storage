@@ -1,0 +1,96 @@
+---
+title: Quick Start
+description: Install react-native-cloud-storage and read and write your first cloud file in a few minutes.
+---
+
+This guide takes you from install to reading and writing your first cloud file. The default `CloudStorage` instance automatically uses iCloud on iOS and Google Drive everywhere else, so most of your code stays the same across platforms.
+
+## 1. Install
+
+```package-install
+react-native-cloud-storage
+```
+
+Then complete the native setup for your platform:
+
+- [Expo managed project](/docs/installation/expo)
+- [Bare React Native project](/docs/installation/react-native)
+- [Configure the Google Drive API](/docs/installation/configure-google-drive) — required whenever Google Drive is used (e.g. on Android)
+
+## 2. Provide a Google Drive access token
+
+iCloud works out of the box on iOS. Google Drive requires an access token that you obtain from the user with a library such as [`@react-native-google-signin/google-signin`](https://github.com/react-native-google-signin/google-signin), then hand to the library:
+
+```ts
+import { CloudStorage, CloudStorageProvider } from 'react-native-cloud-storage';
+
+if (CloudStorage.getProvider() === CloudStorageProvider.GoogleDrive) {
+  CloudStorage.setProviderOptions({ accessToken: 'your_access_token' });
+}
+```
+
+<Callout type="info">
+  On iOS the default provider is iCloud, which needs no token. You can skip this step if you only target iOS and don't need to use Google Drive. See
+  [Configure Google Drive API](/docs/installation/configure-google-drive) for details on how to acquire a token.
+</Callout>
+
+## 3. Write and read a file
+
+The core API mirrors Node's `fs`, so reading and writing is just `writeFile` / `readFile`:
+
+```ts
+import { CloudStorage, CloudStorageScope } from 'react-native-cloud-storage';
+
+// Write a file to the app-private scope.
+await CloudStorage.writeFile('/user.json', JSON.stringify({ name: 'Ada' }), CloudStorageScope.AppData);
+
+// Read it back.
+if (await CloudStorage.exists('/user.json', CloudStorageScope.AppData)) {
+  const json = await CloudStorage.readFile('/user.json', CloudStorageScope.AppData);
+  const user = JSON.parse(json);
+}
+```
+
+<Callout type="info">
+  `CloudStorageScope.AppData` is a hidden, app-private container — ideal for app state and backups. Use
+  `CloudStorageScope.Documents` for files the user should see in iCloud Drive or Google Drive.
+</Callout>
+
+## 4. Use the React hook
+
+Inside components, [`useCloudFile`](/docs/api/functions/useCloudFile) keeps a single file's content in sync and gives you helpers to write and remove it:
+
+```tsx
+import { Button, Text, View } from 'react-native';
+import { CloudStorageScope, useCloudFile } from 'react-native-cloud-storage';
+
+function Profile() {
+  const { content, write, remove } = useCloudFile('/user.json', CloudStorageScope.AppData);
+
+  return (
+    <View>
+      <Text>{content ?? 'No profile saved yet'}</Text>
+      <Button title="Save" onPress={() => write(JSON.stringify({ name: 'Ada' }))} />
+      <Button title="Delete" onPress={remove} />
+    </View>
+  );
+}
+```
+
+To react to whether the cloud is reachable at all (for example, iCloud right after launch or before the user signs in), use [`useIsCloudAvailable`](/docs/api/functions/useIsCloudAvailable).
+
+## Next steps
+
+<Cards>
+  <Card
+    title="Using multiple providers"
+    href="/docs/guides/using-multiple-providers"
+    description="Back up to iCloud and Google Drive at the same time."
+  />
+  <Card
+    title="API Reference"
+    href="/docs/api"
+    description="Every CloudStorage method, hook, and type."
+  />
+  <Card title="Example project" href="/docs/example" description="A full app demonstrating the library." />
+</Cards>
