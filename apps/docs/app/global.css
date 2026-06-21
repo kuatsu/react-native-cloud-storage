@@ -41,3 +41,16 @@ body {
 .api-sidebar-badge {
   @apply inline-flex shrink-0 items-center rounded-full border border-fd-primary/40 bg-fd-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-fd-primary;
 }
+
+/* Overloaded members nest "Parameters"/"Returns"/"Deprecated" as deep (h5/h6) headings, which the
+   prose theme renders too faintly. Keep them looking like section headings. */
+.api-reference-body :is(h5, h6) {
+  @apply mt-6 mb-3 text-base font-semibold text-fd-foreground;
+}
+
+/* TypeDoc renders inline types as a run of separate code spans joined by punctuation, which reads as
+   "pill soup" in the parameter/returns tables. Drop the inline-code chrome inside the API reference
+   so a type expression reads as one continuous monospace string. Fenced code blocks are untouched. */
+.api-reference-body :not(pre) > code {
+  @apply border-0 bg-transparent p-0 font-normal text-fd-foreground;
+}

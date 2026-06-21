@@ -17,10 +17,11 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const MDX = page.data.body;
   const badges = readBadgesFromPageData(page.data);
   const tocBadges = readTocBadgesFromPageData(page.data);
+  const isApiPage = page.path.startsWith('api/');
 
   // API pages are generated from the library source, so link "Open in GitHub" to the package source
   // rather than the (gitignored) generated MDX file.
-  const githubUrl = page.path.startsWith('api/')
+  const githubUrl = isApiPage
     ? `https://github.com/${gitConfig.user}/${gitConfig.repo}/tree/${gitConfig.branch}/packages/react-native-cloud-storage/src`
     : `https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/apps/docs/content/docs/${page.path}`;
 
@@ -33,7 +34,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
         <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
         <ViewOptions markdownUrl={`${page.url}.mdx`} githubUrl={githubUrl} />
       </div>
-      <DocsBody>
+      <DocsBody className={isApiPage ? 'api-reference-body' : undefined}>
         <MDX
           components={getMDXComponents(
             {

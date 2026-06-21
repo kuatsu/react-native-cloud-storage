@@ -70,3 +70,11 @@ export interface CloudStorageProviderOptions {
     timeout?: number;
   };
 }
+
+/**
+ * Options for a single cloud storage provider: the iCloud options when the iCloud provider is used,
+ * or the Google Drive options when the Google Drive provider is used. This is the value type of
+ * {@link CloudStorageProviderOptions} and the shape accepted by `setProviderOptions` and the
+ * `CloudStorage` constructor.
+ */
+export type CloudStorageProviderOptionsValue = CloudStorageProviderOptions[keyof CloudStorageProviderOptions];
