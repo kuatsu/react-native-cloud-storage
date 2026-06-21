@@ -66,6 +66,19 @@ function transformNode(node: Node): Node {
 }
 
 /**
+ * Lifts the TypeDoc `api/` folder's contents up to the sidebar root (under the `---API Reference---`
+ * separator) instead of nesting them in a collapsible index-folder. An index-folder renders its
+ * chevron inside its link, so on mobile it navigates instead of expanding — flattening avoids that
+ * and matches the layout of the other sections. The folder's own index page becomes an "Overview"
+ * entry.
+ */
+function liftApiReferenceFolder(folder: Folder): Node[] {
+  const transformed = transformApiReferenceFolder(folder);
+  const overview = transformed.index == null ? [] : [{ ...transformed.index, name: 'Overview' }];
+  return [...overview, ...transformed.children];
+}
+
+/**
  * Reshapes the TypeDoc-generated `api/` subtree: lifts the two classes (`CloudStorage`,
  * `CloudStorageError`) to the section root, renames the remaining kind folders to friendly labels
  * (Hooks, Interfaces, Enums, Type Aliases), and orders everything for the sidebar.
@@ -75,10 +88,15 @@ export function createApiReferenceTreePlugin(): LoaderPlugin {
     name: 'api-reference-tree',
     transformPageTree: {
       root(node: Root) {
-        return {
-          ...node,
-          children: node.children.map(transformNode),
-        };
+        const children: Node[] = [];
+        for (const child of node.children) {
+          if (child.type === 'folder' && isApiReferenceFolder(child)) {
+            children.push(...liftApiReferenceFolder(child));
+          } else {
+            children.push(transformNode(child));
+          }
+        }
+        return { ...node, children };
       },
     },
   };
