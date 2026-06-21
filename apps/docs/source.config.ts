@@ -22,5 +22,10 @@ export const docs = defineDocs({
 });
 
 export default defineConfig({
-  mdxOptions: {},
+  mdxOptions: {
+    // `package-install` code blocks become npm/pnpm/yarn/bun tabs; persist syncs the choice site-wide.
+    remarkNpmOptions: {
+      persist: { id: 'package-manager' },
+    },
+  },
 });
