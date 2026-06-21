@@ -1,0 +1,21 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+
+:root {
+  --color-fd-primary: #0ea5e9;
+  --color-fd-primary-foreground: #04293a;
+  --color-fd-ring: #0ea5e9;
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+.dark {
+  --color-fd-primary: #38bdf8;
+  --color-fd-primary-foreground: #04293a;
+  --color-fd-ring: #38bdf8;
+}
+
+body {
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}

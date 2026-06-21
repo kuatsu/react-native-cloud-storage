@@ -1,0 +1,5 @@
+{
+  "title": "React Native Cloud Storage",
+  "root": true,
+  "pages": ["index"]
+}

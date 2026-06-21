@@ -1,19 +1,27 @@
-# Dependencies
+# deps
 /node_modules
 
-# Production
+# generated content
+.source
+content/docs/api
+
+# test & build
+/coverage
+/.next/
+/out/
 /build
+*.tsbuildinfo
 
-# Generated files
-.docusaurus
-.cache-loader
-
-# Misc
+# misc
 .DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
+*.pem
+/.pnp
+.pnp.js
 npm-debug.log*
-pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# others
+.env*.local
+.vercel
+next-env.d.ts
