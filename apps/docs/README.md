@@ -40,7 +40,4 @@ additive `@platform` / `@provider` TSDoc tags in the library source; never edit 
 
 ## Deployment
 
-Deployed on Netlify. Configuration lives in `netlify.toml` (base directory `apps/docs`, build command
-`pnpm build`, publish directory `.next`, `@netlify/plugin-nextjs`). Netlify installs workspace
-dependencies from the repo-root pnpm lockfile. If the site is instead configured through the Netlify
-UI (as for other Kuatsu OSS sites), mirror those same values there.
+Deployed on Vercel.
