@@ -3,7 +3,7 @@ import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 export const gitConfig = {
   user: 'kuatsu',
   repo: 'react-native-cloud-storage',
-  branch: 'master',
+  branch: 'main',
 };
 
 export function baseOptions(): BaseLayoutProps {
