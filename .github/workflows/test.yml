@@ -44,6 +44,9 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
 
+      - name: Run tests
+        run: pnpm --filter react-native-cloud-storage test
+
   build:
     runs-on: ubuntu-latest
     steps:

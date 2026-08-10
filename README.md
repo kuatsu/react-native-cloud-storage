@@ -2,11 +2,11 @@
 
 ![npm bundle size](https://img.shields.io/bundlephobia/min/react-native-cloud-storage?style=flat-square) ![GitHub](https://img.shields.io/github/license/kuatsu/react-native-cloud-storage?style=flat-square) ![GitHub last commit](https://img.shields.io/github/last-commit/kuatsu/react-native-cloud-storage?style=flat-square)
 
-This library provides a unified and streamlined API for accessing cloud storage services on iOS, Android and Web. It supports iCloud (on iOS only) and Google Drive (all platforms).
+This library provides a unified and streamlined API for accessing cloud storage services on iOS, Android and Web. It supports iCloud (on iOS only) and Google Drive (all platforms; on Web, text-based file operations only).
 
 - 💾 Read and write files to the cloud
 - 🧪 Fully compatible with Expo
-- 📱 iOS, Android & Web support
+- 📱 iOS & Android support, plus Web support for text-based Google Drive operations
 - 🏎️ Lightning fast iCloud performance using native iOS APIs
 - 🌐 Google Drive REST API implementation for all platforms
 - 🧬 Easy to use React Hooks API, or use the imperative `fs`-style API

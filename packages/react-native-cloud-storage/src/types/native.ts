@@ -27,6 +27,7 @@ export enum NativeCloudStorageErrorCode {
   ACCESS_TOKEN_MISSING = 'ERR_ACCESS_TOKEN_MISSING',
   INVALID_URL = 'ERR_INVALID_URL',
   NETWORK_ERROR = 'ERR_NETWORK_ERROR',
+  UNSUPPORTED_PLATFORM = 'ERR_UNSUPPORTED_PLATFORM',
 }
 
 export type NativeLocalFileSystem = NativeCloudStorageLocalFileSystemSpec;
