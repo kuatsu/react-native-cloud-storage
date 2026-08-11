@@ -24,6 +24,10 @@ if (CloudStorage.getProvider() === CloudStorageProvider.GoogleDrive) {
 }
 ```
 
+<Callout type="info">
+  The default [`CloudStorage`](/docs/api/classes/CloudStorage) and [`CloudKVStorage`](/docs/api/classes/CloudKVStorage) APIs share provider options. Set the access token through either API and both defaults will use it. The `drive.appdata` scope is sufficient for key-value storage.
+</Callout>
+
 Below is a more practical example of how this could look in action using the Expo AuthSession API:
 
 ```tsx

@@ -5,7 +5,9 @@ description: Install react-native-cloud-storage and read and write your first cl
 
 This guide takes you from install to reading and writing your first cloud file. The default `CloudStorage` instance automatically uses iCloud on iOS and Google Drive everywhere else, so most of your code stays the same across platforms.
 
-## 1. Install
+If you'd like to use the key-value store instead of storing files, see [the key-value storage guide](/docs/guides/key-value-storage).
+
+## Install
 
 ```package-install
 react-native-cloud-storage
@@ -17,7 +19,7 @@ Then complete the native setup for your platform:
 - [Bare React Native project](/docs/installation/react-native)
 - [Configure the Google Drive API](/docs/installation/configure-google-drive) — required whenever Google Drive is used (e.g. on Android)
 
-## 2. Provide a Google Drive access token
+## Provide a Google Drive access token
 
 iCloud works out of the box on iOS. Google Drive requires an access token that you obtain from the user with a library such as [`@react-native-google-signin/google-signin`](https://github.com/react-native-google-signin/google-signin), then hand to the library:
 
@@ -34,7 +36,7 @@ if (CloudStorage.getProvider() === CloudStorageProvider.GoogleDrive) {
   [Configure Google Drive API](/docs/installation/configure-google-drive) for details on how to acquire a token.
 </Callout>
 
-## 3. Write and read a file
+## Write and read a file
 
 The core API mirrors Node's `fs`, so reading and writing is just `writeFile` / `readFile`:
 
@@ -56,7 +58,7 @@ if (await CloudStorage.exists('/user.json', CloudStorageScope.AppData)) {
   `CloudStorageScope.Documents` for files the user should see in iCloud Drive or Google Drive.
 </Callout>
 
-## 4. Use the React hook
+## Use the React hook
 
 Inside components, [`useCloudFile`](/docs/api/functions/useCloudFile) keeps a single file's content in sync and gives you helpers to write and remove it:
 

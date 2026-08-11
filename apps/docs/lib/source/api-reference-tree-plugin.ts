@@ -79,8 +79,8 @@ function liftApiReferenceFolder(folder: Folder): Node[] {
 }
 
 /**
- * Reshapes the TypeDoc-generated `api/` subtree: lifts the two classes (`CloudStorage`,
- * `CloudStorageError`) to the section root, renames the remaining kind folders to friendly labels
+ * Reshapes the TypeDoc-generated `api/` subtree: lifts the public classes to the section root,
+ * renames the remaining kind folders to friendly labels
  * (Hooks, Interfaces, Enums, Type Aliases), and orders everything for the sidebar.
  */
 export function createApiReferenceTreePlugin(): LoaderPlugin {

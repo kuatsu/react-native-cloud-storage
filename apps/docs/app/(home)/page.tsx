@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
-import { ArrowRight, Cloud, FolderTree, Github, Layers, Puzzle, Webhook } from 'lucide-react';
+import { ArrowRight, Cloud, FolderTree, Github, Key, Layers, Webhook } from 'lucide-react';
 import { gitConfig } from '@/lib/layout.shared';
 
 const githubUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}`;
@@ -25,12 +25,17 @@ const data = await CloudStorage.readFile('/data.json');`;
 const features: { icon: typeof FolderTree; title: string; description: ReactNode }[] = [
   {
     icon: FolderTree,
-    title: 'fs-like API',
+    title: 'Read & write files',
     description: (
       <>
         Read, write, stat, and list files with an API that follows Node's <InlineCode>fs</InlineCode> conventions.
       </>
     ),
+  },
+  {
+    icon: Key,
+    title: 'Cloud-backed key-value storage',
+    description: <>Store data natively in the iCloud key-value store or in an emulated JSON-based Google Drive store</>,
   },
   {
     icon: Cloud,
@@ -46,11 +51,6 @@ const features: { icon: typeof FolderTree; title: string; description: ReactNode
         cloud state.
       </>
     ),
-  },
-  {
-    icon: Puzzle,
-    title: 'Expo config plugin',
-    description: 'Configure native capabilities automatically in Expo projects.',
   },
 ];
 
@@ -79,8 +79,8 @@ export default function HomePage() {
             <span className="text-fd-primary"> React Native.</span>
           </h1>
           <p className="max-w-xl text-fd-muted-foreground md:text-lg">
-            Use iCloud and Google Drive as file storage in your React Native app, with a single fs-like API, React
-            hooks, and an Expo config plugin.
+            Use iCloud and Google Drive as file or key-value storage in your React Native app, with an intuitive API,
+            React hooks, and an Expo config plugin.
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <Link
@@ -133,9 +133,9 @@ export default function HomePage() {
       </section>
 
       <section className="flex flex-col items-center gap-4 rounded-3xl border border-fd-border bg-fd-card p-8 text-center">
-        <h2 className="text-2xl font-semibold tracking-tight">Ready to back up your app's files?</h2>
+        <h2 className="text-2xl font-semibold tracking-tight">Ready to bring your app into the cloud?</h2>
         <p className="max-w-xl text-fd-muted-foreground">
-          Install the library, follow the platform setup, and start reading and writing cloud files in minutes.
+          Install the library, follow the platform setup, and start reading and writing cloud data in minutes.
         </p>
         <Link
           href="/docs"

@@ -1,0 +1,189 @@
+---
+title: Key-value storage
+description: Store small preferences and app state in iCloud or Google Drive.
+---
+
+[`CloudKVStorage`](/docs/api/classes/CloudKVStorage) stores small string values such as preferences, feature flags, and sync cursors. It uses the native iCloud key-value store when iCloud is selected on iOS. Google Drive uses a hidden JSON document in the app data folder on every platform.
+
+Use the file API for documents and large data. Use the key-value API when your data naturally fits into a record of named values.
+
+| Provider     | Implementation                                      | Support                                    |
+| ------------ | --------------------------------------------------- | ------------------------------------------ |
+| iCloud       | Native `NSUbiquitousKeyValueStore`                  | iOS only                                   |
+| Google Drive | `.rncs-kv.json` in the hidden `appDataFolder` space | iOS, Android, and Web                      |
+
+You can check support at runtime with [`CloudKVStorage.getSupportLevel()`](/docs/api/classes/CloudKVStorage#getsupportlevel).
+
+## Configure iCloud
+
+<Callout type="warn">
+  iCloud key-value synchronization needs the `com.apple.developer.ubiquity-kvstore-identifier` entitlement. Without it, local operations can appear to work, but values may not synchronize.
+</Callout>
+
+For Expo projects, enable the entitlement through the config plugin:
+
+```json
+{
+  "expo": {
+    "plugins": [
+      [
+        "react-native-cloud-storage",
+        {
+          "enableKeyValueStorage": true
+        }
+      ]
+    ]
+  }
+}
+```
+
+Your Apple App ID and provisioning profile must support iCloud key-value storage. Rebuild the development client after you change this option. See [Install in an Expo managed project](/docs/installation/expo) for the complete plugin setup.
+
+For a bare React Native project, enable **Key-value storage** under the iCloud capability in your target's **Signing & Capabilities** settings. See [Install in a bare React Native project](/docs/installation/react-native) for the remaining native setup.
+
+## Configure Google Drive
+
+Google Drive key-value storage uses the `appDataFolder` space. Request the following OAuth scope:
+
+```text
+https://www.googleapis.com/auth/drive.appdata
+```
+
+Then provide the access token through either static API:
+
+```ts
+import { CloudKVStorage, CloudStorageProvider } from 'react-native-cloud-storage';
+
+CloudKVStorage.setProvider(CloudStorageProvider.GoogleDrive);
+CloudKVStorage.setProviderOptions({ accessToken: 'your_access_token' });
+```
+
+The default `CloudStorage` and `CloudKVStorage` instances share provider configuration. Configuring either static API updates both defaults, so you only need to provide the access token once if you use both file and key-value storage. See [Configure Google Drive API](/docs/installation/configure-google-drive) for authentication details.
+
+## Store and read values
+
+The API uses familiar AsyncStorage-style method names. Values are always strings, and a missing key returns `null`.
+
+```ts
+import { CloudKVStorage } from 'react-native-cloud-storage';
+
+await CloudKVStorage.setItem('theme', 'dark');
+
+const theme = await CloudKVStorage.getItem('theme'); // "dark"
+
+await CloudKVStorage.removeItem('theme');
+```
+
+Use the multi-value methods when you need several keys:
+
+```ts
+await CloudKVStorage.multiSet([
+  ['theme', 'dark'],
+  ['language', 'en'],
+]);
+
+const values = await CloudKVStorage.multiGet(['theme', 'language', 'missing']);
+// [['theme', 'dark'], ['language', 'en'], ['missing', null]]
+
+const allItems = await CloudKVStorage.getAllItems();
+// { theme: 'dark', language: 'en' }
+```
+
+[`clear()`](/docs/api/classes/CloudKVStorage#clear) removes every key in the selected store.
+
+## Use the React hook
+
+[`useCloudKV`](/docs/api/functions/useCloudKV) reads one key, exposes mutation functions, and refreshes after relevant external changes:
+
+```tsx
+import { Button, Text, View } from 'react-native';
+import { useCloudKV } from 'react-native-cloud-storage';
+
+function ThemeSetting() {
+  const { value, loading, setValue, removeValue } = useCloudKV('theme');
+
+  if (loading) return <Text>Loading…</Text>;
+
+  return (
+    <View>
+      <Text>Theme: {value ?? 'system'}</Text>
+      <Button title="Use dark theme" onPress={() => setValue('dark')} />
+      <Button title="Use system theme" onPress={removeValue} />
+    </View>
+  );
+}
+```
+
+The store does not serialize non-string values automatically. Provide a serializer when you use another type:
+
+```tsx
+const { value: preferences, setValue: setPreferences } = useCloudKV<{
+  theme: 'light' | 'dark';
+  compact: boolean;
+}>('preferences', {
+  serializer: {
+    parse: (raw) => JSON.parse(raw),
+    stringify: (value) => JSON.stringify(value),
+  },
+});
+
+await setPreferences({ theme: 'dark', compact: true });
+```
+
+This explicit serializer prevents a code change from silently changing the stored format.
+
+## React to changes from other devices
+
+iCloud sends native external-change events. Google Drive has no equivalent push API, so it can poll the hidden document when you set `kvPollInterval`:
+
+```ts
+import { CloudKVStorage } from 'react-native-cloud-storage';
+
+CloudKVStorage.setProviderOptions({ kvPollInterval: 15_000 });
+
+const handleChange = async (event: { changedKeys: string[] }) => {
+  if (event.changedKeys.length === 0 || event.changedKeys.includes('theme')) {
+    console.log('New theme:', await CloudKVStorage.getItem('theme'));
+  }
+};
+
+CloudKVStorage.subscribeToExternalChanges(handleChange);
+
+// Later:
+CloudKVStorage.unsubscribeFromExternalChanges(handleChange);
+```
+
+Polling starts when the first listener subscribes and stops when the final listener unsubscribes. When `kvPollInterval` is `null` or omitted, Google Drive subscriptions do nothing. An empty `changedKeys` array means that consumers should refresh all relevant values, for example after an iCloud account change.
+
+The hook handles this subscription and refresh behavior for its key automatically.
+
+## Limits and errors
+
+All providers require a non-empty key no longer than 64 UTF-8 bytes. The iCloud store also allows at most 1024 keys and 1 MB of total data.
+
+Google Drive enforces equivalent limits by default. You can disable them when you control both sides and accept provider-specific behavior:
+
+```ts
+CloudKVStorage.setProviderOptions({ kvStrictLimits: false });
+```
+
+## Migrate from react-native-cloud-store
+
+The string operations map directly:
+
+| react-native-cloud-store | react-native-cloud-storage |
+| ------------------------ | -------------------------- |
+| `kvGetItem`              | `getItem`                  |
+| `kvSetItem`              | `setItem`                  |
+| `kvGetAllItems`          | `getAllItems`              |
+| `kvSync`                 | `sync`                     |
+
+The main difference is that a missing key returns `null` instead of `undefined`.
+
+## API reference
+
+<Cards>
+  <Card title="CloudKVStorage" href="/docs/api/classes/CloudKVStorage" description="All key-value storage methods and configuration options." />
+  <Card title="useCloudKV" href="/docs/api/functions/useCloudKV" description="Reactive access to one cloud key-value entry." />
+  <Card title="CloudKVChangeReason" href="/docs/api/enumerations/CloudKVChangeReason" description="Reasons for external store changes." />
+</Cards>

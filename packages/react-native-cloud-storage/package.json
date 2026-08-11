@@ -138,6 +138,9 @@
         },
         "CloudStorageLocalFileSystem": {
           "className": "RCTCloudStorageLocalFileSystem"
+        },
+        "CloudStorageKVStore": {
+          "className": "RCTCloudStorageKVStore"
         }
       }
     }

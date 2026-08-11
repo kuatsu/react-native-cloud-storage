@@ -31,6 +31,7 @@ There are a few options you can pass to the config plugin:
 
 - `iCloudContainerEnvironment`: Set the iCloud container environment. Can be `Production` or `Development`. Defaults to `Production`. [Learn more about this option.](https://developer.apple.com/documentation/bundleresources/entitlements/com_apple_developer_icloud-container-environment)
 - `iCloudContainerIdentifier`: Manually set the iCloud container identifier. If not set, the container identifier will be derived from the app's bundle identifier (`iCloud.$BUNDLE_IDENTIFIER`).
+- `enableKeyValueStorage`: Add the iCloud key-value store entitlement required to use [`CloudKVStorage`](/docs/guides/key-value-storage). Defaults to `false`.
 
 **Example:**
 
@@ -42,7 +43,8 @@ There are a few options you can pass to the config plugin:
         "react-native-cloud-storage",
         {
           "iCloudContainerEnvironment": "Development",
-          "iCloudContainerIdentifier": "iCloud.mycompany.icloud"
+          "iCloudContainerIdentifier": "iCloud.mycompany.icloud",
+          "enableKeyValueStorage": true
         }
       ]
     ]
