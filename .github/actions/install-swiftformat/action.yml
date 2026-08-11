@@ -8,7 +8,7 @@ runs:
       uses: irgaly/setup-mint@v1
 
     - name: Cache Mint packages
-      uses: actions/cache@v3
+      uses: actions/cache@v6
       with:
         path: ~/.mint
         key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
