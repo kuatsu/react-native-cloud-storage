@@ -24,7 +24,7 @@ import { CloudStorage, CloudKVStorage, CloudStorageScope } from 'react-native-cl
 await CloudStorage.writeFile('/data.txt', 'Hello, world!', CloudStorageScope.AppData);
 
 // Or write to the key-value store (iCloud ubiquitous key-value store on iOS, Google Drive with emulated JSON file elsewhere)
-await CloudKVStorage.setItem('theme', 'dark', CloudStorageScope.AppData);
+await CloudKVStorage.setItem('theme', 'dark');
 
 // Read it back later.
 const helloWorld = await CloudStorage.readFile('/data.txt', CloudStorageScope.AppData); // 'Hello, world!'

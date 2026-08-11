@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import RNCloudKVStorage from '../cloud-kv-storage';
 
 /** Converts a typed value to and from the string format used by CloudKVStorage. */
@@ -40,6 +40,7 @@ export interface UseCloudKVResult<T> {
 export const useCloudKV = <T = string>(key: string, options?: UseCloudKVOptions<T>): UseCloudKVResult<T> => {
   const [value, setValueState] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
+  const readSequence = useRef(0);
   const instance = options?.instance ?? RNCloudKVStorage.getDefaultInstance();
   const serializer = useMemo<CloudKVSerializer<T>>(
     () =>
@@ -54,17 +55,23 @@ export const useCloudKV = <T = string>(key: string, options?: UseCloudKVOptions<
   );
 
   const read = useCallback(async () => {
+    const sequence = ++readSequence.current;
     setLoading(true);
     try {
       const raw = await instance.getItem(key);
-      setValueState(raw === null ? null : serializer.parse(raw));
+      if (sequence === readSequence.current) {
+        setValueState(raw === null ? null : serializer.parse(raw));
+      }
     } finally {
-      setLoading(false);
+      if (sequence === readSequence.current) setLoading(false);
     }
   }, [instance, key, serializer]);
 
   useEffect(() => {
     void read();
+    return () => {
+      readSequence.current += 1;
+    };
   }, [read]);
 
   useEffect(() => {

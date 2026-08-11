@@ -115,7 +115,8 @@ export interface CloudStorageProviderOptions {
     timeout?: number;
     /**
      * The polling interval in milliseconds for key-value external-change detection.
-     * Polling is off when this value is null or undefined.
+     * Polling requires a finite value of at least 1 ms. It is off for null, undefined, non-finite,
+     * or non-positive values.
      */
     kvPollInterval?: number | null;
     /**

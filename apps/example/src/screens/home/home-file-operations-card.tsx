@@ -102,6 +102,7 @@ const HomeFileOperationsCard: React.FC<HomeFileOperationsCardProps> = ({
       await cloudStorage.uploadFile(filePath, file.uri.replace(/^file:\/\//, ''), {
         mimeType: file.mimeType ?? 'application/octet-stream',
       });
+      setStats(await cloudStorage.stat(filePath));
       Alert.alert('File uploaded', 'File uploaded successfully.');
     } catch (error) {
       console.warn(error);

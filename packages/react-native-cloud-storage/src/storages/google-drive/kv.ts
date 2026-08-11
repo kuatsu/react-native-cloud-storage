@@ -2,6 +2,7 @@ import type { CloudStorageProviderOptions, DeepRequired } from '../../types/main
 import { NativeCloudStorageErrorCode, type NativeKVStorage } from '../../types/native';
 import CloudStorageError from '../../utils/cloud-storage-error';
 import { KV_LIMITS } from '../../utils/constants';
+import { assertValidKVKey, getKVItemsByteLength } from '../../utils/kv';
 import GoogleDriveApiClient from './client';
 import { MimeTypes } from './types';
 
@@ -19,7 +20,7 @@ export default class GoogleDriveKV implements NativeKVStorage {
   private readonly drive: GoogleDriveApiClient;
   private readonly options: DeepRequired<CloudStorageProviderOptions['googledrive']>;
   private fileId: string | null | undefined;
-  private cachedEntries: KVEntries | undefined;
+  private mutationQueue: Promise<void> = Promise.resolve();
 
   constructor(options: DeepRequired<CloudStorageProviderOptions['googledrive']>) {
     this.options = options;
@@ -42,6 +43,12 @@ export default class GoogleDriveKV implements NativeKVStorage {
       'appDataFolder',
       `name = '${DOCUMENT_NAME}' and 'appDataFolder' in parents and trashed = false`
     );
+    if (files.length > 1 && this.options.strictFilenames) {
+      throw new CloudStorageError(
+        `Multiple key-value documents found: ${files.map((file) => file.id).join(', ')}`,
+        NativeCloudStorageErrorCode.MULTIPLE_FILES_SAME_NAME
+      );
+    }
     this.fileId = files[0]?.id ?? null;
     return this.fileId;
   }
@@ -86,20 +93,14 @@ export default class GoogleDriveKV implements NativeKVStorage {
     return result;
   }
 
-  private assertKey(key: string): void {
-    const keyBytes = new TextEncoder().encode(key).byteLength;
-    if (!key || keyBytes > KV_LIMITS.maxKeyBytes) {
-      throw new CloudStorageError(`Invalid key: ${key}`, NativeCloudStorageErrorCode.KV_INVALID_KEY);
-    }
-  }
-
   private assertLimits(document: KVDocument): void {
     if (!this.options.kvStrictLimits) return;
 
-    for (const key of Object.keys(document.entries)) this.assertKey(key);
+    for (const key of Object.keys(document.entries)) assertValidKVKey(key);
+    const items = Object.fromEntries(Object.entries(document.entries).map(([key, entry]) => [key, entry.v]));
     if (
       Object.keys(document.entries).length > KV_LIMITS.maxKeys ||
-      new TextEncoder().encode(JSON.stringify(document)).byteLength > KV_LIMITS.maxTotalBytes
+      getKVItemsByteLength(items) > KV_LIMITS.maxTotalBytes
     ) {
       throw new CloudStorageError('Key-value store quota exceeded', NativeCloudStorageErrorCode.KV_QUOTA_EXCEEDED);
     }
@@ -113,42 +114,47 @@ export default class GoogleDriveKV implements NativeKVStorage {
     if (fileId) {
       await this.drive.updateFile(fileId, { body, mimeType: MimeTypes.JSON });
     } else {
-      await this.drive.createFile(
+      this.fileId = await this.drive.createTextFile(
         { name: DOCUMENT_NAME, parents: ['appDataFolder'] },
         { body, mimeType: MimeTypes.JSON }
       );
-      this.fileId = undefined;
     }
-    this.cachedEntries = document.entries;
   }
 
   public async fetchEntries(): Promise<KVEntries> {
     const document = await this.fetchDocument();
-    this.cachedEntries = document.entries;
     return Object.fromEntries(Object.entries(document.entries).map(([key, entry]) => [key, { ...entry }]));
   }
 
+  private enqueueMutation(mutation: () => Promise<void>): Promise<void> {
+    const result = this.mutationQueue.then(mutation, mutation);
+    this.mutationQueue = result.catch(() => {});
+    return result;
+  }
+
   async kvGetItem(key: string): Promise<string | null> {
-    this.assertKey(key);
+    assertValidKVKey(key);
     const entries = await this.fetchEntries();
     return entries[key]?.v ?? null;
   }
 
-  async kvSetItem(key: string, value: string): Promise<void> {
-    this.assertKey(key);
-    const localEntries = this.cachedEntries ?? {};
-    const remoteDocument = await this.fetchDocument();
-    const entries = this.mergeEntries(localEntries, remoteDocument.entries, { [key]: { v: value, t: Date.now() } });
-    await this.writeDocument({ version: 1, entries });
+  kvSetItem(key: string, value: string): Promise<void> {
+    assertValidKVKey(key);
+    return this.enqueueMutation(async () => {
+      const remoteDocument = await this.fetchDocument();
+      const entries = this.mergeEntries(remoteDocument.entries, { [key]: { v: value, t: Date.now() } });
+      await this.writeDocument({ version: 1, entries });
+    });
   }
 
-  async kvRemoveItem(key: string): Promise<void> {
-    this.assertKey(key);
-    const localEntries = this.cachedEntries ?? {};
-    const remoteDocument = await this.fetchDocument();
-    const entries = this.mergeEntries(localEntries, remoteDocument.entries);
-    delete entries[key];
-    await this.writeDocument({ version: 1, entries });
+  kvRemoveItem(key: string): Promise<void> {
+    assertValidKVKey(key);
+    return this.enqueueMutation(async () => {
+      const remoteDocument = await this.fetchDocument();
+      const entries = { ...remoteDocument.entries };
+      delete entries[key];
+      await this.writeDocument({ version: 1, entries });
+    });
   }
 
   async kvGetAllKeys(): Promise<string[]> {
@@ -159,13 +165,14 @@ export default class GoogleDriveKV implements NativeKVStorage {
     return Object.entries(await this.fetchEntries()).map(([key, entry]) => ({ key, value: entry.v }));
   }
 
-  async kvClear(): Promise<void> {
-    await this.fetchDocument();
-    await this.writeDocument({ version: 1, entries: {} });
+  kvClear(): Promise<void> {
+    return this.enqueueMutation(async () => {
+      await this.fetchDocument();
+      await this.writeDocument({ version: 1, entries: {} });
+    });
   }
 
   async kvSync(): Promise<boolean> {
-    this.cachedEntries = undefined;
     await this.fetchEntries();
     return true;
   }

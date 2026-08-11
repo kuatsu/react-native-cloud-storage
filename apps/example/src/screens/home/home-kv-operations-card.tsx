@@ -21,19 +21,21 @@ const getErrorMessage = (error: unknown): string => {
 };
 
 const HomeKVOperationsCard: React.FC<HomeKVOperationsCardProps> = ({ storage, provider, enabled }) => {
-  const [key, setKey] = useState('example.message');
+  const [keyDraft, setKeyDraft] = useState('example.message');
+  const [submittedKey, setSubmittedKey] = useState('example.message');
   const [draftValue, setDraftValue] = useState('Hello from CloudKVStorage!');
   const [storedValue, setStoredValue] = useState<string | null>(null);
-  const [_lastExternalChange, setLastExternalChange] = useState<CloudKVExternalChangeEvent | null>(null);
-  const [_status, setStatus] = useState('');
+  const [lastExternalChange, setLastExternalChange] = useState<CloudKVExternalChangeEvent | null>(null);
+  const [status, setStatus] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const readValue = useCallback(
-    async (showStatus = true) => {
+    async (key: string, showStatus = true) => {
       if (!enabled) return;
       setLoading(true);
       setError('');
+      setStatus('');
       try {
         const value = await storage.getItem(key);
         setStoredValue(value);
@@ -44,33 +46,42 @@ const HomeKVOperationsCard: React.FC<HomeKVOperationsCardProps> = ({ storage, pr
         setLoading(false);
       }
     },
-    [enabled, key, storage]
+    [enabled, storage]
   );
 
   useEffect(() => {
     setStoredValue(null);
     setStatus('');
     setError('');
-    void readValue(false);
-  }, [readValue]);
+    setLastExternalChange(null);
+  }, [enabled, storage]);
 
   useEffect(() => {
     if (!enabled) return;
 
     const handleExternalChange = (event: CloudKVExternalChangeEvent) => {
       setLastExternalChange(event);
-      if (event.changedKeys.length === 0 || event.changedKeys.includes(key)) void readValue(false);
+      if (event.changedKeys.length === 0 || event.changedKeys.includes(submittedKey)) {
+        void readValue(submittedKey, false);
+      }
     };
     storage.subscribeToExternalChanges(handleExternalChange);
     return () => storage.unsubscribeFromExternalChanges(handleExternalChange);
-  }, [enabled, key, readValue, storage]);
+  }, [enabled, readValue, storage, submittedKey]);
+
+  const readDraftValue = () => {
+    setSubmittedKey(keyDraft);
+    void readValue(keyDraft);
+  };
 
   const writeValue = async () => {
     setLoading(true);
     setError('');
+    setStatus('');
+    setSubmittedKey(keyDraft);
     try {
-      await storage.setItem(key, draftValue);
-      setStoredValue(await storage.getItem(key));
+      await storage.setItem(keyDraft, draftValue);
+      setStoredValue(await storage.getItem(keyDraft));
       setStatus('Value written successfully.');
     } catch (writeError) {
       setError(getErrorMessage(writeError));
@@ -82,8 +93,10 @@ const HomeKVOperationsCard: React.FC<HomeKVOperationsCardProps> = ({ storage, pr
   const removeValue = async () => {
     setLoading(true);
     setError('');
+    setStatus('');
+    setSubmittedKey(keyDraft);
     try {
-      await storage.removeItem(key);
+      await storage.removeItem(keyDraft);
       setStoredValue(null);
       setStatus('Value removed successfully.');
     } catch (removeError) {
@@ -96,9 +109,10 @@ const HomeKVOperationsCard: React.FC<HomeKVOperationsCardProps> = ({ storage, pr
   const synchronize = async () => {
     setLoading(true);
     setError('');
+    setStatus('');
     try {
       const synchronized = await storage.sync();
-      setStoredValue(await storage.getItem(key));
+      setStoredValue(await storage.getItem(submittedKey));
       setStatus(synchronized ? 'Synchronization requested successfully.' : 'Synchronization was not requested.');
     } catch (syncError) {
       setError(getErrorMessage(syncError));
@@ -110,6 +124,7 @@ const HomeKVOperationsCard: React.FC<HomeKVOperationsCardProps> = ({ storage, pr
   const clearValues = async () => {
     setLoading(true);
     setError('');
+    setStatus('');
     try {
       await storage.clear();
       setStoredValue(null);
@@ -144,7 +159,14 @@ const HomeKVOperationsCard: React.FC<HomeKVOperationsCardProps> = ({ storage, pr
       )}
 
       <Text style={styles.label}>Key</Text>
-      <TextInput editable={!loading} placeholder="Key" value={key} onChangeText={setKey} style={styles.input} />
+      <TextInput
+        editable={!loading}
+        placeholder="Key"
+        value={keyDraft}
+        onChangeText={setKeyDraft}
+        onSubmitEditing={readDraftValue}
+        style={styles.input}
+      />
       <Text style={styles.label}>Value</Text>
       <TextInput
         editable={!loading}
@@ -160,14 +182,20 @@ const HomeKVOperationsCard: React.FC<HomeKVOperationsCardProps> = ({ storage, pr
         <Text selectable>{storedValue ?? 'null'}</Text>
       </View>
 
-      <Button disabled={controlsDisabled} title="Read value" onPress={() => void readValue()} />
+      <Button disabled={controlsDisabled} title="Read value" onPress={readDraftValue} />
       <Button disabled={controlsDisabled} title="Write value" onPress={() => void writeValue()} />
       <Button disabled={controlsDisabled} title="Remove value" onPress={() => void removeValue()} />
       <Button disabled={controlsDisabled} title="Synchronize store" onPress={() => void synchronize()} />
       <Button disabled={controlsDisabled} title="Clear store" onPress={confirmClear} />
 
       {loading && <ActivityIndicator style={styles.activityIndicator} />}
+      {status.length > 0 && <Text style={styles.status}>{status}</Text>}
       {error.length > 0 && <Text style={styles.error}>{error}</Text>}
+      {lastExternalChange && (
+        <Text style={styles.smallText}>
+          Last external change: {lastExternalChange.reason} ({lastExternalChange.changedKeys.join(', ') || 'all keys'})
+        </Text>
+      )}
     </Card>
   );
 };

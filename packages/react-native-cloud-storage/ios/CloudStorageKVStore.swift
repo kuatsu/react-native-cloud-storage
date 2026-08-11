@@ -29,7 +29,9 @@ public class CloudStorageKVStore: NSObject {
   @objc(kvGetAllKeys:withRejecter:)
   public func kvGetAllKeys(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
-      Array(self.store.dictionaryRepresentation.keys)
+      self.store.dictionaryRepresentation.compactMap { key, value -> String? in
+        value is String ? key : nil
+      }
     }
   }
 

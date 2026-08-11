@@ -19,6 +19,8 @@ const HomeWorkingDirectoryCard: React.FC<HomeWorkingDirectoryCardProps> = ({
   onLoadingChange,
   onParentDirectoryChange,
 }) => {
+  const rootDirectorySelected = parentDirectory.trim() === '' || parentDirectory.trim() === '/';
+
   const checkDirectoryExists = async () => {
     onLoadingChange(true);
     try {
@@ -61,6 +63,11 @@ const HomeWorkingDirectoryCard: React.FC<HomeWorkingDirectoryCardProps> = ({
   };
 
   const deleteDirectory = async (recursive: boolean) => {
+    if (rootDirectorySelected) {
+      Alert.alert('Cannot delete root directory', 'Choose a directory below the scope root.');
+      return;
+    }
+
     onLoadingChange(true);
     try {
       await cloudStorage.rmdir(parentDirectory, { recursive });
@@ -73,6 +80,11 @@ const HomeWorkingDirectoryCard: React.FC<HomeWorkingDirectoryCardProps> = ({
   };
 
   const confirmDeleteDirectory = () => {
+    if (rootDirectorySelected) {
+      Alert.alert('Cannot delete root directory', 'Choose a directory below the scope root.');
+      return;
+    }
+
     Alert.alert('Delete directory', 'Do you want to delete the directory and all its contents (recursively)?', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Directory only', onPress: () => void deleteDirectory(false) },

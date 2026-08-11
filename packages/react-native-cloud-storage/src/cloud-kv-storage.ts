@@ -14,6 +14,7 @@ import {
 import { NativeCloudStorageErrorCode, type NativeKVStorage } from './types/native';
 import CloudStorageError from './utils/cloud-storage-error';
 import { DEFAULT_PROVIDER_OPTIONS, KV_LIMITS, LINKING_ERROR } from './utils/constants';
+import { assertValidKVKey, getKVItemsByteLength } from './utils/kv';
 
 type ExternalChangeListener = (event: CloudKVExternalChangeEvent) => void;
 type KVItems = Record<string, string>;
@@ -41,6 +42,8 @@ export default class RNCloudKVStorage {
   private pollSnapshot: DriveEntries | undefined;
   private driveBackend: GoogleDriveKV | null = null;
   private driveBackendOptions: CloudStorageProviderOptionsValue | null = null;
+  private iCloudItems: KVItems | null = null;
+  private iCloudMutationQueue: Promise<unknown> = Promise.resolve();
 
   //#region Constructor and configuration
   /**
@@ -96,6 +99,7 @@ export default class RNCloudKVStorage {
     };
     this.driveBackend = null;
     this.driveBackendOptions = null;
+    this.iCloudItems = null;
     this.configureExternalChangeSource();
   }
 
@@ -147,6 +151,7 @@ export default class RNCloudKVStorage {
     this.provider = { provider, options: DEFAULT_PROVIDER_OPTIONS[provider] };
     this.driveBackend = null;
     this.driveBackendOptions = null;
+    this.iCloudItems = null;
     this.configureExternalChangeSource();
   }
 
@@ -172,13 +177,21 @@ export default class RNCloudKVStorage {
     this.provider.options = { ...this.provider.options, ...definedOptions };
     this.driveBackend = null;
     this.driveBackendOptions = null;
+    this.iCloudItems = null;
     this.configureExternalChangeSource();
   }
   //#endregion
 
   //#region External changes
   private notifyExternalChangeListeners(event: CloudKVExternalChangeEvent): void {
-    for (const listener of this.externalChangeListeners) listener(event);
+    this.iCloudItems = null;
+    for (const listener of this.externalChangeListeners) {
+      try {
+        listener(event);
+      } catch (error) {
+        console.error('CloudKVStorage external-change listener failed', error);
+      }
+    }
   }
 
   private getNativeModule(): NativeKVStoreTurboModule | null {
@@ -241,7 +254,7 @@ export default class RNCloudKVStorage {
     const interval = (
       this.provider.options as DeepRequired<CloudStorageProviderOptions[CloudStorageProvider.GoogleDrive]>
     ).kvPollInterval;
-    if (interval === null) return;
+    if (interval == null || !Number.isFinite(interval) || interval < 1) return;
     void this.pollDrive().catch(() => {});
     this.pollTimer = setInterval(() => void this.pollDrive().catch(() => {}), interval);
   }
@@ -267,22 +280,24 @@ export default class RNCloudKVStorage {
   //#endregion
 
   //#region Key-value operations
-  private validateKey(key: string): void {
-    if (!key || new TextEncoder().encode(key).byteLength > KV_LIMITS.maxKeyBytes) {
-      throw new CloudStorageError(`Invalid key: ${key}`, NativeCloudStorageErrorCode.KV_INVALID_KEY);
+  private assertICloudQuota(items: KVItems): void {
+    if (Object.keys(items).length > KV_LIMITS.maxKeys || getKVItemsByteLength(items) > KV_LIMITS.maxTotalBytes) {
+      throw new CloudStorageError('Key-value store quota exceeded', NativeCloudStorageErrorCode.KV_QUOTA_EXCEEDED);
     }
   }
 
-  private assertICloudQuota(items: KVItems): void {
-    const entries = Object.entries(items);
-    const totalBytes = entries.reduce(
-      (total, [key, value]) =>
-        total + new TextEncoder().encode(key).byteLength + new TextEncoder().encode(value).byteLength,
-      0
-    );
-    if (entries.length > KV_LIMITS.maxKeys || totalBytes > KV_LIMITS.maxTotalBytes) {
-      throw new CloudStorageError('Key-value store quota exceeded', NativeCloudStorageErrorCode.KV_QUOTA_EXCEEDED);
+  private async getICloudItems(storage: NativeKVStorage): Promise<KVItems> {
+    if (this.iCloudItems === null) {
+      const items = await storage.kvGetAllItems();
+      this.iCloudItems = Object.fromEntries(items.map(({ key, value }) => [key, value]));
     }
+    return { ...this.iCloudItems };
+  }
+
+  private enqueueICloudMutation<T>(mutation: () => Promise<T>): Promise<T> {
+    const result = this.iCloudMutationQueue.then(mutation, mutation);
+    this.iCloudMutationQueue = result.catch(() => {});
+    return result;
   }
 
   /**
@@ -292,7 +307,7 @@ export default class RNCloudKVStorage {
    * @throws CloudStorageError with `ERR_KV_INVALID_KEY` when the key is invalid.
    */
   getItem(key: string): Promise<string | null> {
-    this.validateKey(key);
+    assertValidKVKey(key);
     return this.nativeStorage.kvGetItem(key);
   }
 
@@ -303,13 +318,21 @@ export default class RNCloudKVStorage {
    * @throws CloudStorageError when the key is invalid or a store limit is exceeded.
    */
   async setItem(key: string, value: string): Promise<void> {
-    this.validateKey(key);
-    if (this.getProvider() === CloudStorageProvider.ICloud) {
-      const items = await this.getAllItems();
+    assertValidKVKey(key);
+    const provider = this.getProvider();
+    const storage = this.nativeStorage;
+    if (provider !== CloudStorageProvider.ICloud) {
+      await storage.kvSetItem(key, value);
+      return;
+    }
+
+    await this.enqueueICloudMutation(async () => {
+      const items = await this.getICloudItems(storage);
       items[key] = value;
       this.assertICloudQuota(items);
-    }
-    await this.nativeStorage.kvSetItem(key, value);
+      await storage.kvSetItem(key, value);
+      this.iCloudItems = items;
+    });
   }
 
   /**
@@ -317,9 +340,19 @@ export default class RNCloudKVStorage {
    * @param key The key to remove.
    * @throws CloudStorageError with `ERR_KV_INVALID_KEY` when the key is invalid.
    */
-  removeItem(key: string): Promise<void> {
-    this.validateKey(key);
-    return this.nativeStorage.kvRemoveItem(key);
+  async removeItem(key: string): Promise<void> {
+    assertValidKVKey(key);
+    const provider = this.getProvider();
+    const storage = this.nativeStorage;
+    if (provider !== CloudStorageProvider.ICloud) {
+      await storage.kvRemoveItem(key);
+      return;
+    }
+
+    await this.enqueueICloudMutation(async () => {
+      await storage.kvRemoveItem(key);
+      if (this.iCloudItems !== null) delete this.iCloudItems[key];
+    });
   }
 
   /** @returns All keys in the store. */
@@ -329,13 +362,29 @@ export default class RNCloudKVStorage {
 
   /** @returns All key-value pairs as an object. */
   async getAllItems(): Promise<Record<string, string>> {
+    const provider = this.getProvider();
     const items = await this.nativeStorage.kvGetAllItems();
-    return Object.fromEntries(items.map(({ key, value }) => [key, value]));
+    const result = Object.fromEntries(items.map(({ key, value }) => [key, value]));
+    if (provider === CloudStorageProvider.ICloud) this.iCloudItems = { ...result };
+    return result;
   }
 
-  /** Removes all values from the store. */
-  clear(): Promise<void> {
-    return this.nativeStorage.kvClear();
+  /**
+   * Removes all values from the store. On iCloud this clears the app's complete ubiquitous
+   * key-value store, including values written outside this library.
+   */
+  async clear(): Promise<void> {
+    const provider = this.getProvider();
+    const storage = this.nativeStorage;
+    if (provider !== CloudStorageProvider.ICloud) {
+      await storage.kvClear();
+      return;
+    }
+
+    await this.enqueueICloudMutation(async () => {
+      await storage.kvClear();
+      this.iCloudItems = {};
+    });
   }
 
   /**
@@ -344,7 +393,11 @@ export default class RNCloudKVStorage {
    * @returns A tuple for each key and its string value or null.
    */
   async multiGet(keys: string[]): Promise<Array<[string, string | null]>> {
-    for (const key of keys) this.validateKey(key);
+    for (const key of keys) assertValidKVKey(key);
+    if (this.getProvider() === CloudStorageProvider.GoogleDrive) {
+      const items = await this.getAllItems();
+      return keys.map((key) => [key, items[key] ?? null]);
+    }
     return Promise.all(
       keys.map(async (key) => [key, await this.nativeStorage.kvGetItem(key)] as [string, string | null])
     );
@@ -355,8 +408,26 @@ export default class RNCloudKVStorage {
    * @param entries Key-value tuples to write.
    */
   async multiSet(entries: Array<[string, string]>): Promise<void> {
-    for (const [key] of entries) this.validateKey(key);
-    for (const [key, value] of entries) await this.setItem(key, value);
+    for (const [key] of entries) assertValidKVKey(key);
+    if (entries.length === 0) return;
+
+    const provider = this.getProvider();
+    const storage = this.nativeStorage;
+    if (provider !== CloudStorageProvider.ICloud) {
+      for (const [key, value] of entries) await storage.kvSetItem(key, value);
+      return;
+    }
+
+    await this.enqueueICloudMutation(async () => {
+      const currentItems = await this.getICloudItems(storage);
+      const prospectiveItems = { ...currentItems, ...Object.fromEntries(entries) };
+      this.assertICloudQuota(prospectiveItems);
+      for (const [key, value] of entries) {
+        await storage.kvSetItem(key, value);
+        currentItems[key] = value;
+        this.iCloudItems = { ...currentItems };
+      }
+    });
   }
 
   /**
@@ -364,8 +435,20 @@ export default class RNCloudKVStorage {
    * @param keys The keys to remove.
    */
   async multiRemove(keys: string[]): Promise<void> {
-    for (const key of keys) this.validateKey(key);
-    for (const key of keys) await this.nativeStorage.kvRemoveItem(key);
+    for (const key of keys) assertValidKVKey(key);
+    const provider = this.getProvider();
+    const storage = this.nativeStorage;
+    if (provider !== CloudStorageProvider.ICloud) {
+      for (const key of keys) await storage.kvRemoveItem(key);
+      return;
+    }
+
+    await this.enqueueICloudMutation(async () => {
+      for (const key of keys) {
+        await storage.kvRemoveItem(key);
+        if (this.iCloudItems !== null) delete this.iCloudItems[key];
+      }
+    });
   }
 
   /**
@@ -374,7 +457,14 @@ export default class RNCloudKVStorage {
    * @returns Whether the synchronization request completed.
    */
   sync(): Promise<boolean> {
-    return this.nativeStorage.kvSync();
+    const provider = this.getProvider();
+    const storage = this.nativeStorage;
+    if (provider !== CloudStorageProvider.ICloud) return storage.kvSync();
+
+    return this.enqueueICloudMutation(async () => {
+      this.iCloudItems = null;
+      return storage.kvSync();
+    });
   }
   //#endregion
 
@@ -467,7 +557,10 @@ export default class RNCloudKVStorage {
     return RNCloudKVStorage.getDefaultInstance().getAllItems();
   }
 
-  /** Removes all values from the default instance. */
+  /**
+   * Removes all values from the default instance. On iCloud this clears the app's complete
+   * ubiquitous key-value store, including values written outside this library.
+   */
   static clear(): Promise<void> {
     return RNCloudKVStorage.getDefaultInstance().clear();
   }

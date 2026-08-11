@@ -39,6 +39,14 @@
   return self;
 }
 
+- (void)invalidate
+{
+  if (_externalChangeObserver != nil) {
+    [[NSNotificationCenter defaultCenter] removeObserver:_externalChangeObserver];
+    _externalChangeObserver = nil;
+  }
+}
+
 - (void)dealloc
 {
   if (_externalChangeObserver != nil) {

@@ -74,6 +74,62 @@ describe('Google Drive key-value emulation', () => {
     expect(document.entries.added).toEqual({ v: 'yes', t: 200 });
   });
 
+  it('does not restore a remotely deleted cached key', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(fileList)
+      .mockResolvedValueOnce(response('{"version":1,"entries":{"deleted":{"v":"old","t":100}}}', true))
+      .mockResolvedValueOnce(response('{"version":1,"entries":{}}', true))
+      .mockResolvedValueOnce(response({}));
+    vi.stubGlobal('fetch', fetchMock);
+    const storage = new GoogleDriveKV(options());
+
+    await storage.kvGetItem('deleted');
+    await storage.kvSetItem('other', 'value');
+
+    const document = JSON.parse(fetchMock.mock.calls[3]![1]!.body as string);
+    expect(document.entries.deleted).toBeUndefined();
+    expect(document.entries.other.v).toBe('value');
+  });
+
+  it('serializes initial writes and reuses the created document id', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(response({ files: [] }))
+      .mockResolvedValueOnce(response({ id: 'created-kv-file' }))
+      .mockResolvedValueOnce(response('{"version":1,"entries":{"first":{"v":"one","t":1}}}', true))
+      .mockResolvedValueOnce(response({}));
+    vi.stubGlobal('fetch', fetchMock);
+    const storage = new GoogleDriveKV(options());
+
+    await Promise.all([storage.kvSetItem('first', 'one'), storage.kvSetItem('second', 'two')]);
+
+    expect(fetchMock.mock.calls.filter(([url]) => String(url).includes('spaces=appDataFolder')).length).toBe(1);
+    expect(String(fetchMock.mock.calls[2]![0])).toContain('/files/created-kv-file');
+  });
+
+  it('rejects duplicate documents in strict filename mode', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => response({ files: [{ id: 'first' }, { id: 'second' }] }))
+    );
+
+    await expect(new GoogleDriveKV(options({ strictFilenames: true })).kvGetItem('key')).rejects.toMatchObject({
+      code: 'ERR_MULTIPLE_FILES_SAME_NAME',
+    });
+  });
+
+  it('allows key and value bytes up to the strict quota', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(response({ files: [] }))
+      .mockResolvedValueOnce(response({ id: 'created-kv-file' }));
+    vi.stubGlobal('fetch', fetchMock);
+    const storage = new GoogleDriveKV(options());
+
+    await expect(storage.kvSetItem('k', 'x'.repeat(1024 * 1024 - 1))).resolves.toBeUndefined();
+  });
+
   it('rejects documents over the strict quota', async () => {
     vi.stubGlobal(
       'fetch',
