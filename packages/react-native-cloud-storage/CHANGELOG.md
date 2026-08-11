@@ -1,5 +1,17 @@
 
 
+# [3.1.0](https://github.com/kuatsu/react-native-cloud-storage/compare/v3.0.1...v3.1.0) (2026-08-11)
+
+
+### Bug Fixes
+
+* **web:** make library importable under react-native-web ([d231194](https://github.com/kuatsu/react-native-cloud-storage/commit/d231194f671e2b273d1a75b1211686279dd082f0))
+
+
+### Features
+
+* Implement KV storage ([#76](https://github.com/kuatsu/react-native-cloud-storage/issues/76)) ([ef452b7](https://github.com/kuatsu/react-native-cloud-storage/commit/ef452b76821e4ee6bdcc6e5c8d5c9cb23413e29f))
+
 ## [3.0.1](https://github.com/kuatsu/react-native-cloud-storage/compare/v3.0.0...v3.0.1) (2026-06-21)
 
 
