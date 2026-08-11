@@ -1,0 +1,87 @@
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Berlin
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: chore
+      prefix-development: chore
+      include: scope
+    ignore:
+      # Expo SDK pins these packages. Upgrade them together with `expo install --fix`
+      # and the SDK upgrade guide.
+      - dependency-name: 'expo'
+      - dependency-name: 'expo-*'
+      - dependency-name: '@expo/*'
+      - dependency-name: 'react'
+      - dependency-name: 'react-dom'
+      - dependency-name: 'react-native'
+      - dependency-name: 'react-native-web'
+      - dependency-name: 'react-native-safe-area-context'
+      - dependency-name: 'react-native-screens'
+      - dependency-name: '@react-native/*'
+      - dependency-name: '@react-native-community/*'
+      - dependency-name: '@react-navigation/*'
+      # These major updates can break the toolchain. Upgrade them deliberately.
+      - dependency-name: '@babel/*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'next'
+        update-types: ['version-update:semver-major']
+    groups:
+      babel:
+        patterns:
+          - '@babel/*'
+        update-types:
+          - minor
+          - patch
+      docs:
+        patterns:
+          - 'fumadocs*'
+          - 'next'
+          - 'tailwindcss'
+          - '@tailwindcss/*'
+          - 'tailwind-merge'
+          - 'lucide-react'
+          - 'typedoc*'
+          - '@types/mdx'
+          - 'postcss'
+        update-types:
+          - minor
+          - patch
+      production-dependencies:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+      development-dependencies:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: github-actions
+    directories:
+      - '/'
+      - '/.github/actions/*'
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Berlin
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      github-actions:
+        patterns:
+          - '*'
