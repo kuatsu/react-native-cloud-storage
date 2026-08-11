@@ -25,6 +25,6 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["react-native-cloud-storage"]
+    "plugins": [["react-native-cloud-storage", { "enableKeyValueStorage": true }]]
   }
 }

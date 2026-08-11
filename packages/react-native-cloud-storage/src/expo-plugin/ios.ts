@@ -38,6 +38,10 @@ const withRNCloudStorageEntitlementsPlist: ConfigPlugin<RNCloudStorageConfigPlug
     entitlementsPlist['com.apple.developer.ubiquity-container-identifiers'] = [
       getICloudContainerIdentifier(config, options),
     ];
+    if (options?.enableKeyValueStorage) {
+      entitlementsPlist['com.apple.developer.ubiquity-kvstore-identifier'] =
+        '$(TeamIdentifierPrefix)$(CFBundleIdentifier)';
+    }
 
     return newConfig;
   });

@@ -25,13 +25,14 @@ export const API_SECTION_KEYS = new Set([...FLATTENED_FOLDERS, ...Object.keys(FO
 /** Sidebar order for flattened pages (by title). Lower sorts first. */
 export const PAGE_ORDER: Record<string, number> = {
   CloudStorage: 0,
-  CloudStorageError: 1,
+  CloudKVStorage: 1,
+  CloudStorageError: 2,
 };
 
 /** Sidebar order for section folders (by canonical label). Lower sorts first. */
 export const FOLDER_ORDER: Record<string, number> = {
-  'Hooks': 2,
-  'Interfaces': 3,
-  'Enums': 4,
-  'Type Aliases': 5,
+  'Hooks': 3,
+  'Interfaces': 4,
+  'Enums': 5,
+  'Type Aliases': 6,
 };

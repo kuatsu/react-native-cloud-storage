@@ -28,6 +28,22 @@ export enum NativeCloudStorageErrorCode {
   INVALID_URL = 'ERR_INVALID_URL',
   NETWORK_ERROR = 'ERR_NETWORK_ERROR',
   UNSUPPORTED_PLATFORM = 'ERR_UNSUPPORTED_PLATFORM',
+  /** The key-value store exceeded its total size or key-count limit. */
+  KV_QUOTA_EXCEEDED = 'ERR_KV_QUOTA_EXCEEDED',
+  /** A key was empty or longer than 64 UTF-8 bytes. */
+  KV_INVALID_KEY = 'ERR_KV_INVALID_KEY',
+  /** The selected provider does not support key-value storage on the current platform. */
+  KV_NOT_SUPPORTED = 'ERR_KV_NOT_SUPPORTED',
+}
+
+export interface NativeKVStorage {
+  kvGetItem(key: string): Promise<string | null>;
+  kvSetItem(key: string, value: string): Promise<void>;
+  kvRemoveItem(key: string): Promise<void>;
+  kvGetAllKeys(): Promise<string[]>;
+  kvGetAllItems(): Promise<Array<{ key: string; value: string }>>;
+  kvClear(): Promise<void>;
+  kvSync(): Promise<boolean>;
 }
 
 export type NativeLocalFileSystem = NativeCloudStorageLocalFileSystemSpec;

@@ -25,4 +25,14 @@ Once complete, it should look like this:
 
 ![Example of correct iOS configuration](/ios_installation.jpg)
 
+If you use [`CloudKVStorage`](/docs/guides/key-value-storage), also enable **Key-value storage** in the iCloud capability. Confirm that the target has this entitlement:
+
+```text
+com.apple.developer.ubiquity-kvstore-identifier
+```
+
+<Callout type="warn">
+  Your Apple App ID and provisioning profile must support iCloud key-value storage. Without the entitlement, local operations can appear to work, but values may not synchronize.
+</Callout>
+
 Finally, proceed with [the Google Drive configuration](/docs/installation/configure-google-drive).

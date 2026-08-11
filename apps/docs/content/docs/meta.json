@@ -9,6 +9,7 @@
     "installation/configure-google-drive",
     "---Guides & Tips---",
     "guides/quick-start",
+    "guides/key-value-storage",
     "guides/using-multiple-providers",
     "guides/google-drive-files-same-name",
     "guides/migrating-icloud-documents",

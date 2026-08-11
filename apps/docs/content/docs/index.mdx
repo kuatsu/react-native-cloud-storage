@@ -3,13 +3,14 @@ title: Introduction
 description: iCloud and Google Drive for React Native.
 ---
 
-React Native Cloud Storage allows you to use iCloud (iOS only) and Google Drive as file storage in your React Native app. The API of its core functionality follows the conventions of the Node.js module `fs`. React hooks and other utilities make working with cloud files even easier.
+React Native Cloud Storage allows you to use iCloud (iOS only) and Google Drive as file and data storage in your React Native app. Its API is intentionally developer-friendly, mirroring known tools like `fs` and `AsyncStorage`.
 
 ## Features
 
-- **`fs`-like API** — `readFile`, `writeFile`, `appendFile`, `readdir`, `mkdir`, `stat`, `unlink`, and more, modeled on Node's `fs` so there's almost nothing new to learn.
+- **File storage with `fs`-like API** — `readFile`, `writeFile`, `appendFile`, `readdir`, `mkdir`, `stat`, `unlink`, and more, modeled on Node's `fs` so there's nothing new to learn.
+- **Key-value storage** — save preferences and small app state through native iCloud key-value storage or an emulated Google Drive store.
 - **Two providers, one API** — [iCloud](/docs/api/enumerations/CloudStorageProvider) (via a native CloudKit module) and [Google Drive](/docs/installation/configure-google-drive) (via the REST API). Use the platform default or [switch between them at runtime](/docs/guides/using-multiple-providers).
-- **React hooks** — [`useCloudFile`](/docs/api/functions/useCloudFile) and [`useIsCloudAvailable`](/docs/api/functions/useIsCloudAvailable) keep your components in sync with cloud state.
+- **React hooks** — [`useCloudFile`](/docs/api/functions/useCloudFile), [`useCloudKV`](/docs/api/functions/useCloudKV), and [`useIsCloudAvailable`](/docs/api/functions/useIsCloudAvailable) keep your components in sync with cloud state.
 - **Scopes** — read and write in a hidden, app-private container ([`AppData`](/docs/api/enumerations/CloudStorageScope)) or the user-visible iCloud Drive / Google Drive [`Documents`](/docs/api/enumerations/CloudStorageScope) folder.
 - **Expo config plugin** — configures the native iCloud capability automatically, with no manual Xcode steps.
 - **Built for the New Architecture** — ships as a Turbo Module and is fully typed with TypeScript.
@@ -17,19 +18,21 @@ React Native Cloud Storage allows you to use iCloud (iOS only) and Google Drive 
 ## Quick example
 
 ```ts
-import { CloudStorage, CloudStorageScope } from 'react-native-cloud-storage';
+import { CloudStorage, CloudKVStorage, CloudStorageScope } from 'react-native-cloud-storage';
 
-// Write a JSON file to the app-private scope (iCloud on iOS, Google Drive elsewhere).
-await CloudStorage.writeFile('/state.json', JSON.stringify({ level: 7 }), CloudStorageScope.AppData);
+// Write a file to the app-private scope (iCloud on iOS, Google Drive elsewhere).
+await CloudStorage.writeFile('/data.txt', 'Hello, world!', CloudStorageScope.AppData);
+
+// Or write to the key-value store (iCloud ubiquitous key-value store on iOS, Google Drive with emulated JSON file elsewhere)
+await CloudKVStorage.setItem('theme', 'dark');
 
 // Read it back later.
-if (await CloudStorage.exists('/state.json', CloudStorageScope.AppData)) {
-  const json = await CloudStorage.readFile('/state.json', CloudStorageScope.AppData);
-  const { level } = JSON.parse(json);
-}
+const helloWorld = await CloudStorage.readFile('/data.txt', CloudStorageScope.AppData); // 'Hello, world!'
+
+const theme = await CloudKVStorage.getItem('theme'); // 'dark'
 ```
 
-Prefer hooks? [`useCloudFile`](/docs/api/functions/useCloudFile) wraps this read/write cycle into a single reactive value.
+Prefer hooks? [`useCloudFile`](/docs/api/functions/useCloudFile) and [`useCloudKV`](/docs/api/functions/useCloudKV) wrap this into reactive values.
 
 ## Provider & platform support
 
@@ -46,5 +49,6 @@ By default, the library picks the right provider for each platform: iCloud on iO
   <Card title="Install in Expo" href="/docs/installation/expo" description="Add the library to an Expo managed project with the config plugin." />
   <Card title="Install in bare React Native" href="/docs/installation/react-native" description="Set up the native iCloud capability in a bare project." />
   <Card title="Configure Google Drive" href="/docs/installation/configure-google-drive" description="Acquire and provide an access token for the Drive API." />
+  <Card title="Cloud key-value storage" href="/docs/guides/key-value-storage" description="Store preferences and small app state across devices." />
   <Card title="API Reference" href="/docs/api" description="Browse the full CloudStorage API, hooks, and types." />
 </Cards>

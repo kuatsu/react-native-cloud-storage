@@ -160,23 +160,30 @@ export default class GoogleDriveApiClient {
     });
   }
 
+  public async createTextFile(
+    metadata: { name: string; parents?: string[] },
+    media: { mimeType: string; body: string }
+  ): Promise<string> {
+    const multipartRequestBody = this.buildMultiPartBody(metadata, media);
+    const file = await this.request<{ id: string }>(`/files`, {
+      queryParameters: { uploadType: 'multipart', fields: 'id' },
+      method: 'POST',
+      headers: {
+        'Content-Type': `multipart/related; boundary=${MULTIPART_BOUNDARY}`,
+        'Content-Length': multipartRequestBody.length.toString(),
+      },
+      body: multipartRequestBody,
+      baseUrl: BASE_UPLOAD_URL,
+    });
+    return file.id;
+  }
+
   public async createFile(
     metadata: { name: string; parents?: string[] },
     media: { mimeType: string; body: string } | { mimeType: string; localPath: string }
   ): Promise<void> {
     if ('body' in media) {
-      const multipartRequestBody = this.buildMultiPartBody(metadata, media);
-
-      await this.request(`/files`, {
-        queryParameters: { uploadType: 'multipart' },
-        method: 'POST',
-        headers: {
-          'Content-Type': `multipart/related; boundary=${MULTIPART_BOUNDARY}`,
-          'Content-Length': multipartRequestBody.length.toString(),
-        },
-        body: multipartRequestBody,
-        baseUrl: BASE_UPLOAD_URL,
-      });
+      await this.createTextFile(metadata, media);
     } else {
       // First, create an empty file with the required metadata
       const file = await this.request<{ id: string }>(`/files`, {

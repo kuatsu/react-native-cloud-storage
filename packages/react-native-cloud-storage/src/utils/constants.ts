@@ -17,5 +17,13 @@ export const DEFAULT_PROVIDER_OPTIONS: DeepRequired<CloudStorageProviderOptions>
     accessToken: null,
     strictFilenames: false,
     timeout: 3000,
+    kvPollInterval: null,
+    kvStrictLimits: true,
   },
 };
+
+export const KV_LIMITS = {
+  maxTotalBytes: 1024 * 1024,
+  maxKeys: 1024,
+  maxKeyBytes: 64,
+} as const;
