@@ -15,7 +15,7 @@
   },
   "packageManager": "pnpm@10.28.2",
   "devDependencies": {
-    "@commitlint/cli": "^19.7.1",
+    "@commitlint/cli": "^21.2.1",
     "@commitlint/config-conventional": "^17.0.2",
     "del-cli": "^7.0.0",
     "husky": "^9.1.7",
