@@ -20,8 +20,8 @@
     "del-cli": "^7.0.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.3.0",
-    "oxlint": "^1.50.0",
-    "oxfmt": "^0.35.0",
+    "oxlint": "^1.78.0",
+    "oxfmt": "^0.63.0",
     "typescript": "~5.9.3"
   }
 }
