@@ -70,11 +70,11 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-native": "0.83.2",
-    "react-native-builder-bob": "^0.30.2",
+    "react-native-builder-bob": "^0.43.0",
     "react-native-web": "^0.21.2",
     "release-it": "^15.0.0",
     "typescript": "~5.9.3",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   },
   "peerDependencies": {
     "expo": ">=48.0.0",
