@@ -15,7 +15,11 @@ buildscript {
 }
 
 apply plugin: "com.android.library"
-apply plugin: "kotlin-android"
+// Avoid duplicate Kotlin extension registration with AGP 9 built-in Kotlin
+if (project.extensions.findByName('kotlin') == null) {
+  apply plugin: "kotlin-android"
+}
+
 apply plugin: "com.facebook.react"
 
 def getExtOrDefault(name) {
