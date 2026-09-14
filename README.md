@@ -1,8 +1,18 @@
-# ☁️ react-native-cloud-storage
+<a href="https://kuatsu.de/?utm_campaign=generic&utm_source=github&utm_medium=referral&utm_content=react-native-cloud-storage" align="center">
+  <picture>
+    <img alt="react-native-cloud-storage: The React Native cloud drive layer" src="apps/docs/public/repo-banner.jpg">
+  </picture>
+</a>
 
-![npm bundle size](https://img.shields.io/bundlephobia/min/react-native-cloud-storage?style=flat-square) ![GitHub](https://img.shields.io/github/license/kuatsu/react-native-cloud-storage?style=flat-square) ![GitHub last commit](https://img.shields.io/github/last-commit/kuatsu/react-native-cloud-storage?style=flat-square)
+# react-native-cloud-storage
 
-This library provides a unified and developer-friendly API for accessing cloud storage services on iOS, Android and Web. It supports document storage and key-value stores across iCloud (on iOS only) and Google Drive (all platforms).
+[![npm version](https://img.shields.io/npm/v/react-native-cloud-storage.svg)](https://www.npmjs.com/package/react-native-cloud-storage)
+[![CI](https://github.com/kuatsu/react-native-cloud-storage/actions/workflows/ci.yml/badge.svg)](https://github.com/kuatsu/react-native-cloud-storage/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
+
+**The React Native cloud drive layer.**
+
+React Native Cloud Storage gives your app a unified and developer-friendly API for accessing cloud storage services on iOS, Android and Web. It supports document storage and key-value stores across iCloud (on iOS only) and Google Drive (all platforms).
 
 - 💾 Read and write files to the cloud
 - 🔑 Store key-value pairs on the cloud
@@ -13,24 +23,21 @@ This library provides a unified and developer-friendly API for accessing cloud s
 - 🧬 Easy to use React Hooks API, or use the imperative `fs`-style API
 - 👌 Zero dependencies, small bundle size
 
+## Documentation
+
+The documentation is available at [cloudstorage.kuatsu.de](https://cloudstorage.kuatsu.de).
+
 ## Installation
 
-### React Native
+Install the package using your favorite package manager.
 
 ```sh
 npm install react-native-cloud-storage
-cd ios && pod install
+# or
+yarn add react-native-cloud-storage
 ```
 
-Afterwards, follow the [configuration instructions](https://react-native-cloud-storage.oss.kuatsu.de/docs/installation/react-native).
-
-### Expo
-
-```sh
-npx expo install react-native-cloud-storage
-```
-
-Afterwards, [add the provided config plugin](https://react-native-cloud-storage.oss.kuatsu.de/docs/installation/expo) and `expo prebuild` or rebuild your development client.
+If you're using Expo, [add the provided config plugin](https://cloudstorage.kuatsu.de/docs/installation/expo) and `expo prebuild` or rebuild your development client.
 
 ## Quick Start
 
@@ -74,18 +81,10 @@ const App = () => {
 };
 ```
 
-## Documentation
-
-A detailed documentation is located [here](https://react-native-cloud-storage.oss.kuatsu.de/docs/intro).
-
 ## Contributing
 
 See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
 
-## Example Project
+## Built at Kuatsu
 
-There's an example app available in the `example` directory. To use the Google Drive implementation, you'll need to provide a valid access token for the Google Drive API. For testing purposes, you can create one using the [Google OAuth 2.0 Playground](https://developers.google.com/oauthplayground).
-
-## License
-
-MIT
+Kuatsu is a boutique React Native agency specialized on building highly performant React Native apps. Visit [https://kuatsu.de](kuatsu.de) to learn more about our work.

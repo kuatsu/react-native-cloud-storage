@@ -2,7 +2,7 @@
 
 The documentation site for [`react-native-cloud-storage`](https://github.com/kuatsu/react-native-cloud-storage),
 built with [Fumadocs](https://fumadocs.dev) on Next.js. Deployed to
-[react-native-cloud-storage.oss.kuatsu.de](https://react-native-cloud-storage.oss.kuatsu.de).
+[cloudstorage.kuatsu.de](https://cloudstorage.kuatsu.de).
 
 ## Structure
 
