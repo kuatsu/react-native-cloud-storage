@@ -99,7 +99,7 @@ const HomeFileOperationsCard: React.FC<HomeFileOperationsCardProps> = ({
     onLoadingChange(true);
     try {
       const file = result.assets[0];
-      await cloudStorage.uploadFile(filePath, file.uri.replace(/^file:\/\//, ''), {
+      await cloudStorage.uploadFile(filePath, decodeURIComponent(file.uri.replace(/^file:\/\//, '')), {
         mimeType: file.mimeType ?? 'application/octet-stream',
       });
       setStats(await cloudStorage.stat(filePath));
@@ -116,7 +116,7 @@ const HomeFileOperationsCard: React.FC<HomeFileOperationsCardProps> = ({
     try {
       const directory = FileSystem.cacheDirectory;
       if (!directory) throw new Error('Could not get cache directory');
-      const newFilename = directory.replace(/^file:\/\//, '') + Crypto.randomUUID();
+      const newFilename = decodeURIComponent(directory.replace(/^file:\/\//, '')) + Crypto.randomUUID();
       await cloudStorage.downloadFile(filePath, newFilename);
       Alert.alert('File downloaded', `File downloaded to ${newFilename}`);
     } catch (error) {
