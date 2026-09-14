@@ -18,7 +18,12 @@ public class CloudStorageCloudKit: NSObject {
   @objc(appendToFile:withData:withScope:withResolver:withRejecter:)
   public func appendToFile(path: String, data: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withBackgroundPromise(resolve: resolve, reject: reject) {
-      let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
+      let fileUrl: URL
+      do {
+        fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope, true)
+      } catch CloudStorageError.fileNotFound {
+        fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
+      }
       return try FileUtils.appendFile(fileUrl: fileUrl, content: data)
     }
   }
@@ -66,7 +71,7 @@ public class CloudStorageCloudKit: NSObject {
   @objc(deleteFile:withScope:withResolver:withRejecter:)
   public func deleteFile(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withBackgroundPromise(resolve: resolve, reject: reject) {
-      let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
+      let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope, true)
       return try FileUtils.deleteFileOrDirectory(fileUrl: fileUrl)
     }
   }
@@ -74,7 +79,7 @@ public class CloudStorageCloudKit: NSObject {
   @objc(deleteDirectory:withRecursive:withScope:withResolver:withRejecter:)
   public func deleteDirectory(path: String, recursive _: Bool, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withBackgroundPromise(resolve: resolve, reject: reject) {
-      let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
+      let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope, true)
       return try FileUtils.deleteFileOrDirectory(fileUrl: fileUrl)
     }
   }
