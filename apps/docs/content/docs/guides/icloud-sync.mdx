@@ -1,0 +1,47 @@
+---
+title: iCloud file synchronization
+description: Understand local completion, download requests, and iCloud setup checks.
+---
+
+## Local completion is not server completion
+
+The iCloud file provider uses Foundation ubiquity APIs for iCloud Documents. It does not use CloudKit records or databases. iOS manages synchronization between the local ubiquity container and iCloud.
+
+- `writeFile()` and `appendFile()` resolve after the local write.
+- `uploadFile()` resolves after it copies the source file into the local container. It does not wait for iCloud to receive the file. Google Drive resolves after its HTTP upload completes.
+- `triggerSync()` requests a download of one iCloud file. It does not upload local changes, refresh a directory, or wait for download completion. It has no effect on Google Drive.
+- `readdir()` combines local entries with an iCloud metadata query. `exists()` and reads also query metadata when the path is not known locally. These queries reflect the device's current view, which can lag behind another device.
+- `readFile()` and `downloadFile(remotePath, localPath)` use coordinated reads. iOS can download file contents during that read. The promise resolves after the read or local copy, not just after requesting a download.
+
+Do not report an iCloud backup as uploaded based only on a resolved write or upload promise. The API provides no server-upload completion signal. Check the file from another device when testing cross-device delivery.
+
+For binary transfers, pass an absolute local filesystem path. On iOS, `file://` URLs also work, including percent-encoded filenames. `downloadFile(remotePath, localPath)` does not overwrite an existing local destination.
+
+## Refresh file content explicitly
+
+`useCloudFile` reads on mount and when its path, scope, or instance changes. Its own writes and removals update its content. It does not subscribe to remote file changes or poll for them.
+
+Call the hook's `read()` to refresh content. Its `sync()` only calls `triggerSync()`; it does not read content or wait for a download. Handle read errors while files are unavailable. A successful read is not a guarantee that it contains the latest server version.
+
+## Choose the scope for your data
+
+`CloudStorageScope.AppData` is a valid iCloud file scope. It uses the ubiquity container root for app-private files. `CloudStorageScope.Documents` uses that container's `Documents` directory for user-facing files. Switching to Documents does not fix a signing or synchronization problem.
+
+The `documentsMode: 'legacy_sandbox'` option reads and writes the local app sandbox instead. Use it only for [legacy data migration](/docs/guides/migrating-icloud-documents), not cloud synchronization.
+
+[`CloudKVStorage`](/docs/guides/key-value-storage) uses the separate `NSUbiquitousKeyValueStore` service on iOS. Working key-value synchronization does not prove that iCloud Documents is configured correctly. Key-value `sync()` does not synchronize files.
+
+## Check the installed build
+
+1. Enable iCloud Documents for the Apple App ID. Associate the intended container with that App ID and use a provisioning profile that permits it.
+2. Inspect the **signed app**, not only the source entitlements file. For a built app, run:
+
+   ```sh
+   codesign -d --entitlements :- /path/to/YourApp.app
+   ```
+
+   Confirm `com.apple.developer.icloud-services` includes `CloudDocuments`. Check that `com.apple.developer.ubiquity-container-identifiers` and `com.apple.developer.icloud-container-identifiers` contain the intended container. Both devices must use the same container. This library uses the default ubiquity container; check its selection if you configure multiple containers.
+3. On both devices, sign in to the same iCloud account. Enable iCloud Drive and allow the app to use iCloud. Check available iCloud storage and network access. iOS controls transfer timing; reopening the app or requesting a download does not force a server upload.
+4. Rebuild and reinstall after entitlement or container changes. For Expo, keep these settings in the app configuration and [plugin options](/docs/installation/expo). Do not rely on edits to generated native projects.
+
+`isCloudAvailable()` and `useIsCloudAvailable()` check for an iCloud identity. They do not check network reachability, access to the selected container, or synchronization progress.
