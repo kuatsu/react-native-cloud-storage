@@ -7,7 +7,16 @@ An example project is available within the [`apps/example` directory](https://gi
 
 ## iOS Setup
 
-When setting up the example project for iOS, you will need to follow the [iOS installation steps](/docs/installation/react-native) in order to provide your own iCloud container.
+Set `expo.ios.bundleIdentifier` in `apps/example/app.json` to an App ID owned by your Apple team. The existing `react-native-cloud-storage` plugin uses `iCloud.<bundleIdentifier>` as the container identifier. To use a different container, set `iCloudContainerIdentifier` in that plugin's options.
+
+Register the App ID and container for your team. Use a provisioning profile that supports them. See [Expo installation](/docs/installation/expo) for plugin options and [iCloud setup checks](/docs/guides/icloud-sync#check-the-installed-build) for signing and device settings.
+
+From the repository root, run:
+
+```sh
+pnpm package build
+pnpm example ios
+```
 
 ## Android Setup
 
