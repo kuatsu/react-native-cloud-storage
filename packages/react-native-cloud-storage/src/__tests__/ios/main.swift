@@ -72,6 +72,15 @@ expectError("ERR_FILE_EXISTS") { try FileUtils.writeFile(fileUrl: textFile, cont
 let textStat = try FileUtils.statFile(fileUrl: textFile)
 assert(textStat.isFile && textStat.size == 7)
 
+let concurrentFile = directory.appendingPathComponent("concurrent.txt")
+try FileUtils.writeFile(fileUrl: concurrentFile, content: "")
+DispatchQueue.concurrentPerform(iterations: 20) { _ in
+  try! FileUtils.appendFile(fileUrl: concurrentFile, content: "x")
+}
+
+let concurrentContent = try FileUtils.readFile(fileUrl: concurrentFile)
+assert(concurrentContent == String(repeating: "x", count: 20))
+
 let destination = directory.appendingPathComponent("copy.zip")
 try FileUtils.copyFile(from: file, to: destination)
 expectError("ERR_FILE_EXISTS") { try FileUtils.copyFile(from: textFile, to: destination) }
