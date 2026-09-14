@@ -74,7 +74,7 @@ export interface CloudStorageFileStat {
 
 export enum CloudStorageProvider {
   /**
-   * Apple iCloud, backed by CloudKit.
+   * Apple iCloud file storage, backed by iCloud Documents.
    * @platform ios
    */
   ICloud = 'icloud',

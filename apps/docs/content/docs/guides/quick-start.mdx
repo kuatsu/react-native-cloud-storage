@@ -21,7 +21,7 @@ Then complete the native setup for your platform:
 
 ## Provide a Google Drive access token
 
-iCloud works out of the box on iOS. Google Drive requires an access token that you obtain from the user with a library such as [`@react-native-google-signin/google-signin`](https://github.com/react-native-google-signin/google-signin), then hand to the library:
+iCloud needs native configuration and a signed-in iCloud account on iOS, but no access token. Google Drive requires an access token that you obtain from the user with a library such as [`@react-native-google-signin/google-signin`](https://github.com/react-native-google-signin/google-signin), then hand to the library:
 
 ```ts
 import { CloudStorage, CloudStorageProvider } from 'react-native-cloud-storage';
@@ -60,7 +60,7 @@ if (await CloudStorage.exists('/user.json', CloudStorageScope.AppData)) {
 
 ## Use the React hook
 
-Inside components, [`useCloudFile`](/docs/api/functions/useCloudFile) keeps a single file's content in sync and gives you helpers to write and remove it:
+Inside components, [`useCloudFile`](/docs/api/functions/useCloudFile) reads a single file and gives you helpers to read, write, and remove it. It updates content after its own writes and removals. It does not subscribe to remote file changes or poll for them.
 
 ```tsx
 import { Button, Text, View } from 'react-native';
