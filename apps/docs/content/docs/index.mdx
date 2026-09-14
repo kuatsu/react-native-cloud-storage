@@ -9,8 +9,8 @@ React Native Cloud Storage allows you to use iCloud (iOS only) and Google Drive 
 
 - **File storage with `fs`-like API** — `readFile`, `writeFile`, `appendFile`, `readdir`, `mkdir`, `stat`, `unlink`, and more, modeled on Node's `fs` so there's nothing new to learn.
 - **Key-value storage** — save preferences and small app state through native iCloud key-value storage or an emulated Google Drive store.
-- **Two providers, one API** — [iCloud](/docs/api/enumerations/CloudStorageProvider) (via a native CloudKit module) and [Google Drive](/docs/installation/configure-google-drive) (via the REST API). Use the platform default or [switch between them at runtime](/docs/guides/using-multiple-providers).
-- **React hooks** — [`useCloudFile`](/docs/api/functions/useCloudFile), [`useCloudKV`](/docs/api/functions/useCloudKV), and [`useIsCloudAvailable`](/docs/api/functions/useIsCloudAvailable) keep your components in sync with cloud state.
+- **Two providers, one API** — [iCloud](/docs/api/enumerations/CloudStorageProvider) (via Foundation ubiquity APIs for iCloud Documents) and [Google Drive](/docs/installation/configure-google-drive) (via the REST API). Use the platform default or [switch between them at runtime](/docs/guides/using-multiple-providers).
+- **React hooks** — [`useCloudFile`](/docs/api/functions/useCloudFile), [`useCloudKV`](/docs/api/functions/useCloudKV), and [`useIsCloudAvailable`](/docs/api/functions/useIsCloudAvailable) expose file content, key-value state, and provider availability. The file hook does not monitor remote changes.
 - **Scopes** — read and write in a hidden, app-private container ([`AppData`](/docs/api/enumerations/CloudStorageScope)) or the user-visible iCloud Drive / Google Drive [`Documents`](/docs/api/enumerations/CloudStorageScope) folder.
 - **Expo config plugin** — configures the native iCloud capability automatically, with no manual Xcode steps.
 - **Built for the New Architecture** — ships as a Turbo Module and is fully typed with TypeScript.
@@ -38,7 +38,7 @@ Prefer hooks? [`useCloudFile`](/docs/api/functions/useCloudFile) and [`useCloudK
 
 | Provider     | iOS | Android | Notes                                                          |
 | ------------ | :-: | :-----: | ------------------------------------------------------------- |
-| iCloud       | ✅  |    —    | Backed by a native CloudKit module; available out of the box. |
+| iCloud       | ✅  |    —    | Uses iCloud Documents; requires native setup and an iCloud account. |
 | Google Drive | ✅  |   ✅    | Backed by the Drive REST API; you provide an access token.    |
 
 By default, the library picks the right provider for each platform: iCloud on iOS, Google Drive everywhere else. You can override this or even use both providers at once.

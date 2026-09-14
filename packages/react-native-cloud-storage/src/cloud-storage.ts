@@ -13,6 +13,12 @@ import GoogleDrive from './storages/google-drive';
 import { NativeCloudKit, NativeCloudKitModule, type NativeCloudStorageCloudKitTurboModule } from './storages/cloudkit';
 import { DEFAULT_PROVIDER_OPTIONS, LINKING_ERROR } from './utils/constants';
 
+/**
+ * File storage for iCloud and Google Drive.
+ * iCloud uses Foundation ubiquity APIs (iCloud Documents), not CloudKit.
+ * iCloud writes and uploads complete locally; iOS synchronizes changes asynchronously.
+ * A successful operation does not confirm that another device has received the changes.
+ */
 export default class RNCloudStorage {
   private static defaultInstance: RNCloudStorage;
   private provider: {
@@ -220,9 +226,10 @@ export default class RNCloudStorage {
 
   //#region File system operations
   /**
-   * Tests whether or not the cloud storage is available. Always returns true for Google Drive. iCloud may be
-   * unavailable right after app launch or if the user is not logged in.
-   * @returns A promise that resolves to true if the cloud storage is available, false otherwise.
+   * Checks for an iCloud identity or a configured Google Drive access token.
+   * Does not check network reachability, token validity, container access, or synchronization status.
+   * iCloud may be unavailable right after app launch or if the user is not signed in.
+   * @returns A promise that resolves to true if an identity or token is present, false otherwise.
    */
   isCloudAvailable(): Promise<boolean> {
     return this.nativeStorage.isCloudAvailable();
@@ -241,6 +248,7 @@ export default class RNCloudStorage {
 
   /**
    * Tests whether or not the file at the given path exists.
+   * iCloud discovery reflects the device's current view, not a complete server listing.
    * @param path The path to test.
    * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
    * @returns A promise that resolves to true if the path exists, false otherwise.
@@ -272,6 +280,7 @@ export default class RNCloudStorage {
 
   /**
    * Lists the contents of the directory at the given path.
+   * iCloud discovery reflects the device's current view, not a complete server listing.
    * @param path The directory to list.
    * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
    * @returns A promise that resolves to an array of file names, excluding '.' and '..'.
@@ -291,10 +300,11 @@ export default class RNCloudStorage {
   }
 
   /**
-   * Triggers synchronization for the file at the given path. Does not have any effect on Google Drive.
-   * @param path The file to trigger synchronization for.
+   * Requests an iCloud file download. Does not have any effect on Google Drive.
+   * Does not upload changes, refresh directories, or wait for the download to complete.
+   * @param path The file to request a download for.
    * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
-   * @returns A promise that resolves once the synchronization has been triggered.
+   * @returns A promise that resolves once the download has been requested, not completed.
    * @provider icloud
    */
   triggerSync(path: string, scope?: CloudStorageScope): Promise<void> {
@@ -307,7 +317,8 @@ export default class RNCloudStorage {
    * @param localPath The local path of the file to upload.
    * @param options The options for the upload. Must contain a `mimeType` property.
    * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
-   * @returns A promise that resolves when the file has been uploaded.
+   * @returns A promise that resolves after the local iCloud container copy or the Google Drive upload completes.
+   * iOS uploads the iCloud copy asynchronously; this promise does not confirm server delivery.
    */
   uploadFile(
     remotePath: string,
@@ -319,10 +330,11 @@ export default class RNCloudStorage {
   }
 
   /**
-   * Triggers synchronization for the file at the given path. Does not have any effect on Google Drive.
-   * @param path The file to trigger synchronization for.
+   * Requests an iCloud file download. Does not have any effect on Google Drive.
+   * Does not upload changes, refresh directories, or wait for the download to complete.
+   * @param path The file to request a download for.
    * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
-   * @returns A promise that resolves once the synchronization has been triggered.
+   * @returns A promise that resolves once the download has been requested, not completed.
    * @deprecated Use `triggerSync` instead.
    */
   downloadFile(path: string, scope?: CloudStorageScope): Promise<void>;
@@ -425,6 +437,7 @@ export default class RNCloudStorage {
 
   /**
    * Tests whether or not the file at the given path exists in the provider of the default static instance.
+   * iCloud discovery reflects the device's current view, not a complete server listing.
    * @param path The path to test.
    * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
    * @returns A promise that resolves to true if the path exists, false otherwise.
@@ -434,9 +447,10 @@ export default class RNCloudStorage {
   }
 
   /**
-   * Tests whether or not the cloud storage is available for the provider of the default static instance. Always returns true for Google Drive. iCloud may be
-   * unavailable right after app launch or if the user is not logged in.
-   * @returns A promise that resolves to true if the cloud storage is available, false otherwise.
+   * Checks for an iCloud identity or a configured Google Drive access token on the default instance.
+   * Does not check network reachability, token validity, container access, or synchronization status.
+   * iCloud may be unavailable right after app launch or if the user is not signed in.
+   * @returns A promise that resolves to true if an identity or token is present, false otherwise.
    */
   static isCloudAvailable(): Promise<boolean> {
     return RNCloudStorage.getDefaultInstance().isCloudAvailable();
@@ -476,6 +490,7 @@ export default class RNCloudStorage {
 
   /**
    * Lists the contents of the directory at the given path in the provider of the default static instance.
+   * iCloud discovery reflects the device's current view, not a complete server listing.
    * @param path The directory to list.
    * @param scope The directory scope the path is in. Defaults to the default scope set for the default static instance.
    * @returns A promise that resolves to an array of file names, excluding '.' and '..'.
@@ -495,10 +510,11 @@ export default class RNCloudStorage {
   }
 
   /**
-   * Triggers synchronization for the file at the given path in the provider of the default static instance. Does not have any effect on Google Drive.
-   * @param path The file to trigger synchronization for.
+   * Requests an iCloud file download on the default instance. Does not have any effect on Google Drive.
+   * Does not upload changes, refresh directories, or wait for the download to complete.
+   * @param path The file to request a download for.
    * @param scope The directory scope the path is in. Defaults to the default scope set for the default static instance.
-   * @returns A promise that resolves once the synchronization has been triggered.
+   * @returns A promise that resolves once the download has been requested, not completed.
    * @provider icloud
    */
   static triggerSync(path: string, scope?: CloudStorageScope): Promise<void> {
@@ -511,7 +527,8 @@ export default class RNCloudStorage {
    * @param localPath The local path of the file to upload.
    * @param options The options for the upload. Must contain a `mimeType` property.
    * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
-   * @returns A promise that resolves when the file has been uploaded.
+   * @returns A promise that resolves after the local iCloud container copy or the Google Drive upload completes.
+   * iOS uploads the iCloud copy asynchronously; this promise does not confirm server delivery.
    */
   static uploadFile(
     remotePath: string,
@@ -523,10 +540,11 @@ export default class RNCloudStorage {
   }
 
   /**
-   * Triggers synchronization for the file at the given path in the provider of the default static instance. Does not have any effect on Google Drive.
-   * @param path The file to trigger synchronization for.
+   * Requests an iCloud file download on the default instance. Does not have any effect on Google Drive.
+   * Does not upload changes, refresh directories, or wait for the download to complete.
+   * @param path The file to request a download for.
    * @param scope The directory scope the path is in. Defaults to set default scope set for the current provider.
-   * @returns A promise that resolves once the synchronization has been triggered.
+   * @returns A promise that resolves once the download has been requested, not completed.
    * @deprecated Use `triggerSync` instead.
    */
   static downloadFile(path: string, scope?: CloudStorageScope): Promise<void>;
