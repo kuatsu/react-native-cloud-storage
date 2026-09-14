@@ -45,6 +45,7 @@
     "typecheck": "tsc --noEmit",
     "release": "release-it",
     "test": "vitest run",
+    "test:ios": "bash scripts/test-ios-utils.sh",
     "prepack": "cp ../../README.md ./README.md",
     "postpack": "rm ./README.md"
   },

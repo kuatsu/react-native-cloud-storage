@@ -105,7 +105,7 @@ public class CloudStorageCloudKit: NSObject {
         throw CloudStorageError.pathIsDirectory(path: remotePath)
       }
 
-      let destinationUrl = URL(fileURLWithPath: localPath)
+      let destinationUrl = try FileUtils.localFileURL(path: localPath)
       let destinationDirectoryUrl = destinationUrl.deletingLastPathComponent()
 
       if try !FileUtils.checkFileExists(fileUrl: destinationDirectoryUrl) {
@@ -129,7 +129,7 @@ public class CloudStorageCloudKit: NSObject {
   public func uploadFile(remotePath: String, localPath: String, mimeType _: String, scope: String, overwrite: Bool, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
       let destinationUrl = try CloudKitUtils.getFileURL(path: remotePath, scope: scope)
-      let sourceUrl = URL(fileURLWithPath: localPath)
+      let sourceUrl = try FileUtils.localFileURL(path: localPath)
 
       if try !FileUtils.checkFileExists(fileUrl: sourceUrl) {
         throw CloudStorageError.fileNotFound(path: localPath)

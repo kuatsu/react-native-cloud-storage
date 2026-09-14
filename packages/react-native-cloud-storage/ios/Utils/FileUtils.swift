@@ -139,6 +139,17 @@ enum FileUtils {
     }
   }
 
+  static func localFileURL(path: String) throws -> URL {
+    guard path.lowercased().hasPrefix("file:") else {
+      return URL(fileURLWithPath: path)
+    }
+    guard let url = URL(string: path), url.isFileURL, url.path.hasPrefix("/"),
+          url.host == nil || url.host == "" || url.host == "localhost" else {
+      throw CloudStorageError.invalidUrl(url: path)
+    }
+    return url
+  }
+
   static func sanitizePath(path: String) -> String {
     path.replacingOccurrences(of: "^/+", with: "", options: .regularExpression)
   }

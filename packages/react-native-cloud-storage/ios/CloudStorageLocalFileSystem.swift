@@ -16,7 +16,7 @@ public class CloudStorageLocalFileSystem: NSObject {
   @objc(createFile:withData:withResolver:withRejecter:)
   public func createFile(path: String, data: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
-      let fileUrl = URL(fileURLWithPath: path)
+      let fileUrl = try FileUtils.localFileURL(path: path)
       let directoryUrl = fileUrl.deletingLastPathComponent()
 
       var isDirectory: ObjCBool = false
@@ -36,7 +36,7 @@ public class CloudStorageLocalFileSystem: NSObject {
   @objc(readFile:withResolver:withRejecter:)
   public func readFile(path: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withPromise(resolve: resolve, reject: reject) {
-      let fileUrl = URL(fileURLWithPath: path)
+      let fileUrl = try FileUtils.localFileURL(path: path)
       return try FileUtils.readFile(fileUrl: fileUrl)
     }
   }
@@ -49,8 +49,11 @@ public class CloudStorageLocalFileSystem: NSObject {
       return
     }
 
-    let sanitizedPath = sanitizePath(localPath)
-    let localUrl = URL(fileURLWithPath: sanitizedPath)
+    guard let localUrl = try? FileUtils.localFileURL(path: localPath) else {
+      let error = CloudStorageError.invalidUrl(url: localPath)
+      reject(error.code, error.message, nil)
+      return
+    }
 
     let configuration = URLSessionConfiguration.default
     if let headers = options?["headers"] as? [String: String] {
@@ -100,8 +103,11 @@ public class CloudStorageLocalFileSystem: NSObject {
       return
     }
 
-    let sanitizedPath = sanitizePath(localPath)
-    let localUrl = URL(fileURLWithPath: sanitizedPath)
+    guard let localUrl = try? FileUtils.localFileURL(path: localPath) else {
+      let error = CloudStorageError.invalidUrl(url: localPath)
+      reject(error.code, error.message, nil)
+      return
+    }
 
     guard let uploadTypeString = options["uploadType"] as? String,
           let uploadType = UploadType(rawValue: uploadTypeString) else {
@@ -166,7 +172,7 @@ public class CloudStorageLocalFileSystem: NSObject {
       let task = URLSession.shared.dataTask(with: request) { _, response, error in
         if let error {
           let nsError = error as NSError
-          let cloudError = CloudStorageError.networkError(message: "Upload error for path \(sanitizedPath): \(nsError.localizedDescription)")
+          let cloudError = CloudStorageError.networkError(message: "Upload error for path \(localPath): \(nsError.localizedDescription)")
           reject(cloudError.code, cloudError.message, nsError)
           return
         }
@@ -184,16 +190,9 @@ public class CloudStorageLocalFileSystem: NSObject {
       task.resume()
     } catch {
       let nsError = error as NSError
-      let cloudError = CloudStorageError.readError(path: sanitizedPath)
+      let cloudError = CloudStorageError.readError(path: localPath)
       reject(cloudError.code, cloudError.message, nsError)
     }
-  }
-
-  private func sanitizePath(_ path: String) -> String {
-    if path.hasPrefix("file://") {
-      return String(path.dropFirst("file://".count))
-    }
-    return path
   }
 
   private func getMimeType(for url: URL) -> String? {
