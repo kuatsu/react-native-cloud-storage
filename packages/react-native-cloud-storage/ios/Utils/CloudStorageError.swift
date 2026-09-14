@@ -25,6 +25,18 @@ enum CloudStorageError: Error {
   case fileNotDownloadable(path: String)
   case invalidUrl(url: String)
   case networkError(message: String)
+  case native(code: String, message: String, cause: NSError)
+
+  var cause: NSError? {
+    if case let .native(_, _, cause) = self {
+      return cause
+    }
+    return nil
+  }
+
+  func caused(by error: Error) -> CloudStorageError {
+    .native(code: code, message: "\(message): \((error as NSError).localizedDescription)", cause: error as NSError)
+  }
 
   var code: String {
     switch self {
@@ -44,6 +56,7 @@ enum CloudStorageError: Error {
     case .fileNotDownloadable: "ERR_FILE_NOT_DOWNLOADABLE"
     case .invalidUrl: "ERR_INVALID_URL"
     case .networkError: "ERR_NETWORK_ERROR"
+    case let .native(code, _, _): code
     }
   }
 
@@ -80,6 +93,8 @@ enum CloudStorageError: Error {
     case let .invalidUrl(url):
       "Invalid URL provided: \(url)"
     case let .networkError(message):
+      message
+    case let .native(_, message, _):
       message
     }
   }

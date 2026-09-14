@@ -41,7 +41,7 @@ func withPromise(_ promise: Promise, _ block: () throws -> Any?) {
     let result = try block()
     promise.resolve(result)
   } catch let error as CloudStorageError {
-    promise.reject(error: error)
+    promise.reject(error: error, cause: error.cause)
   } catch let error as NSError {
     promise.reject(error: CloudStorageError.unknown(message: error.description), cause: error)
   }

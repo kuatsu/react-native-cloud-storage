@@ -26,7 +26,8 @@ export const createProxiedNativeModule = <T extends object>(nativeModule: T | nu
               Object.values(NativeCloudStorageErrorCode).includes(error.code as NativeCloudStorageErrorCode)
                 ? new CloudStorageError(
                     'message' in error && typeof error.message === 'string' ? error.message : 'Unknown error',
-                    error.code as NativeCloudStorageErrorCode
+                    error.code as NativeCloudStorageErrorCode,
+                    error
                   )
                 : new CloudStorageError('Unknown error', NativeCloudStorageErrorCode.UNKNOWN, error);
             throw error_;

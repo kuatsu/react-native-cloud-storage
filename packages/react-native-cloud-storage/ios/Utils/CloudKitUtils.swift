@@ -27,17 +27,10 @@ enum CloudKitUtils {
      - Throws: An NSError if the file is not downloadable or the sync failed.
    */
   static func triggerSync(fileUrl: URL) throws {
-    let isDownloadable = fileManager.isUbiquitousItem(at: fileUrl)
-
-    if !isDownloadable {
-      throw CloudStorageError.fileNotDownloadable(path: fileUrl.path)
-    }
-
     do {
-      // trigger download of file
       try fileManager.startDownloadingUbiquitousItem(at: fileUrl)
     } catch {
-      throw CloudStorageError.fileNotDownloadable(path: fileUrl.path)
+      throw CloudStorageError.fileNotDownloadable(path: fileUrl.path).caused(by: error)
     }
   }
 

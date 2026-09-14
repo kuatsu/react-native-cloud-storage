@@ -30,7 +30,7 @@ enum FileUtils {
     do {
       return try String(contentsOf: fileUrl, encoding: .utf8)
     } catch {
-      throw CloudStorageError.readError(path: fileUrl.path)
+      throw CloudStorageError.readError(path: fileUrl.path).caused(by: error)
     }
   }
 
@@ -45,7 +45,7 @@ enum FileUtils {
     do {
       try content.write(to: fileUrl, atomically: true, encoding: .utf8)
     } catch {
-      throw CloudStorageError.writeError(path: fileUrl.path)
+      throw CloudStorageError.writeError(path: fileUrl.path).caused(by: error)
     }
   }
 
@@ -59,7 +59,7 @@ enum FileUtils {
     do {
       try fileManager.createDirectory(at: directoryUrl, withIntermediateDirectories: true, attributes: nil)
     } catch {
-      throw CloudStorageError.writeError(path: directoryUrl.path)
+      throw CloudStorageError.writeError(path: directoryUrl.path).caused(by: error)
     }
   }
 
@@ -74,7 +74,7 @@ enum FileUtils {
     do {
       return try fileManager.contentsOfDirectory(atPath: directoryUrl.path)
     } catch {
-      throw CloudStorageError.readError(path: directoryUrl.path)
+      throw CloudStorageError.readError(path: directoryUrl.path).caused(by: error)
     }
   }
 
@@ -88,7 +88,7 @@ enum FileUtils {
     do {
       try fileManager.removeItem(at: fileUrl)
     } catch {
-      throw CloudStorageError.deleteError(path: fileUrl.path)
+      throw CloudStorageError.deleteError(path: fileUrl.path).caused(by: error)
     }
   }
 
@@ -103,7 +103,7 @@ enum FileUtils {
     do {
       try fileManager.copyItem(at: sourceUrl, to: destinationUrl)
     } catch {
-      throw CloudStorageError.writeError(path: destinationUrl.path)
+      throw CloudStorageError.writeError(path: destinationUrl.path).caused(by: error)
     }
   }
 
@@ -135,7 +135,7 @@ enum FileUtils {
         isFile: isFile
       )
     } catch {
-      throw CloudStorageError.statError(path: fileUrl.path)
+      throw CloudStorageError.statError(path: fileUrl.path).caused(by: error)
     }
   }
 

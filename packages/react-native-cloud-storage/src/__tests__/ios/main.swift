@@ -18,4 +18,10 @@ do {
   fatalError("Accepted a non-local file URL")
 } catch CloudStorageError.invalidUrl {}
 
+let nativeError = NSError(domain: NSCocoaErrorDomain, code: NSFileReadNoPermissionError)
+let error = CloudStorageError.fileNotDownloadable(path: file.path).caused(by: nativeError)
+assert(error.code == "ERR_FILE_NOT_DOWNLOADABLE")
+assert(error.cause === nativeError)
+assert(error.message.contains(nativeError.localizedDescription))
+
 print("iOS file utility checks passed")
