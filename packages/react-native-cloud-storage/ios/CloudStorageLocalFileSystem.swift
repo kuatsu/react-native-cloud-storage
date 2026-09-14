@@ -179,7 +179,7 @@ public class CloudStorageLocalFileSystem: NSObject {
 
         guard let httpResponse = response as? HTTPURLResponse, (200 ... 299).contains(httpResponse.statusCode) else {
           let httpResponse = response as? HTTPURLResponse
-          let message = "Upload failed for path \(sanitizedPath) with status code: \(httpResponse?.statusCode ?? -1)"
+          let message = "Upload failed for path \(localPath) with status code: \(httpResponse?.statusCode ?? -1)"
           let cloudError = CloudStorageError.networkError(message: message)
           reject(cloudError.code, cloudError.message, nil)
           return
