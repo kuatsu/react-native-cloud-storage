@@ -103,7 +103,7 @@ const HomeFileOperationsCard: React.FC<HomeFileOperationsCardProps> = ({
         mimeType: file.mimeType ?? 'application/octet-stream',
       });
       setStats(await cloudStorage.stat(filePath));
-      Alert.alert('File uploaded', 'File uploaded successfully.');
+      Alert.alert('File saved', 'File saved. On iCloud, iOS uploads the local container copy asynchronously.');
     } catch (error) {
       console.warn(error);
     } finally {
@@ -154,7 +154,7 @@ const HomeFileOperationsCard: React.FC<HomeFileOperationsCardProps> = ({
     onLoadingChange(true);
     try {
       await cloudStorage.triggerSync(filePath);
-      Alert.alert('File download', 'File downloaded successfully.');
+      Alert.alert('Download requested', 'iOS received the download request. This does not confirm completion.');
     } catch (error) {
       console.warn(error);
     } finally {
