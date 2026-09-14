@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if which swiftformat >/dev/null; then
-  cd ios && swiftformat "$@" .
+  cd ios && swiftformat "$@" . ../src/__tests__/ios --config .swiftformat --swift-version "$(<.swift-version)"
 else
   echo "error: SwiftFormat is not installed. Install with 'brew install swiftformat' or manually from https://github.com/nicklockwood/SwiftFormat"
   exit 1
