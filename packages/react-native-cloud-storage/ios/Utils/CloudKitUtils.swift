@@ -8,6 +8,8 @@
 
 import Foundation
 
+// MARK: - CloudKitUtils
+
 enum CloudKitUtils {
   private static let fileManager = FileManager.default
 
@@ -69,7 +71,14 @@ enum CloudKitUtils {
     let fileUrl = directory.appendingPathComponent(FileUtils.sanitizePath(path: path))
 
     if shouldExist != nil {
-      let fileExists = try FileUtils.checkFileExists(fileUrl: fileUrl)
+      var fileExists = try FileUtils.checkFileExists(fileUrl: fileUrl)
+      if !fileExists, scope != .documentsLegacy {
+        let urls = try ICloudMetadataQuery().gather()
+        if let discoveredUrl = urls.first(where: { canonicalPath($0) == canonicalPath(fileUrl) }), shouldExist == true {
+          return discoveredUrl
+        }
+        fileExists = contains(fileUrl, in: urls)
+      }
       if shouldExist! && !fileExists {
         throw CloudStorageError.fileNotFound(path: path)
       } else if !shouldExist! && fileExists {
@@ -97,6 +106,47 @@ enum CloudKitUtils {
     return try getFileURL(path: path, scope: directoryScope, shouldExist)
   }
 
+  private static func canonicalPath(_ url: URL) -> String {
+    url.standardizedFileURL.resolvingSymlinksInPath().path
+  }
+
+  static func contains(_ url: URL, in metadataURLs: [URL]) -> Bool {
+    let path = canonicalPath(url)
+    return metadataURLs.contains { canonicalPath($0) == path || canonicalPath($0).hasPrefix(path + "/") }
+  }
+
+  static func directoryEntries(at directoryUrl: URL, localNames: [String], metadataURLs: [URL]) -> [String] {
+    let prefix = canonicalPath(directoryUrl) + "/"
+    let cloudNames = Set(metadataURLs.compactMap { url -> String? in
+      let path = canonicalPath(url)
+      guard path.hasPrefix(prefix) else { return nil }
+      return path.dropFirst(prefix.count).split(separator: "/").first.map(String.init)
+    })
+    let localNames = localNames.filter { name in
+      // Hide a physical placeholder only when metadata supplies its logical filename.
+      !(name.hasPrefix(".") && name.hasSuffix(".icloud") && !cloudNames.contains(name)
+        && cloudNames.contains(String(name.dropFirst().dropLast(".icloud".count))))
+    }
+    return cloudNames.union(localNames).sorted()
+  }
+
+  static func listFiles(directoryUrl: URL, scope: String) throws -> [String] {
+    if scope == DirectoryScope.documentsLegacy.rawValue {
+      return try FileUtils.listFiles(directoryUrl: directoryUrl)
+    }
+    let urls = try ICloudMetadataQuery().gather()
+    let localNames: [String]
+    do {
+      localNames = try FileUtils.listFiles(directoryUrl: directoryUrl)
+    } catch let error as CloudStorageError {
+      guard let cause = error.cause, cause.domain == NSCocoaErrorDomain,
+            [NSFileNoSuchFileError, NSFileReadNoSuchFileError].contains(cause.code),
+            contains(directoryUrl, in: urls) else { throw error }
+      return directoryEntries(at: directoryUrl, localNames: [], metadataURLs: urls)
+    }
+    return directoryEntries(at: directoryUrl, localNames: localNames, metadataURLs: urls)
+  }
+
   static var appDataDirectory: URL? {
     fileManager.url(forUbiquityContainerIdentifier: nil)
   }
@@ -107,5 +157,46 @@ enum CloudKitUtils {
 
   static var legacyDocumentsDirectory: URL? {
     fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
+  }
+}
+
+// MARK: - ICloudMetadataQuery
+
+final class ICloudMetadataQuery {
+  private let query: NSMetadataQuery
+  private let queue = OperationQueue()
+  private let completion = DispatchSemaphore(value: 0)
+  private var result: Result<[URL], Error>?
+
+  init(query: NSMetadataQuery = NSMetadataQuery()) {
+    self.query = query
+    queue.maxConcurrentOperationCount = 1
+    query.operationQueue = queue
+    query.searchScopes = [NSMetadataQueryUbiquitousDataScope, NSMetadataQueryUbiquitousDocumentsScope]
+    query.predicate = NSPredicate(format: "%K LIKE %@", NSMetadataItemFSNameKey, "*")
+  }
+
+  func gather(timeout: TimeInterval = 30) throws -> [URL] {
+    let observer = NotificationCenter.default.addObserver(forName: .NSMetadataQueryDidFinishGathering, object: query, queue: queue) { [self] _ in
+      query.disableUpdates()
+      result = .success(query.results.compactMap { ($0 as? NSMetadataItem)?.value(forAttribute: NSMetadataItemURLKey) as? URL })
+      completion.signal()
+    }
+    defer {
+      queue.addOperations([BlockOperation { [self] in
+        query.stop()
+        NotificationCenter.default.removeObserver(observer)
+      }], waitUntilFinished: true)
+    }
+    queue.addOperation { [self] in
+      if !query.start() {
+        result = .failure(CloudStorageError.unknown(message: "Could not start the iCloud metadata query"))
+        completion.signal()
+      }
+    }
+    guard completion.wait(timeout: .now() + timeout) == .success else {
+      throw CloudStorageError.networkError(message: "The iCloud metadata query timed out")
+    }
+    return try result!.get()
   }
 }

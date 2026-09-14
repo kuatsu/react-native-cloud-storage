@@ -91,4 +91,61 @@ assert(!exists)
 expectError("ERR_FILE_NOT_FOUND") { _ = try FileUtils.readFile(fileUrl: destination) }
 expectError("ERR_FILE_NOT_FOUND") { _ = try FileUtils.statFile(fileUrl: destination) }
 
+let metadataURLs = [
+  directory.appendingPathComponent("remote.zip"),
+  directory.appendingPathComponent("nested/remote.txt"),
+  directory.appendingPathComponent("Documents/public.txt"),
+  directory.appendingPathComponent("../another-container/ignored.zip"),
+]
+let entries = CloudKitUtils.directoryEntries(at: directory, localNames: [".remote.zip.icloud", "local.txt", ".literal.icloud"], metadataURLs: metadataURLs)
+assert(entries == [".literal.icloud", "Documents", "local.txt", "nested", "remote.zip"])
+assert(CloudKitUtils.contains(directory.appendingPathComponent("nested"), in: metadataURLs))
+assert(!CloudKitUtils.contains(directory.appendingPathComponent("nest"), in: metadataURLs))
+let hiddenFile = directory.appendingPathComponent(".remote.zip.icloud")
+let hiddenEntries = CloudKitUtils.directoryEntries(at: directory, localNames: [hiddenFile.lastPathComponent], metadataURLs: metadataURLs + [hiddenFile])
+assert(hiddenEntries.contains(hiddenFile.lastPathComponent))
+
+// MARK: - TestMetadataQuery
+
+final class TestMetadataQuery: NSMetadataQuery {
+  enum Behavior { case success, startFailure, timeout }
+  let behavior: Behavior
+  var didStop = false
+
+  init(_ behavior: Behavior) {
+    self.behavior = behavior
+    super.init()
+  }
+
+  override func start() -> Bool {
+    assert(OperationQueue.current === operationQueue)
+    if behavior == .startFailure {
+      return false
+    }
+    if behavior == .success {
+      NotificationCenter.default.post(name: .NSMetadataQueryDidFinishGathering, object: self)
+    }
+    return true
+  }
+
+  override var results: [Any] {
+    []
+  }
+
+  override func disableUpdates() {}
+  override func stop() {
+    didStop = true
+  }
+}
+
+let successfulQuery = TestMetadataQuery(.success)
+let queryResults = try ICloudMetadataQuery(query: successfulQuery).gather()
+assert(queryResults.isEmpty && successfulQuery.didStop)
+let failedQuery = TestMetadataQuery(.startFailure)
+expectError("ERR_UNKNOWN") { _ = try ICloudMetadataQuery(query: failedQuery).gather() }
+assert(failedQuery.didStop)
+let timedOutQuery = TestMetadataQuery(.timeout)
+expectError("ERR_NETWORK_ERROR") { _ = try ICloudMetadataQuery(query: timedOutQuery).gather(timeout: 0.01) }
+assert(timedOutQuery.didStop)
+
 print("iOS file utility checks passed")
