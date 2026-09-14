@@ -6,13 +6,12 @@ import {
   type CloudStorageProviderOptionsValue,
   type DeepRequired,
 } from './types/main';
-import { NativeCloudStorageErrorCode, type NativeStorage, type NativeStorageScope } from './types/native';
+import { type NativeStorage, type NativeStorageScope } from './types/native';
 import { isProviderSupported } from './utils/helpers';
 import { Platform, type EventSubscription } from 'react-native';
 import GoogleDrive from './storages/google-drive';
 import { NativeCloudKit, NativeCloudKitModule, type NativeCloudStorageCloudKitTurboModule } from './storages/cloudkit';
 import { DEFAULT_PROVIDER_OPTIONS, LINKING_ERROR } from './utils/constants';
-import CloudStorageError from './utils/cloud-storage-error';
 
 export default class RNCloudStorage {
   private static defaultInstance: RNCloudStorage;
@@ -335,18 +334,11 @@ export default class RNCloudStorage {
    */
   downloadFile(remotePath: string, localPath: string, scope?: CloudStorageScope): Promise<void>;
   downloadFile(remotePathOrPath: string, localPathOrScope?: string, scope?: CloudStorageScope): Promise<void> {
-    if (
-      !localPathOrScope ||
-      (!scope &&
-        typeof localPathOrScope === 'string' &&
-        Object.values(CloudStorageScope).includes(localPathOrScope as CloudStorageScope))
-    ) {
-      // deprecated `triggerSync` call
+    if (!localPathOrScope) {
       return this.triggerSync(remotePathOrPath, scope);
     }
-
-    if (!localPathOrScope) {
-      throw new CloudStorageError('Invalid arguments provided to downloadFile', NativeCloudStorageErrorCode.UNKNOWN);
+    if (!scope && Object.values(CloudStorageScope).includes(localPathOrScope as CloudStorageScope)) {
+      return this.triggerSync(remotePathOrPath, localPathOrScope as CloudStorageScope);
     }
     return this.nativeStorage.downloadFile(remotePathOrPath, localPathOrScope, this.resolveNativeScope(scope));
   }
@@ -546,15 +538,10 @@ export default class RNCloudStorage {
    */
   static downloadFile(remotePath: string, localPath: string, scope?: CloudStorageScope): Promise<void>;
   static downloadFile(remotePathOrPath: string, localPathOrScope?: string, scope?: CloudStorageScope): Promise<void> {
-    if (typeof scope === 'string') {
-      if (!localPathOrScope) {
-        throw new CloudStorageError('Invalid arguments provided to downloadFile', NativeCloudStorageErrorCode.UNKNOWN);
-      }
-      return RNCloudStorage.getDefaultInstance().downloadFile(remotePathOrPath, localPathOrScope, scope);
-    } else {
-      // deprecated `triggerSync` call
+    if (localPathOrScope === undefined) {
       return RNCloudStorage.getDefaultInstance().triggerSync(remotePathOrPath, scope);
     }
+    return RNCloudStorage.getDefaultInstance().downloadFile(remotePathOrPath, localPathOrScope, scope);
   }
 
   /**
