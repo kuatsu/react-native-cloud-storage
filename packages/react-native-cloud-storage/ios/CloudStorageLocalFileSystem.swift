@@ -15,7 +15,7 @@ public class CloudStorageLocalFileSystem: NSObject {
 
   @objc(createFile:withData:withResolver:withRejecter:)
   public func createFile(path: String, data: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    withPromise(resolve: resolve, reject: reject) {
+    withBackgroundPromise(resolve: resolve, reject: reject) {
       let fileUrl = try FileUtils.localFileURL(path: path)
       let directoryUrl = fileUrl.deletingLastPathComponent()
 
@@ -35,7 +35,7 @@ public class CloudStorageLocalFileSystem: NSObject {
 
   @objc(readFile:withResolver:withRejecter:)
   public func readFile(path: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    withPromise(resolve: resolve, reject: reject) {
+    withBackgroundPromise(resolve: resolve, reject: reject) {
       let fileUrl = try FileUtils.localFileURL(path: path)
       return try FileUtils.readFile(fileUrl: fileUrl)
     }

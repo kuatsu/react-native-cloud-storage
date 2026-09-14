@@ -9,6 +9,13 @@
 import Foundation
 import React
 
+/// Coordinated reads can wait for iCloud downloads. Keep them off the bridge and main queues.
+func withBackgroundPromise(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock, _ block: @escaping () throws -> Any?) {
+  DispatchQueue.global(qos: .utility).async {
+    withPromise(resolve: resolve, reject: reject, block)
+  }
+}
+
 // MARK: - Promise
 
 class Promise {

@@ -1,141 +1,155 @@
-//
-//  FileUtils.swift
-//  CloudStorage
-//
-//  Created by Maximilian Krause on 27.09.24.
-//  Copyright © 2024 Kuatsu App Agency. All rights reserved.
-//
-
 import Foundation
 
 enum FileUtils {
   private static let fileManager = FileManager.default
 
+  private static func finishCoordination<Value>(_ result: Result<Value, Error>?, error: NSError?, fallback: CloudStorageError) throws -> Value {
+    if let error {
+      throw fallback.caused(by: error)
+    }
+    do {
+      // A successful coordination always calls its accessor.
+      return try result!.get()
+    } catch let error as CloudStorageError {
+      throw error
+    } catch {
+      throw fallback.caused(by: error)
+    }
+  }
+
+  private static func coordinateReading<Value>(at url: URL, options: NSFileCoordinator.ReadingOptions = [], error: CloudStorageError, _ operation: (URL) throws -> Value) throws -> Value {
+    var coordinationError: NSError?
+    var result: Result<Value, Error>?
+    NSFileCoordinator().coordinate(readingItemAt: url, options: options, error: &coordinationError) { coordinatedUrl in
+      result = Result { try operation(coordinatedUrl) }
+    }
+    if let coordinationError, coordinationError.domain == NSCocoaErrorDomain,
+       [NSFileNoSuchFileError, NSFileReadNoSuchFileError].contains(coordinationError.code) {
+      throw CloudStorageError.fileNotFound(path: url.path).caused(by: coordinationError)
+    }
+    return try finishCoordination(result, error: coordinationError, fallback: error)
+  }
+
+  private static func coordinateWriting<Value>(at url: URL, options: NSFileCoordinator.WritingOptions = [], error: CloudStorageError, _ operation: (URL) throws -> Value) throws -> Value {
+    var coordinationError: NSError?
+    var result: Result<Value, Error>?
+    NSFileCoordinator().coordinate(writingItemAt: url, options: options, error: &coordinationError) { coordinatedUrl in
+      result = Result { try operation(coordinatedUrl) }
+    }
+    return try finishCoordination(result, error: coordinationError, fallback: error)
+  }
+
   static func checkFileExists(fileUrl: URL) throws -> Bool {
-    fileManager.fileExists(atPath: fileUrl.path)
+    do {
+      return try coordinateReading(at: fileUrl, options: .immediatelyAvailableMetadataOnly, error: .readError(path: fileUrl.path)) { url in
+        fileManager.fileExists(atPath: url.path) || fileManager.isUbiquitousItem(at: url)
+      }
+    } catch let error as CloudStorageError {
+      if let cause = error.cause, cause.domain == NSCocoaErrorDomain,
+         [NSFileNoSuchFileError, NSFileReadNoSuchFileError].contains(cause.code) {
+        return false
+      }
+      throw error
+    }
   }
 
-  /**
-     Reads a file and returns its content as a string.
-
-     - Parameter fileUrl: The URL of the file to read.
-     - Returns: The content of the file as a string.
-     - Throws: An NSError if the file couldn't be read.
-   */
   static func readFile(fileUrl: URL) throws -> String {
-    if try !checkFileExists(fileUrl: fileUrl) {
-      throw CloudStorageError.fileNotFound(path: fileUrl.path)
-    }
-
-    do {
-      return try String(contentsOf: fileUrl, encoding: .utf8)
-    } catch {
-      throw CloudStorageError.readError(path: fileUrl.path).caused(by: error)
+    try coordinateReading(at: fileUrl, error: .readError(path: fileUrl.path)) { url in
+      guard fileManager.fileExists(atPath: url.path) else {
+        throw CloudStorageError.fileNotFound(path: url.path)
+      }
+      return try String(contentsOf: url, encoding: .utf8)
     }
   }
 
-  /**
-     Writes a string to a file. If the file already exists, it will be overwritten.
-
-     - Parameter fileUrl: The URL of the file to write to.
-     - Parameter content: The string to write to the file.
-     - Throws: An NSError if the file couldn't be written to.
-   */
-  static func writeFile(fileUrl: URL, content: String) throws {
-    do {
-      try content.write(to: fileUrl, atomically: true, encoding: .utf8)
-    } catch {
-      throw CloudStorageError.writeError(path: fileUrl.path).caused(by: error)
+  static func writeFile(fileUrl: URL, content: String, overwrite: Bool = true) throws {
+    try coordinateWriting(at: fileUrl, options: .forReplacing, error: .writeError(path: fileUrl.path)) { url in
+      if !overwrite, fileManager.fileExists(atPath: url.path) || fileManager.isUbiquitousItem(at: url) {
+        throw CloudStorageError.fileAlreadyExists(path: url.path)
+      }
+      try content.write(to: url, atomically: true, encoding: .utf8)
     }
   }
 
-  /**
-     Creates a directory.
+  static func appendFile(fileUrl: URL, content: String) throws {
+    try coordinateWriting(at: fileUrl, options: .forMerging, error: .writeError(path: fileUrl.path)) { url in
+      let existing = fileManager.fileExists(atPath: url.path) ? try String(contentsOf: url, encoding: .utf8) : ""
+      try (existing + content).write(to: url, atomically: true, encoding: .utf8)
+    }
+  }
 
-     - Parameter directoryUrl: The URL of the directory to create.
-     - Throws: An NSError if the directory couldn't be created.
-   */
   static func createDirectory(directoryUrl: URL) throws {
-    do {
-      try fileManager.createDirectory(at: directoryUrl, withIntermediateDirectories: true, attributes: nil)
-    } catch {
-      throw CloudStorageError.writeError(path: directoryUrl.path).caused(by: error)
+    try coordinateWriting(at: directoryUrl, error: .writeError(path: directoryUrl.path)) { url in
+      try fileManager.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
     }
   }
 
-  /**
-     Lists the files in a directory.
-
-     - Parameter directoryUrl: The URL of the directory to list the files of.
-     - Returns: An array of Strings representing the file names.
-     - Throws: An NSError if the directory couldn't be read.
-   */
   static func listFiles(directoryUrl: URL) throws -> [String] {
-    do {
-      return try fileManager.contentsOfDirectory(atPath: directoryUrl.path)
-    } catch {
-      throw CloudStorageError.readError(path: directoryUrl.path).caused(by: error)
+    try coordinateReading(at: directoryUrl, options: .immediatelyAvailableMetadataOnly, error: .readError(path: directoryUrl.path)) { url in
+      try fileManager.contentsOfDirectory(atPath: url.path)
     }
   }
 
-  /**
-     Deletes a file or directory.
-
-     - Parameter fileUrl: The URL of the file or directory to delete.
-     - Throws: An NSError if the file / directory couldn't be deleted.
-   */
   static func deleteFileOrDirectory(fileUrl: URL) throws {
-    do {
-      try fileManager.removeItem(at: fileUrl)
-    } catch {
-      throw CloudStorageError.deleteError(path: fileUrl.path).caused(by: error)
+    try coordinateWriting(at: fileUrl, options: .forDeleting, error: .deleteError(path: fileUrl.path)) { url in
+      try fileManager.removeItem(at: url)
     }
   }
 
-  /**
-    Copies a file from a source to a destination.
+  static func copyFile(from sourceUrl: URL, to destinationUrl: URL, overwrite: Bool = false) throws {
+    var coordinationError: NSError?
+    var result: Result<Void, Error>?
+    NSFileCoordinator().coordinate(readingItemAt: sourceUrl, options: [], writingItemAt: destinationUrl, options: .forReplacing, error: &coordinationError) { source, destination in
+      result = Result {
+        guard fileManager.fileExists(atPath: source.path) else {
+          throw CloudStorageError.fileNotFound(path: source.path)
+        }
+        if try source.resourceValues(forKeys: [.isDirectoryKey]).isDirectory == true {
+          throw CloudStorageError.pathIsDirectory(path: source.path)
+        }
+        let parent = destination.deletingLastPathComponent()
+        guard fileManager.fileExists(atPath: parent.path) else {
+          throw CloudStorageError.directoryNotFound(path: parent.path)
+        }
+        if try parent.resourceValues(forKeys: [.isDirectoryKey]).isDirectory != true {
+          throw CloudStorageError.pathIsFile(path: parent.path)
+        }
 
-    - Parameter sourceUrl: The URL of the file to copy from.
-    - Parameter destinationUrl: The URL to copy the file to.
-    - Throws: An NSError if the file couldn't be copied.
-   */
-  static func copyFile(from sourceUrl: URL, to destinationUrl: URL) throws {
-    do {
-      try fileManager.copyItem(at: sourceUrl, to: destinationUrl)
-    } catch {
-      throw CloudStorageError.writeError(path: destinationUrl.path).caused(by: error)
+        if fileManager.fileExists(atPath: destination.path) || fileManager.isUbiquitousItem(at: destination) {
+          guard overwrite else { throw CloudStorageError.fileAlreadyExists(path: destination.path) }
+          if try destination.resourceValues(forKeys: [.isDirectoryKey]).isDirectory == true {
+            throw CloudStorageError.pathIsDirectory(path: destination.path)
+          }
+          // Stage outside the cloud container so a failed copy cannot destroy the existing backup.
+          let stagingDirectory = try fileManager.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: destination, create: true)
+          defer { try? fileManager.removeItem(at: stagingDirectory) }
+          let stagedFile = stagingDirectory.appendingPathComponent(destination.lastPathComponent)
+          try fileManager.copyItem(at: source, to: stagedFile)
+          _ = try fileManager.replaceItemAt(destination, withItemAt: stagedFile)
+        } else {
+          try fileManager.copyItem(at: source, to: destination)
+        }
+      }
     }
+    try finishCoordination(result, error: coordinationError, fallback: .writeError(path: destinationUrl.path))
   }
 
-  /**
-     Gets the stats of a file.
-
-     - Parameter fileUrl: The URL of the file to get the stats of.
-     - Returns: The stats of the file.
-     - Throws: An NSError if the stats couldn't be retrieved.
-   */
   static func statFile(fileUrl: URL) throws -> FileStat {
-    if try !checkFileExists(fileUrl: fileUrl) {
-      throw CloudStorageError.fileNotFound(path: fileUrl.path)
-    }
-
-    do {
-      let attributes = try fileManager.attributesOfItem(atPath: fileUrl.path)
-      let size = attributes[FileAttributeKey.size] as! UInt64
-      let birthtime = attributes[FileAttributeKey.creationDate] as! Date
-      let mtime = attributes[FileAttributeKey.modificationDate] as! Date
-      let isDirectory = attributes[FileAttributeKey.type] as! FileAttributeType == FileAttributeType.typeDirectory
-      let isFile = attributes[FileAttributeKey.type] as! FileAttributeType == FileAttributeType.typeRegular
-
+    try coordinateReading(at: fileUrl, options: .immediatelyAvailableMetadataOnly, error: .statError(path: fileUrl.path)) { url in
+      guard fileManager.fileExists(atPath: url.path) || fileManager.isUbiquitousItem(at: url) else {
+        throw CloudStorageError.fileNotFound(path: url.path)
+      }
+      let values = try url.resourceValues(forKeys: [.fileSizeKey, .creationDateKey, .contentModificationDateKey, .isDirectoryKey, .isRegularFileKey])
+      guard let size = values.fileSize, let birthtime = values.creationDate, let mtime = values.contentModificationDate else {
+        throw CloudStorageError.statError(path: url.path)
+      }
       return FileStat(
-        size: size,
+        size: UInt64(size),
         birthtimeMs: birthtime.timeIntervalSince1970 * 1000,
         mtimeMs: mtime.timeIntervalSince1970 * 1000,
-        isDirectory: isDirectory,
-        isFile: isFile
+        isDirectory: values.isDirectory == true,
+        isFile: values.isRegularFile == true
       )
-    } catch {
-      throw CloudStorageError.statError(path: fileUrl.path).caused(by: error)
     }
   }
 
