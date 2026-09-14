@@ -70,18 +70,18 @@ enum CloudKitUtils {
     // append path to scope directory
     let fileUrl = directory.appendingPathComponent(FileUtils.sanitizePath(path: path))
 
-    if shouldExist != nil {
+    if let shouldExist {
       var fileExists = try FileUtils.checkFileExists(fileUrl: fileUrl)
       if !fileExists, scope != .documentsLegacy {
         let urls = try ICloudMetadataQuery().gather()
-        if let discoveredUrl = urls.first(where: { canonicalPath($0) == canonicalPath(fileUrl) }), shouldExist == true {
+        if let discoveredUrl = urls.first(where: { canonicalPath($0) == canonicalPath(fileUrl) }), shouldExist {
           return discoveredUrl
         }
         fileExists = contains(fileUrl, in: urls)
       }
-      if shouldExist! && !fileExists {
+      if shouldExist && !fileExists {
         throw CloudStorageError.fileNotFound(path: path)
-      } else if !shouldExist! && fileExists {
+      } else if !shouldExist && fileExists {
         throw CloudStorageError.fileAlreadyExists(path: path)
       }
     }
@@ -112,7 +112,10 @@ enum CloudKitUtils {
 
   static func contains(_ url: URL, in metadataURLs: [URL]) -> Bool {
     let path = canonicalPath(url)
-    return metadataURLs.contains { canonicalPath($0) == path || canonicalPath($0).hasPrefix(path + "/") }
+    return metadataURLs.contains { url in
+      let candidate = canonicalPath(url)
+      return candidate == path || candidate.hasPrefix(path + "/")
+    }
   }
 
   static func directoryEntries(at directoryUrl: URL, localNames: [String], metadataURLs: [URL]) -> [String] {
