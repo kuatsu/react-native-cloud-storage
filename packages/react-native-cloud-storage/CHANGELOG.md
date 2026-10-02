@@ -1,5 +1,21 @@
 
 
+## [3.1.1](https://github.com/kuatsu/react-native-cloud-storage/compare/v3.1.0...v3.1.1) (2026-10-02)
+
+
+### 🐛 Bug Fixes
+
+* **android:** skip explicit Kotlin plugin when AGP registers the kotlin extension ([#85](https://github.com/kuatsu/react-native-cloud-storage/issues/85)) ([13f40bb](https://github.com/kuatsu/react-native-cloud-storage/commit/13f40bb49048340104d04abe13a005df2df84863))
+* **example:** decode local file paths ([ad2d399](https://github.com/kuatsu/react-native-cloud-storage/commit/ad2d399f70cb7848cd6c5044fc62e96748a35c75))
+* **example:** report transfer progress correctly ([e9858dc](https://github.com/kuatsu/react-native-cloud-storage/commit/e9858dc542e09a222d9fe04f69b31c403f1e0632))
+* forward download paths and scopes correctly ([105ab13](https://github.com/kuatsu/react-native-cloud-storage/commit/105ab13574bcf2ebfba770277af7c3cc28fcba3c))
+* **ios:** accept file URLs for local transfers ([7f028ee](https://github.com/kuatsu/react-native-cloud-storage/commit/7f028ee0450e4a518a692e1f25700caf2e1fa17b))
+* **ios:** coordinate cloud file reads and writes ([87b6fa4](https://github.com/kuatsu/react-native-cloud-storage/commit/87b6fa41f22046da014534ac6f82d8a9e60f085a))
+* **ios:** discover cloud files through metadata queries ([bc28245](https://github.com/kuatsu/react-native-cloud-storage/commit/bc28245c19813de08877c50803ebd7a05a51eeb4))
+* **ios:** keep local paths in upload errors ([884bc86](https://github.com/kuatsu/react-native-cloud-storage/commit/884bc86e3fc185e83b013c3f76a80d442759a2a6))
+* **ios:** preserve file and download errors ([226f781](https://github.com/kuatsu/react-native-cloud-storage/commit/226f781efe2dde43cca9508f54347d7fafcc3fb2))
+* **ios:** resolve remote files before append and delete ([e2fb63b](https://github.com/kuatsu/react-native-cloud-storage/commit/e2fb63babaa436999955856e3d8908534601ffe4))
+
 # [3.1.0](https://github.com/kuatsu/react-native-cloud-storage/compare/v3.0.1...v3.1.0) (2026-08-11)
 
 
