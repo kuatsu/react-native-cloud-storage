@@ -73,7 +73,7 @@
     "react-native": "0.83.2",
     "react-native-builder-bob": "^0.43.1",
     "react-native-web": "^0.21.2",
-    "release-it": "^15.0.0",
+    "release-it": "^21.1.0",
     "typescript": "~5.9.3",
     "vitest": "^5.0.2"
   },
