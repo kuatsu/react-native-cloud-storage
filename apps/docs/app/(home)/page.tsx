@@ -1,10 +1,12 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
-import { ArrowRight, Cloud, FolderTree, Github, Key, Layers, Webhook } from 'lucide-react';
+import { resolveLinkItems } from 'fumadocs-ui/layouts/shared';
+import { ArrowRight, Cloud, FolderTree, Key, Layers, Webhook } from 'lucide-react';
 import { gitConfig } from '@/lib/layout.shared';
 
 const githubUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}`;
+const githubIcon = resolveLinkItems({ githubUrl }).find((link) => link.type === 'icon')?.icon;
 
 function InlineCode({ children }: { children: ReactNode }) {
   return (
@@ -94,7 +96,9 @@ export default function HomePage() {
               rel="noreferrer noopener"
               target="_blank"
               className="inline-flex items-center gap-2 rounded-xl border border-fd-border bg-fd-card px-5 py-2.5 text-base font-medium transition-colors hover:bg-fd-accent">
-              <Github className="size-4" />
+              <span aria-hidden="true" className="size-4 [&_svg]:size-full">
+                {githubIcon}
+              </span>
               GitHub
             </a>
           </div>
