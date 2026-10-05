@@ -67,7 +67,7 @@
     "@expo/config-plugins": "^10.0.2",
     "@release-it/conventional-changelog": "^12.0.0",
     "@types/react": "~19.2.14",
-    "jsdom": "^30.1.0",
+    "jsdom": "^30.1.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-native": "0.83.2",
@@ -75,7 +75,7 @@
     "react-native-web": "^0.21.2",
     "release-it": "^21.1.0",
     "typescript": "~5.9.3",
-    "vitest": "^5.0.2"
+    "vitest": "^5.0.3"
   },
   "peerDependencies": {
     "expo": ">=48.0.0",

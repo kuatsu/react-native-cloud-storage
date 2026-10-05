@@ -19,9 +19,9 @@
     "@commitlint/config-conventional": "^21.2.3",
     "del-cli": "^7.0.0",
     "husky": "^9.1.7",
-    "lint-staged": "^17.5.1",
-    "oxlint": "^1.83.0",
-    "oxfmt": "^0.68.0",
+    "lint-staged": "^17.6.0",
+    "oxlint": "^1.86.0",
+    "oxfmt": "^0.71.0",
     "typescript": "~5.9.3"
   }
 }
