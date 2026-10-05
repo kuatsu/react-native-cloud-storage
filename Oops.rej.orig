@@ -1,0 +1,8 @@
+@@ -6,6 +6,7 @@
+ //  Copyright © 2024 Kuatsu App Agency. All rights reserved.
+ //
+ 
++import React
+ import Foundation
+ 
+ enum FileUtils {
