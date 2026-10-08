@@ -75,12 +75,12 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.14)
+      oxfmt:
+        specifier: ^0.68.0
+        version: 0.68.0
       postcss:
         specifier: 8.5.28
         version: 8.5.28
-      prettier:
-        specifier: ^3.9.8
-        version: 3.9.8
       tailwindcss:
         specifier: 4.3.3
         version: 4.3.3
@@ -5920,11 +5920,6 @@ packages:
   presentable-error@0.0.1:
     resolution: {integrity: sha512-E6rsNU1QNJgB3sjj7OANinGncFKuK+164sLXw1/CqBjj/EkXSoSdHCtWQGBNlREIGLnL7IEUEGa08YFVUbrhVg==}
     engines: {node: '>=16'}
-
-  prettier@3.9.8:
-    resolution: {integrity: sha512-WRFq3Wn3WId7LLROfMLdH7xaFr2jR62wU8nLO6rQUOLOxNZUviyJQs1M0iIhLexSFy+L+w0ch66wtoO2jRjG0A==}
-    engines: {node: '>=14'}
-    hasBin: true
 
   pretty-bytes@5.6.0:
     resolution: {integrity: sha512-FFw039TmrBqFK8ma/7OL3sDz/VytdtJr044/QUJtH0wK9lb9jLq9tJyIxUwtQJHwar2BqtiA4iCWSwo9JLkzFg==}
@@ -13759,8 +13754,6 @@ snapshots:
   powershell-utils@0.2.1: {}
 
   presentable-error@0.0.1: {}
-
-  prettier@3.9.8: {}
 
   pretty-bytes@5.6.0: {}
 

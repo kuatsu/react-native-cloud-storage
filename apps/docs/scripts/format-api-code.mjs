@@ -1,14 +1,9 @@
-// Reformats the TypeScript code blocks in the TypeDoc-generated API Markdown.
-//
-// typedoc-plugin-markdown emits method/constructor signatures as bare fragments (e.g.
-// `appendFile(...): Promise<void>;`) with inconsistent line wrapping. Those fragments aren't valid
-// standalone TypeScript, so we wrap each into a `declare function` Prettier can parse, format it, and
-// unwrap — leaving anything unrecognizable untouched.
+// TypeDoc signatures are not valid standalone TypeScript, so wrap them for formatting, then unwrap.
 
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { format } from 'prettier';
+import { format } from 'oxfmt';
 
 const apiDir = fileURLToPath(new URL('../content/docs/api', import.meta.url));
 const TS_FENCE = /(```(?:ts|tsx|typescript)\n)([\s\S]*?)(\n```)/g;
@@ -60,12 +55,11 @@ async function formatCodeBlock(code) {
   }
 
   try {
-    const formatted = await format(scaffold.wrapped, {
-      parser: 'typescript',
+    const formatted = await format('signature.ts', scaffold.wrapped, {
       printWidth: 80,
       semi: true,
     });
-    return unwrapSignature(formatted, scaffold);
+    return formatted.errors.length === 0 ? unwrapSignature(formatted.code, scaffold) : code;
   } catch {
     return code;
   }
