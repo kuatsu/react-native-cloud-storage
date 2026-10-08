@@ -14,6 +14,7 @@
     "ios",
     "cpp",
     "*.podspec",
+    "Package.swift",
     "app.plugin.js",
     "!dist/typescript/example",
     "!ios/build",
