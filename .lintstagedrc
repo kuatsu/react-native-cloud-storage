@@ -1,4 +1,4 @@
 {
-  "*.{js,mjs,cjs,jsx,ts,tsx}": ["pnpm exec oxlint --fix", "pnpm exec oxfmt --write"],
+  "*.{js,mjs,cjs,jsx,ts,tsx}": ["pnpm exec oxlint --fix --no-error-on-unmatched-pattern", "pnpm exec oxfmt --write"],
   "*.json": "pnpm exec oxfmt --write"
 }
