@@ -1,4 +1,10 @@
+# Changelog
 
+## [3.2.0](https://github.com/kuatsu/react-native-cloud-storage/compare/v3.1.1...v3.2.0) (2026-10-08)
+
+### ✨ Features
+
+* **ios:** add SwiftPM support ([b14d66f](https://github.com/kuatsu/react-native-cloud-storage/commit/b14d66f037f74c839e26a4df63f2120b99a6bc80))
 
 ## [3.1.1](https://github.com/kuatsu/react-native-cloud-storage/compare/v3.1.0...v3.1.1) (2026-10-02)
 
