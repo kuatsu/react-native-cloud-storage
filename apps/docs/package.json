@@ -12,11 +12,11 @@
     "clean": "rm -rf .next .source content/docs/api"
   },
   "dependencies": {
-    "fumadocs-core": "16.17.1",
+    "fumadocs-core": "16.17.5",
     "fumadocs-mdx": "15.4.7",
-    "fumadocs-ui": "16.17.1",
-    "lucide-react": "^1.55.0",
-    "next": "16.4.0",
+    "fumadocs-ui": "16.17.5",
+    "lucide-react": "^1.58.0",
+    "next": "16.4.2",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "tailwind-merge": "^3.7.0"
