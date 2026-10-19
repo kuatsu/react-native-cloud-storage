@@ -2,6 +2,9 @@ packages:
   - apps/*
   - packages/*
 
-onlyBuiltDependencies:
-  - core-js
-  - core-js-pure
+nodeLinker: hoisted
+
+allowBuilds:
+  core-js: true
+  core-js-pure: true
+  esbuild: false

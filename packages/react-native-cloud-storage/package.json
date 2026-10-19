@@ -38,7 +38,7 @@
   ],
   "scripts": {
     "clean": "del-cli android/build ios/build dist",
-    "build": "pnpm clean && bob build && rm -f dist/commonjs/package.json",
+    "build": "pnpm run clean && bob build && rm -f dist/commonjs/package.json",
     "codegen": "pnpm run codegen:clean && pnpm run codegen:ios && pnpm run codegen:android",
     "codegen:clean": "del-cli android/generated ios/generated",
     "codegen:ios": "node ../../node_modules/react-native/scripts/generate-codegen-artifacts.js --path . --targetPlatform ios --outputPath ios/generated",
@@ -60,7 +60,7 @@
     "url": "https://github.com/kuatsu/react-native-cloud-storage/issues"
   },
   "homepage": "https://github.com/kuatsu/react-native-cloud-storage#readme",
-  "packageManager": "pnpm@10.28.2",
+  "packageManager": "pnpm@12.14.0",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },

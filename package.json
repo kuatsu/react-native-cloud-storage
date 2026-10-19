@@ -13,7 +13,7 @@
     "prepare": "husky",
     "postinstall": "pnpm package build"
   },
-  "packageManager": "pnpm@10.28.2",
+  "packageManager": "pnpm@12.14.0",
   "devDependencies": {
     "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
