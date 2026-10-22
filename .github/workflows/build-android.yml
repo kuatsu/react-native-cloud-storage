@@ -5,15 +5,21 @@ on:
       - main
     paths:
       - '.github/workflows/build-android.yml'
-      - '**/android/**'
-      - '**/*.gradle'
-      - '**/*.gradle.kts'
+      - '.github/actions/setup/**'
+      - 'packages/react-native-cloud-storage/**'
+      - 'apps/example/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
   pull_request:
     paths:
       - '.github/workflows/build-android.yml'
-      - '**/android/**'
-      - '**/*.gradle'
-      - '**/*.gradle.kts'
+      - '.github/actions/setup/**'
+      - 'packages/react-native-cloud-storage/**'
+      - 'apps/example/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
 jobs:
   build:
     name: Build Android example app
@@ -35,5 +41,12 @@ jobs:
           rm -rf android
           npx expo prebuild -p android
           cd android
-          ./gradlew :app:assembleDebug --no-daemon
+          ./gradlew :app:assembleDebug -PreactNativeArchitectures=x86_64 --no-daemon
         working-directory: apps/example
+      - name: Test native modules
+        uses: callstackincubator/react-native-harness@v1.6.0
+        with:
+          projectRoot: apps/example
+          runner: android
+          app: android/app/build/outputs/apk/debug/app-debug.apk
+          packageManager: pnpm

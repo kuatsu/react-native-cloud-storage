@@ -5,6 +5,8 @@ packages:
 nodeLinker: hoisted
 
 allowBuilds:
+  '@parcel/watcher': false
   core-js: true
   core-js-pure: true
   esbuild: false
+  unrs-resolver: false

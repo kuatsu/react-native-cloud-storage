@@ -6,6 +6,8 @@
     "start": "expo start",
     "android": "rm -rf android && expo run:android",
     "ios": "rm -rf ios && expo run:ios",
+    "test:harness:android": "react-native-harness --harnessRunner android",
+    "test:harness:ios": "react-native-harness --harnessRunner ios",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -22,8 +24,13 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
+    "@react-native-harness/platform-android": "1.6.0",
+    "@react-native-harness/platform-apple": "1.6.0",
+    "@react-native/metro-config": "0.83.2",
     "@types/react": "~19.2.14",
+    "jest": "30.5.2",
     "pod-install": "^1.2.1",
+    "react-native-harness": "1.6.0",
     "typescript": "~5.9.3"
   },
   "private": true
