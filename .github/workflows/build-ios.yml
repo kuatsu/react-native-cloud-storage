@@ -7,13 +7,13 @@ on:
       - '.github/workflows/build-ios.yml'
       - '**/ios/**'
       - '**/*.podspec'
-      - '**/scripts/test-ios-utils.sh'
+      - 'packages/react-native-cloud-storage/package.json'
   pull_request:
     paths:
       - '.github/workflows/build-ios.yml'
       - '**/ios/**'
       - '**/*.podspec'
-      - '**/scripts/test-ios-utils.sh'
+      - 'packages/react-native-cloud-storage/package.json'
 jobs:
   build:
     name: Build iOS example app
@@ -23,7 +23,7 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
       - name: Test iOS file utilities
-        run: pnpm package test:ios
+        run: pnpm package test:ios -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
       - name: Install xcpretty
         run: gem install xcpretty
       - name: Build package

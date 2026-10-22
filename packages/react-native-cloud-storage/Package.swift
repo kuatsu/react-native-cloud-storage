@@ -24,6 +24,7 @@ let package = Package(
       name: "react_native_cloud_storage",
       dependencies: reactHeaders,
       path: "ios",
+      exclude: ["Utils/__tests__"],
       sources: [
         "CloudStorageICloudDrive.swift",
         "CloudStorageKVStore.swift",

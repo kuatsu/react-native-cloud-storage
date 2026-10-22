@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
-import { createProxiedNativeModule } from '../utils/native';
-import { NativeCloudStorageErrorCode } from '../types/native';
+import { createProxiedNativeModule } from '../native';
+import { NativeCloudStorageErrorCode } from '../../types/native';
 
 it('preserves native error details when normalizing known errors', async () => {
   const error = {

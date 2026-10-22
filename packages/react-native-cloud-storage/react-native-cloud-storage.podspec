@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/Kuatsu/react-native-cloud-storage.git", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,m,mm,swift}"
-  s.exclude_files = "ios/generated/**/*"
+  s.exclude_files = "ios/generated/**/*", "ios/**/__tests__/**/*"
   s.public_header_files = "ios/react_native_cloud_storage.h"
 
   # Use install_modules_dependencies helper to install the dependencies if React Native version >=0.71.0.

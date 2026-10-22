@@ -1,7 +1,7 @@
 import { afterEach, expect, it, vi } from 'vitest';
-import GoogleDrive from '../storages/google-drive';
-import { MimeTypes } from '../storages/google-drive/types';
-import { DEFAULT_PROVIDER_OPTIONS } from '../utils/constants';
+import GoogleDrive from '../index';
+import { MimeTypes } from '../types';
+import { DEFAULT_PROVIDER_OPTIONS } from '../../../utils/constants';
 
 const options = { ...DEFAULT_PROVIDER_OPTIONS.googledrive, accessToken: 'token' };
 const response = (body: unknown): Response =>

@@ -51,7 +51,8 @@ pnpm lint -- --fix
 Remember to add tests for your change if possible. Run the unit tests by:
 
 ```sh
-pnpm test
+pnpm package test
+pnpm package test:ios -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
 ```
 
 To edit the Objective-C or Swift files, open `example/ios/CloudStorageExample.xcworkspace` in XCode and find the source files at `Pods > Development Pods > react-native-cloud-storage`.

@@ -1,0 +1,139 @@
+import Foundation
+import Testing
+
+// MARK: - FileUtilsTests
+
+final class FileUtilsTests {
+  let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+
+  init() throws {
+    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+  }
+
+  deinit {
+    try? FileManager.default.removeItem(at: directory)
+  }
+
+  @Test(arguments: [false, true])
+  func localFileURLPreservesPaths(useURL: Bool) throws {
+    let file = directory.appendingPathComponent("backup space é %.zip")
+    let url = try FileUtils.localFileURL(path: useURL ? file.absoluteString : file.path)
+    #expect(url.path == file.path)
+  }
+
+  @Test func rejectsNonLocalFileURLs() {
+    let error = #expect(throws: CloudStorageError.self) {
+      try FileUtils.localFileURL(path: "file://other-host/backup.zip")
+    }
+    #expect(error?.code == "ERR_INVALID_URL")
+  }
+
+  @Test func coordinatesReadsAndWrites() throws {
+    let file = directory.appendingPathComponent("text.txt")
+    try "one".write(to: file, atomically: true, encoding: .utf8)
+    let presenter = FilePresenter(url: file)
+    NSFileCoordinator.addFilePresenter(presenter)
+    defer { NSFileCoordinator.removeFilePresenter(presenter) }
+
+    try FileUtils.appendFile(fileUrl: file, content: " two")
+    #expect(try FileUtils.readFile(fileUrl: file) == "one two")
+    #expect(presenter.reads > 0)
+    #expect(presenter.writes > 0)
+  }
+
+  @Test func concurrentAppendsPreserveAllWrites() async throws {
+    let file = directory.appendingPathComponent("concurrent.txt")
+    try "".write(to: file, atomically: true, encoding: .utf8)
+
+    try await withThrowingTaskGroup(of: Void.self) { group in
+      for _ in 0 ..< 20 {
+        group.addTask {
+          try FileUtils.appendFile(fileUrl: file, content: "x")
+        }
+      }
+      try await group.waitForAll()
+    }
+
+    #expect(try FileUtils.readFile(fileUrl: file) == String(repeating: "x", count: 20))
+  }
+
+  @Test func rejectsWritesWithoutOverwrite() throws {
+    let file = directory.appendingPathComponent("text.txt")
+    try "kept".write(to: file, atomically: true, encoding: .utf8)
+
+    let error = #expect(throws: CloudStorageError.self) {
+      try FileUtils.writeFile(fileUrl: file, content: "lost", overwrite: false)
+    }
+
+    #expect(error?.code == "ERR_FILE_EXISTS")
+    #expect(try String(contentsOf: file, encoding: .utf8) == "kept")
+  }
+
+  @Test func copyRespectsOverwriteAndPreservesExistingData() throws {
+    let source = directory.appendingPathComponent("source.txt")
+    let destination = directory.appendingPathComponent("destination.txt")
+    try "new".write(to: source, atomically: true, encoding: .utf8)
+    try "kept".write(to: destination, atomically: true, encoding: .utf8)
+
+    let overwriteError = #expect(throws: CloudStorageError.self) {
+      try FileUtils.copyFile(from: source, to: destination)
+    }
+    #expect(overwriteError?.code == "ERR_FILE_EXISTS")
+    #expect(try String(contentsOf: destination, encoding: .utf8) == "kept")
+
+    try FileUtils.copyFile(from: source, to: destination, overwrite: true)
+    #expect(try String(contentsOf: destination, encoding: .utf8) == "new")
+
+    let sourceError = #expect(throws: CloudStorageError.self) {
+      try FileUtils.copyFile(from: directory, to: destination, overwrite: true)
+    }
+    #expect(sourceError?.code == "ERR_PATH_IS_DIRECTORY")
+    #expect(try String(contentsOf: destination, encoding: .utf8) == "new")
+  }
+
+  @Test func reportsFileStatistics() throws {
+    let file = directory.appendingPathComponent("text.txt")
+    try "one two".write(to: file, atomically: true, encoding: .utf8)
+
+    let stat = try FileUtils.statFile(fileUrl: file)
+    #expect(stat.isFile)
+    #expect(stat.size == 7)
+  }
+
+  @Test func normalizesMissingFileErrors() throws {
+    let file = directory.appendingPathComponent("missing.txt")
+    #expect(try !FileUtils.checkFileExists(fileUrl: file))
+    let readError = #expect(throws: CloudStorageError.self) {
+      try FileUtils.readFile(fileUrl: file)
+    }
+    #expect(readError?.code == "ERR_FILE_NOT_FOUND")
+    let statError = #expect(throws: CloudStorageError.self) {
+      try FileUtils.statFile(fileUrl: file)
+    }
+    #expect(statError?.code == "ERR_FILE_NOT_FOUND")
+  }
+}
+
+// MARK: - FilePresenter
+
+private final class FilePresenter: NSObject, NSFilePresenter {
+  let presentedItemURL: URL?
+  let presentedItemOperationQueue = OperationQueue()
+  var reads = 0
+  var writes = 0
+
+  init(url: URL) {
+    presentedItemURL = url
+    presentedItemOperationQueue.maxConcurrentOperationCount = 1
+  }
+
+  func relinquishPresentedItem(toReader reader: @escaping @Sendable ((@Sendable () -> Void)?) -> Void) {
+    reads += 1
+    reader(nil)
+  }
+
+  func relinquishPresentedItem(toWriter writer: @escaping @Sendable ((@Sendable () -> Void)?) -> Void) {
+    writes += 1
+    writer(nil)
+  }
+}

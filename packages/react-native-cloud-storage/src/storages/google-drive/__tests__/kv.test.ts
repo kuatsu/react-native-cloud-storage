@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import GoogleDriveKV from '../storages/google-drive/kv';
-import { CloudStorageProvider, type DeepRequired, type CloudStorageProviderOptions } from '../types/main';
-import { DEFAULT_PROVIDER_OPTIONS } from '../utils/constants';
+import GoogleDriveKV from '../kv';
+import { CloudStorageProvider, type DeepRequired, type CloudStorageProviderOptions } from '../../../types/main';
+import { DEFAULT_PROVIDER_OPTIONS } from '../../../utils/constants';
 
 const options = (
   overrides: Partial<CloudStorageProviderOptions[CloudStorageProvider.GoogleDrive]> = {}

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3AA189F9190F2C333CACC93C /* CloudStorageError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BC35442CA6FA6D0085E8B9 /* CloudStorageError.swift */; };
 		5038BD322DFB657800C1D225 /* CloudStorageLocalFileSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5038BD312DFB656A00C1D225 /* CloudStorageLocalFileSystem.swift */; };
 		50ADE3732B56EE1300DB5583 /* CloudStorageEventEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5009AB9B2B56ECD30058E83A /* CloudStorageEventEmitter.swift */; };
 		50BC353B2CA6ED940085E8B9 /* FileUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BC353A2CA6ED940085E8B9 /* FileUtils.swift */; };
@@ -14,6 +15,13 @@
 		50BC35412CA6F0E80085E8B9 /* ICloudDriveUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BC35402CA6F0E80085E8B9 /* ICloudDriveUtils.swift */; };
 		50BC35452CA6FA6D0085E8B9 /* CloudStorageError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BC35442CA6FA6D0085E8B9 /* CloudStorageError.swift */; };
 		50BC35472CA6FF3F0085E8B9 /* Promise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BC35462CA6FF3F0085E8B9 /* Promise.swift */; };
+		5146852B7B236A77A8005796 /* ICloudDriveUtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BCC19B6741BB0592D64CA0B /* ICloudDriveUtilsTests.swift */; };
+		69697402FC434E0A7F1EC3E0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1F49BFFA0FA4415824DC723 /* Foundation.framework */; };
+		9AAFC5644F2E0B96FED57F9C /* ICloudDriveUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BC35402CA6F0E80085E8B9 /* ICloudDriveUtils.swift */; };
+		BA4D948F57DCF459B3C327E7 /* FileUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BC353A2CA6ED940085E8B9 /* FileUtils.swift */; };
+		E06CC91AF29E141C5374027D /* FileUtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0957A346D5925C87EE623 /* FileUtilsTests.swift */; };
+		E14B72AB4D8D79C3ABB48F78 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BC353E2CA6EF760085E8B9 /* Types.swift */; };
+		F3B9DB6A55E5EA0A02C83F93 /* CloudStorageErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6798A22CE5B2ECA83EE4117A /* CloudStorageErrorTests.swift */; };
 		F4FF95D7245B92E800C19C63 /* CloudStorageICloudDrive.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FF95D6245B92E800C19C63 /* CloudStorageICloudDrive.swift */; };
 /* End PBXBuildFile section */
 
@@ -40,7 +48,12 @@
 		50BC35402CA6F0E80085E8B9 /* ICloudDriveUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ICloudDriveUtils.swift; sourceTree = "<group>"; };
 		50BC35442CA6FA6D0085E8B9 /* CloudStorageError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudStorageError.swift; sourceTree = "<group>"; };
 		50BC35462CA6FF3F0085E8B9 /* Promise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Promise.swift; sourceTree = "<group>"; };
+		66E0957A346D5925C87EE623 /* FileUtilsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FileUtilsTests.swift; sourceTree = "<group>"; };
+		6798A22CE5B2ECA83EE4117A /* CloudStorageErrorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CloudStorageErrorTests.swift; sourceTree = "<group>"; };
+		7BCC19B6741BB0592D64CA0B /* ICloudDriveUtilsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ICloudDriveUtilsTests.swift; sourceTree = "<group>"; };
+		B1F49BFFA0FA4415824DC723 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		B3E7B5891CC2AC0600A0062D /* RCTCloudStorageICloudDrive.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RCTCloudStorageICloudDrive.mm; sourceTree = "<group>"; };
+		D9CC9FB8850B112219C990ED /* CloudStorageUtilsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CloudStorageUtilsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4FF95D5245B92E700C19C63 /* CloudStorage-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CloudStorage-Bridging-Header.h"; sourceTree = "<group>"; };
 		F4FF95D6245B92E800C19C63 /* CloudStorageICloudDrive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudStorageICloudDrive.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -50,6 +63,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C02B14CD5F9796C5F5A3D937 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				69697402FC434E0A7F1EC3E0 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -64,6 +85,17 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		42C6F8B6045D96B207B6A8F8 /* __tests__ */ = {
+			isa = PBXGroup;
+			children = (
+				6798A22CE5B2ECA83EE4117A /* CloudStorageErrorTests.swift */,
+				66E0957A346D5925C87EE623 /* FileUtilsTests.swift */,
+				7BCC19B6741BB0592D64CA0B /* ICloudDriveUtilsTests.swift */,
+			);
+			name = __tests__;
+			path = __tests__;
+			sourceTree = "<group>";
+		};
 		50BC35482CA704A60085E8B9 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
@@ -72,6 +104,7 @@
 				50BC353A2CA6ED940085E8B9 /* FileUtils.swift */,
 				50BC35462CA6FF3F0085E8B9 /* Promise.swift */,
 				50BC353E2CA6EF760085E8B9 /* Types.swift */,
+				42C6F8B6045D96B207B6A8F8 /* __tests__ */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -88,12 +121,47 @@
 				5038BD352DFB659F00C1D225 /* CloudStorageLocalFileSystem.m */,
 				F4FF95D5245B92E700C19C63 /* CloudStorage-Bridging-Header.h */,
 				134814211AA4EA7D00B7C361 /* Products */,
+				D9CC9FB8850B112219C990ED /* CloudStorageUtilsTests.xctest */,
+				D7F6698166ED7ABE7B2B165D /* Frameworks */,
 			);
+			sourceTree = "<group>";
+		};
+		D7F6698166ED7ABE7B2B165D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DC67FB17D2BF073561DF2C79 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DC67FB17D2BF073561DF2C79 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				B1F49BFFA0FA4415824DC723 /* Foundation.framework */,
+			);
+			name = iOS;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		37CA51BE93299662ECA99319 /* CloudStorageUtilsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C30CC8A589F33FF096912C17 /* Build configuration list for PBXNativeTarget "CloudStorageUtilsTests" */;
+			buildPhases = (
+				691FF56A744A846BCBE83EE0 /* Sources */,
+				C02B14CD5F9796C5F5A3D937 /* Frameworks */,
+				B4D6A85608A037A21EB87E2C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CloudStorageUtilsTests;
+			productName = CloudStorageUtilsTests;
+			productReference = D9CC9FB8850B112219C990ED /* CloudStorageUtilsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		58B511DA1A9E6C8500147676 /* CloudStorage */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "CloudStorage" */;
@@ -139,9 +207,20 @@
 			projectRoot = "";
 			targets = (
 				58B511DA1A9E6C8500147676 /* CloudStorage */,
+				37CA51BE93299662ECA99319 /* CloudStorageUtilsTests */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B4D6A85608A037A21EB87E2C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		58B511D71A9E6C8500147676 /* Sources */ = {
@@ -156,6 +235,20 @@
 				F4FF95D7245B92E800C19C63 /* CloudStorageICloudDrive.swift in Sources */,
 				50ADE3732B56EE1300DB5583 /* CloudStorageEventEmitter.swift in Sources */,
 				50BC353F2CA6EF760085E8B9 /* Types.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		691FF56A744A846BCBE83EE0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3AA189F9190F2C333CACC93C /* CloudStorageError.swift in Sources */,
+				E14B72AB4D8D79C3ABB48F78 /* Types.swift in Sources */,
+				BA4D948F57DCF459B3C327E7 /* FileUtils.swift in Sources */,
+				9AAFC5644F2E0B96FED57F9C /* ICloudDriveUtils.swift in Sources */,
+				F3B9DB6A55E5EA0A02C83F93 /* CloudStorageErrorTests.swift in Sources */,
+				E06CC91AF29E141C5374027D /* FileUtilsTests.swift in Sources */,
+				5146852B7B236A77A8005796 /* ICloudDriveUtilsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -294,6 +387,36 @@
 			};
 			name = Release;
 		};
+		F6D65218BE071BC43A4675FC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"EXCLUDED_ARCHS[sdk=*]" = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.voicekit.CloudStorageUtilsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F725F32D587C44AD554245A3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"EXCLUDED_ARCHS[sdk=*]" = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.voicekit.CloudStorageUtilsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -311,6 +434,15 @@
 			buildConfigurations = (
 				58B511F01A9E6C8500147676 /* Debug */,
 				58B511F11A9E6C8500147676 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C30CC8A589F33FF096912C17 /* Build configuration list for PBXNativeTarget "CloudStorageUtilsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F6D65218BE071BC43A4675FC /* Release */,
+				F725F32D587C44AD554245A3 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
