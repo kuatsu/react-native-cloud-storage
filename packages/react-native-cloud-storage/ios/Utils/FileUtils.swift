@@ -119,6 +119,19 @@ enum FileUtils {
     }
   }
 
+  static func saveDownloadedFile(temporaryUrl: URL?, response: URLResponse?, destinationUrl: URL) throws {
+    guard let response = response as? HTTPURLResponse, (200 ... 299).contains(response.statusCode) else {
+      let status = (response as? HTTPURLResponse)?.statusCode ?? -1
+      throw CloudStorageError.networkError(message: "Download failed with status code: \(status)")
+    }
+    guard let temporaryUrl else {
+      throw CloudStorageError.unknown(message: "Download failed: temporary file location is missing.")
+    }
+
+    try createDirectory(directoryUrl: destinationUrl.deletingLastPathComponent())
+    try copyFile(from: temporaryUrl, to: destinationUrl, overwrite: true)
+  }
+
   static func copyFile(from sourceUrl: URL, to destinationUrl: URL, overwrite: Bool = false) throws {
     var coordinationError: NSError?
     var result: Result<Void, Error>?

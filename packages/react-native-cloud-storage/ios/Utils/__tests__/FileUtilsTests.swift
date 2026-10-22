@@ -127,6 +127,22 @@ final class FileUtilsTests {
     #expect(try String(contentsOf: file, encoding: .utf8) == "kept")
   }
 
+  @Test(arguments: [401, 403, 404, 500])
+  func failedDownloadsPreserveExistingFiles(status: Int) throws {
+    let destination = directory.appendingPathComponent("backup.txt")
+    let temporary = directory.appendingPathComponent("response.txt")
+    try "kept".write(to: destination, atomically: true, encoding: .utf8)
+    try "error body".write(to: temporary, atomically: true, encoding: .utf8)
+    let response = try HTTPURLResponse(url: #require(URL(string: "https://example.com/backup")), statusCode: status, httpVersion: nil, headerFields: nil)
+
+    let error = #expect(throws: CloudStorageError.self) {
+      try FileUtils.saveDownloadedFile(temporaryUrl: temporary, response: response, destinationUrl: destination)
+    }
+
+    #expect(error?.code == "ERR_NETWORK_ERROR")
+    #expect(try String(contentsOf: destination, encoding: .utf8) == "kept")
+  }
+
   @Test func normalizesMissingFileErrors() throws {
     let file = directory.appendingPathComponent("missing.txt")
     #expect(try !FileUtils.checkFileExists(fileUrl: file))

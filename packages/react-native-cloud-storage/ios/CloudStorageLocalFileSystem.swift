@@ -61,7 +61,7 @@ public class CloudStorageLocalFileSystem: NSObject {
     }
     let session = URLSession(configuration: configuration)
 
-    let downloadTask = session.downloadTask(with: remoteUrl) { tempLocalUrl, _, error in
+    let downloadTask = session.downloadTask(with: remoteUrl) { tempLocalUrl, response, error in
       if let error {
         let nsError = error as NSError
         let cloudError = CloudStorageError.networkError(message: "Download error for path \(remoteUri): \(nsError.localizedDescription)")
@@ -69,26 +69,8 @@ public class CloudStorageLocalFileSystem: NSObject {
         return
       }
 
-      guard let tempLocalUrl else {
-        let cloudError = CloudStorageError.unknown(message: "Download failed: temporary file location is missing.")
-        reject(cloudError.code, cloudError.message, nil)
-        return
-      }
-
-      do {
-        let directory = localUrl.deletingLastPathComponent()
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true, attributes: nil)
-
-        if FileManager.default.fileExists(atPath: localUrl.path) {
-          try FileManager.default.removeItem(at: localUrl)
-        }
-
-        try FileManager.default.moveItem(at: tempLocalUrl, to: localUrl)
-        resolve(nil)
-      } catch {
-        let nsError = error as NSError
-        let cloudError = CloudStorageError.writeError(path: localUrl.path)
-        reject(cloudError.code, cloudError.message, nsError)
+      withPromise(resolve: resolve, reject: reject) {
+        try FileUtils.saveDownloadedFile(temporaryUrl: tempLocalUrl, response: response, destinationUrl: localUrl)
       }
     }
 
