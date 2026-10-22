@@ -26,28 +26,38 @@ struct ICloudDriveUtilsTests {
     #expect(!ICloudDriveUtils.contains(directory.appendingPathComponent("nest"), in: urls))
   }
 
-  @Test func stopsCompletedQueries() throws {
-    let query = TestMetadataQuery(.success)
-    _ = try ICloudMetadataQuery(query: query).gather(timeout: 1)
-    #expect(query.didStop)
+  @Test func stopsCompletedQueries() async throws {
+    let (result, didStop) = await gather(.success)
+    _ = try result.get()
+    #expect(didStop)
   }
 
-  @Test func normalizesQueryStartFailuresAndStopsTheQuery() {
-    let query = TestMetadataQuery(.startFailure)
+  @Test func normalizesQueryStartFailuresAndStopsTheQuery() async {
+    let (result, didStop) = await gather(.startFailure)
     let error = #expect(throws: CloudStorageError.self) {
-      try ICloudMetadataQuery(query: query).gather(timeout: 1)
+      try result.get()
     }
     #expect(error?.code == "ERR_UNKNOWN")
-    #expect(query.didStop)
+    #expect(didStop)
   }
 
-  @Test func normalizesQueryTimeoutsAndStopsTheQuery() {
-    let query = TestMetadataQuery(.timeout)
+  @Test func normalizesQueryTimeoutsAndStopsTheQuery() async {
+    let (result, didStop) = await gather(.timeout, timeout: 0.01)
     let error = #expect(throws: CloudStorageError.self) {
-      try ICloudMetadataQuery(query: query).gather(timeout: 0.01)
+      try result.get()
     }
     #expect(error?.code == "ERR_NETWORK_ERROR")
-    #expect(query.didStop)
+    #expect(didStop)
+  }
+
+  private func gather(_ behavior: TestMetadataQuery.Behavior, timeout: TimeInterval = 30) async -> (Result<[URL], Error>, Bool) {
+    await withCheckedContinuation { continuation in
+      DispatchQueue.global().async {
+        let query = TestMetadataQuery(behavior)
+        let result = Result { try ICloudMetadataQuery(query: query).gather(timeout: timeout) }
+        continuation.resume(returning: (result, query.didStop))
+      }
+    }
   }
 }
 
