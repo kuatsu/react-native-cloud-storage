@@ -10,7 +10,7 @@ export default {
       name: 'android',
       device: androidEmulator('CloudStorage_API_35', {
         apiLevel: 35,
-        profile: 'pixel_8',
+        profile: 'pixel_7',
         diskSize: '6G',
         heapSize: '1G',
       }),
