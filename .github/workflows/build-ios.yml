@@ -24,18 +24,21 @@ jobs:
   build:
     name: Build iOS example app
     runs-on: macOS-26
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7
       - name: Setup
         uses: ./.github/actions/setup
       - name: Select iOS runtime
         run: |
-          version=$(xcrun simctl list devices available --json | jq -er '
-            .devices | to_entries | first(.[] | select(any(.value[]; .name == "iPhone 17 Pro")))
-            | .key | split(".iOS-")[1] | gsub("-"; ".")
+          version=$(xcrun simctl list --json | jq -er '
+            . as $simulators | first(.runtimes[] | select(.isAvailable and
+              any($simulators.devices[.identifier][]?; .isAvailable and .name == "iPhone 17 Pro")))
+            | .version
           ')
           echo "HARNESS_IOS_VERSION=$version" >> "$GITHUB_ENV"
       - name: Test iOS file utilities
+        timeout-minutes: 10
         run: pnpm package test:ios -destination "platform=iOS Simulator,name=iPhone 17 Pro,OS=$HARNESS_IOS_VERSION"
       - name: Install xcpretty
         run: gem install xcpretty
@@ -57,6 +60,7 @@ jobs:
           CODE_SIGNING_ALLOWED=NO | xcpretty"
         working-directory: apps/example
       - name: Test native modules
+        timeout-minutes: 10
         uses: callstackincubator/react-native-harness@v1.6.0
         with:
           projectRoot: apps/example

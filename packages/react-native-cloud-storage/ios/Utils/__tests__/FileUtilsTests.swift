@@ -48,7 +48,11 @@ final class FileUtilsTests {
     try await withThrowingTaskGroup(of: Void.self) { group in
       for _ in 0 ..< 20 {
         group.addTask {
-          try FileUtils.appendFile(fileUrl: file, content: "x")
+          try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            DispatchQueue.global().async {
+              continuation.resume(with: Result { try FileUtils.appendFile(fileUrl: file, content: "x") })
+            }
+          }
         }
       }
       try await group.waitForAll()
