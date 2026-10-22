@@ -72,15 +72,19 @@ public class CloudStorageICloudDrive: NSObject {
   public func deleteFile(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withBackgroundPromise(resolve: resolve, reject: reject) {
       let fileUrl = try ICloudDriveUtils.getFileURL(path: path, scope: scope, true)
-      return try FileUtils.deleteFileOrDirectory(fileUrl: fileUrl)
+      return try FileUtils.deleteFile(fileUrl: fileUrl)
     }
   }
 
   @objc(deleteDirectory:withRecursive:withScope:withResolver:withRejecter:)
-  public func deleteDirectory(path: String, recursive _: Bool, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  public func deleteDirectory(path: String, recursive: Bool, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withBackgroundPromise(resolve: resolve, reject: reject) {
       let fileUrl = try ICloudDriveUtils.getFileURL(path: path, scope: scope, true)
-      return try FileUtils.deleteFileOrDirectory(fileUrl: fileUrl)
+      if !recursive, try fileUrl.resourceValues(forKeys: [.isDirectoryKey]).isDirectory == true,
+         try !(ICloudDriveUtils.listFiles(directoryUrl: fileUrl, scope: scope)).isEmpty {
+        throw CloudStorageError.directoryNotEmpty(path: path)
+      }
+      return try FileUtils.deleteDirectory(directoryUrl: fileUrl, recursive: recursive)
     }
   }
 

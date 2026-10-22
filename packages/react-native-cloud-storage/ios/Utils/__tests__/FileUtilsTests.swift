@@ -100,6 +100,33 @@ final class FileUtilsTests {
     #expect(stat.size == 7)
   }
 
+  @Test func rejectsDeletingDirectoriesAsFiles() throws {
+    let child = directory.appendingPathComponent("child.txt")
+    try "kept".write(to: child, atomically: true, encoding: .utf8)
+
+    let error = #expect(throws: CloudStorageError.self) {
+      try FileUtils.deleteFile(fileUrl: directory)
+    }
+
+    #expect(error?.code == "ERR_PATH_IS_DIRECTORY")
+    #expect(try String(contentsOf: child, encoding: .utf8) == "kept")
+    try FileUtils.deleteFile(fileUrl: child)
+    #expect(!FileManager.default.fileExists(atPath: child.path))
+  }
+
+  @Test(arguments: [false, true])
+  func rejectsDeletingFilesAsDirectories(recursive: Bool) throws {
+    let file = directory.appendingPathComponent("file.txt")
+    try "kept".write(to: file, atomically: true, encoding: .utf8)
+
+    let error = #expect(throws: CloudStorageError.self) {
+      try FileUtils.deleteDirectory(directoryUrl: file, recursive: recursive)
+    }
+
+    #expect(error?.code == "ERR_PATH_IS_FILE")
+    #expect(try String(contentsOf: file, encoding: .utf8) == "kept")
+  }
+
   @Test func normalizesMissingFileErrors() throws {
     let file = directory.appendingPathComponent("missing.txt")
     #expect(try !FileUtils.checkFileExists(fileUrl: file))

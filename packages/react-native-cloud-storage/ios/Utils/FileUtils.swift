@@ -1,3 +1,4 @@
+import Darwin
 import Foundation
 
 enum FileUtils {
@@ -90,9 +91,31 @@ enum FileUtils {
     }
   }
 
-  static func deleteFileOrDirectory(fileUrl: URL) throws {
+  static func deleteFile(fileUrl: URL) throws {
     try coordinateWriting(at: fileUrl, options: .forDeleting, error: .deleteError(path: fileUrl.path)) { url in
-      try fileManager.removeItem(at: url)
+      if try url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory == true {
+        throw CloudStorageError.pathIsDirectory(path: url.path)
+      }
+      if unlink(url.path) != 0 {
+        throw NSError(domain: NSPOSIXErrorDomain, code: Int(errno))
+      }
+    }
+  }
+
+  static func deleteDirectory(directoryUrl: URL, recursive: Bool) throws {
+    try coordinateWriting(at: directoryUrl, options: .forDeleting, error: .deleteError(path: directoryUrl.path)) { url in
+      guard try url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory == true else {
+        throw CloudStorageError.pathIsFile(path: url.path)
+      }
+      if recursive {
+        try fileManager.removeItem(at: url)
+      } else if rmdir(url.path) != 0 {
+        let error = NSError(domain: NSPOSIXErrorDomain, code: Int(errno))
+        if error.code == ENOTEMPTY || error.code == EEXIST {
+          throw CloudStorageError.directoryNotEmpty(path: url.path).caused(by: error)
+        }
+        throw error
+      }
     }
   }
 
