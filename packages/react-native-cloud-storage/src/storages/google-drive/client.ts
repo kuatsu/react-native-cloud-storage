@@ -135,7 +135,7 @@ export default class GoogleDriveApiClient {
       pageToken = response.nextPageToken ?? undefined;
     } while (pageToken);
 
-    return files;
+    return files.sort((first, second) => (first.id < second.id ? -1 : first.id > second.id ? 1 : 0));
   }
 
   public async getFile(fileId: string): Promise<GoogleDriveFile> {

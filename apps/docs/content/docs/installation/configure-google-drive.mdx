@@ -4,7 +4,7 @@ description: Acquire and provide a Google Drive access token so react-native-clo
 ---
 
 <Callout type="warn">
-Please note that filenames are not unique in Google Drive. There can be multiple files with the same name within the same directory (even files and directories sharing the same name). By default, the library will not throw any errors when there are multiple files with the same name detected, but instead default to the first file found. However, this might be problematic when working with the [`CloudStorageScope.Documents` scope](/docs/api/enumerations/CloudStorageScope). Please [see here](/docs/guides/google-drive-files-same-name) for more info.
+Please note that filenames are not unique in Google Drive. There can be multiple files with the same name within the same directory (even files and directories sharing the same name). By default, the library will not throw any errors when there are multiple files with the same name detected, but instead default to the first match in ascending file ID order. However, this might be problematic when working with the [`CloudStorageScope.Documents` scope](/docs/api/enumerations/CloudStorageScope). Please [see here](/docs/guides/google-drive-files-same-name) for more info.
 </Callout>
 
 <Callout type="info">
