@@ -59,7 +59,7 @@ const features: { icon: typeof FolderTree; title: string; description: ReactNode
 const providers = [
   {
     name: 'iCloud (iOS only)',
-    scope: 'Backed by a native CloudKit module.',
+    scope: 'Backed by native iCloud modules.',
   },
   {
     name: 'Google Drive',

@@ -10,7 +10,11 @@ import { type NativeStorage, type NativeStorageScope } from './types/native';
 import { isProviderSupported } from './utils/helpers';
 import { Platform, type EventSubscription } from 'react-native';
 import GoogleDrive from './storages/google-drive';
-import { NativeCloudKit, NativeCloudKitModule, type NativeCloudStorageCloudKitTurboModule } from './storages/cloudkit';
+import {
+  NativeICloudDrive,
+  NativeICloudDriveModule,
+  type NativeCloudStorageICloudDriveTurboModule,
+} from './storages/icloud-drive';
 import { DEFAULT_PROVIDER_OPTIONS, LINKING_ERROR } from './utils/constants';
 
 /**
@@ -50,7 +54,7 @@ export default class RNCloudStorage {
     switch (this.provider.provider) {
       case CloudStorageProvider.ICloud: {
         return (
-          NativeCloudKit ??
+          NativeICloudDrive ??
           (new Proxy(
             {},
             {
@@ -115,8 +119,8 @@ export default class RNCloudStorage {
       });
   }
 
-  private getNativeCloudKitModule(): NativeCloudStorageCloudKitTurboModule | null {
-    return this.provider.provider === CloudStorageProvider.ICloud ? NativeCloudKitModule : null;
+  private getNativeICloudDriveModule(): NativeCloudStorageICloudDriveTurboModule | null {
+    return this.provider.provider === CloudStorageProvider.ICloud ? NativeICloudDriveModule : null;
   }
 
   private removeCloudAvailabilitySubscription(): void {
@@ -131,12 +135,12 @@ export default class RNCloudStorage {
       return;
     }
 
-    const nativeCloudKitModule = this.getNativeCloudKitModule();
-    if (!nativeCloudKitModule) {
+    const nativeICloudDriveModule = this.getNativeICloudDriveModule();
+    if (!nativeICloudDriveModule) {
       return;
     }
 
-    this.cloudAvailabilitySubscription = nativeCloudKitModule.onCloudAvailabilityChanged((event) => {
+    this.cloudAvailabilitySubscription = nativeICloudDriveModule.onCloudAvailabilityChanged((event) => {
       this.notifyCloudAvailabilityListeners(event.available);
     });
   }

@@ -1,13 +1,13 @@
 import Foundation
 import React
 
-@objc(CloudStorageCloudKit)
-public class CloudStorageCloudKit: NSObject {
+@objc(CloudStorageICloudDrive)
+public class CloudStorageICloudDrive: NSObject {
   @objc(fileExists:withScope:withResolver:withRejecter:)
   public func fileExists(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withBackgroundPromise(resolve: resolve, reject: reject) {
       do {
-        _ = try CloudKitUtils.getFileURL(path: path, scope: scope, true)
+        _ = try ICloudDriveUtils.getFileURL(path: path, scope: scope, true)
         return true
       } catch CloudStorageError.fileNotFound {
         return false
@@ -20,9 +20,9 @@ public class CloudStorageCloudKit: NSObject {
     withBackgroundPromise(resolve: resolve, reject: reject) {
       let fileUrl: URL
       do {
-        fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope, true)
+        fileUrl = try ICloudDriveUtils.getFileURL(path: path, scope: scope, true)
       } catch CloudStorageError.fileNotFound {
-        fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
+        fileUrl = try ICloudDriveUtils.getFileURL(path: path, scope: scope)
       }
       return try FileUtils.appendFile(fileUrl: fileUrl, content: data)
     }
@@ -31,7 +31,7 @@ public class CloudStorageCloudKit: NSObject {
   @objc(createFile:withData:withScope:withOverwrite:withResolver:withRejecter:)
   public func createFile(path: String, data: String, scope: String, overwrite: Bool, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withBackgroundPromise(resolve: resolve, reject: reject) {
-      let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
+      let fileUrl = try ICloudDriveUtils.getFileURL(path: path, scope: scope)
       return try FileUtils.writeFile(fileUrl: fileUrl, content: data, overwrite: overwrite)
     }
   }
@@ -39,7 +39,7 @@ public class CloudStorageCloudKit: NSObject {
   @objc(createDirectory:withScope:withResolver:withRejecter:)
   public func createDirectory(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withBackgroundPromise(resolve: resolve, reject: reject) {
-      let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
+      let fileUrl = try ICloudDriveUtils.getFileURL(path: path, scope: scope)
       return try FileUtils.createDirectory(directoryUrl: fileUrl)
     }
   }
@@ -47,15 +47,15 @@ public class CloudStorageCloudKit: NSObject {
   @objc(listFiles:withScope:withResolver:withRejecter:)
   public func listFiles(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withBackgroundPromise(resolve: resolve, reject: reject) {
-      let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope)
-      return try CloudKitUtils.listFiles(directoryUrl: fileUrl, scope: scope)
+      let fileUrl = try ICloudDriveUtils.getFileURL(path: path, scope: scope)
+      return try ICloudDriveUtils.listFiles(directoryUrl: fileUrl, scope: scope)
     }
   }
 
   @objc(readFile:withScope:withResolver:withRejecter:)
   public func readFile(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withBackgroundPromise(resolve: resolve, reject: reject) {
-      let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope, true)
+      let fileUrl = try ICloudDriveUtils.getFileURL(path: path, scope: scope, true)
       return try FileUtils.readFile(fileUrl: fileUrl)
     }
   }
@@ -63,15 +63,15 @@ public class CloudStorageCloudKit: NSObject {
   @objc(triggerSync:withScope:withResolver:withRejecter:)
   public func triggerSync(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withBackgroundPromise(resolve: resolve, reject: reject) {
-      let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope, true)
-      return try CloudKitUtils.triggerSync(fileUrl: fileUrl)
+      let fileUrl = try ICloudDriveUtils.getFileURL(path: path, scope: scope, true)
+      return try ICloudDriveUtils.triggerSync(fileUrl: fileUrl)
     }
   }
 
   @objc(deleteFile:withScope:withResolver:withRejecter:)
   public func deleteFile(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withBackgroundPromise(resolve: resolve, reject: reject) {
-      let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope, true)
+      let fileUrl = try ICloudDriveUtils.getFileURL(path: path, scope: scope, true)
       return try FileUtils.deleteFileOrDirectory(fileUrl: fileUrl)
     }
   }
@@ -79,7 +79,7 @@ public class CloudStorageCloudKit: NSObject {
   @objc(deleteDirectory:withRecursive:withScope:withResolver:withRejecter:)
   public func deleteDirectory(path: String, recursive _: Bool, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withBackgroundPromise(resolve: resolve, reject: reject) {
-      let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope, true)
+      let fileUrl = try ICloudDriveUtils.getFileURL(path: path, scope: scope, true)
       return try FileUtils.deleteFileOrDirectory(fileUrl: fileUrl)
     }
   }
@@ -87,7 +87,7 @@ public class CloudStorageCloudKit: NSObject {
   @objc(statFile:withScope:withResolver:withRejecter:)
   public func statFile(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withBackgroundPromise(resolve: resolve, reject: reject) {
-      let fileUrl = try CloudKitUtils.getFileURL(path: path, scope: scope, true)
+      let fileUrl = try ICloudDriveUtils.getFileURL(path: path, scope: scope, true)
       return try FileUtils.statFile(fileUrl: fileUrl).toDictionary()
     }
   }
@@ -95,7 +95,7 @@ public class CloudStorageCloudKit: NSObject {
   @objc(downloadFile:withLocalPath:withScope:withResolver:withRejecter:)
   public func downloadFile(remotePath: String, localPath: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withBackgroundPromise(resolve: resolve, reject: reject) {
-      let sourceUrl = try CloudKitUtils.getFileURL(path: remotePath, scope: scope, true)
+      let sourceUrl = try ICloudDriveUtils.getFileURL(path: remotePath, scope: scope, true)
       let destinationUrl = try FileUtils.localFileURL(path: localPath)
       return try FileUtils.copyFile(from: sourceUrl, to: destinationUrl)
     }
@@ -104,7 +104,7 @@ public class CloudStorageCloudKit: NSObject {
   @objc(uploadFile:withLocalPath:withMimeType:withScope:withOverwrite:withResolver:withRejecter:)
   public func uploadFile(remotePath: String, localPath: String, mimeType _: String, scope: String, overwrite: Bool, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withBackgroundPromise(resolve: resolve, reject: reject) {
-      let destinationUrl = try CloudKitUtils.getFileURL(path: remotePath, scope: scope)
+      let destinationUrl = try ICloudDriveUtils.getFileURL(path: remotePath, scope: scope)
       let sourceUrl = try FileUtils.localFileURL(path: localPath)
       try FileUtils.createDirectory(directoryUrl: destinationUrl.deletingLastPathComponent())
       return try FileUtils.copyFile(from: sourceUrl, to: destinationUrl, overwrite: overwrite)
@@ -114,7 +114,7 @@ public class CloudStorageCloudKit: NSObject {
   @objc(isCloudAvailable:withRejecter:)
   public func isCloudAvailable(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withBackgroundPromise(resolve: resolve, reject: reject) {
-      CloudKitUtils.isCloudKitAvailable()
+      ICloudDriveUtils.isICloudDriveAvailable()
     }
   }
 }

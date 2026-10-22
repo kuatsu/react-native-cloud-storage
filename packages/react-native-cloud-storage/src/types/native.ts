@@ -1,7 +1,7 @@
 import type {
   CloudStorageFileStat,
-  Spec as NativeCloudStorageCloudKitSpec,
-} from '../specs/NativeCloudStorageCloudKitIOS';
+  Spec as NativeCloudStorageICloudDriveSpec,
+} from '../specs/NativeCloudStorageICloudDriveIOS';
 import type { Spec as NativeCloudStorageLocalFileSystemSpec } from '../specs/NativeCloudStorageLocalFileSystem';
 
 export type NativeStorageScope = 'documents' | 'documents_legacy' | 'app_data';
@@ -48,4 +48,4 @@ export interface NativeKVStorage {
 
 export type NativeLocalFileSystem = NativeCloudStorageLocalFileSystemSpec;
 
-export type NativeStorage = Omit<NativeCloudStorageCloudKitSpec, 'onCloudAvailabilityChanged'>;
+export type NativeStorage = Omit<NativeCloudStorageICloudDriveSpec, 'onCloudAvailabilityChanged'>;

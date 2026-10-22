@@ -10,17 +10,17 @@
 #error "Unable to locate Swift compatibility header for react-native-cloud-storage."
 #endif
 
-@interface RCTCloudStorageCloudKit : NativeCloudStorageCloudKitIOSSpecBase <NativeCloudStorageCloudKitIOSSpec>
+@interface RCTCloudStorageICloudDrive : NativeCloudStorageICloudDriveIOSSpecBase <NativeCloudStorageICloudDriveIOSSpec>
 @end
 
-@implementation RCTCloudStorageCloudKit {
-  CloudStorageCloudKit *_cloudStorageCloudKit;
+@implementation RCTCloudStorageICloudDrive {
+  CloudStorageICloudDrive *_cloudStorageICloudDrive;
   id<NSObject> _ubiquityIdentityObserver;
 }
 
 + (NSString *)moduleName
 {
-  return @"CloudStorageCloudKit";
+  return @"CloudStorageICloudDrive";
 }
 
 + (BOOL)requiresMainQueueSetup
@@ -31,7 +31,7 @@
 - (instancetype)init
 {
   if (self = [super init]) {
-    _cloudStorageCloudKit = [CloudStorageCloudKit new];
+    _cloudStorageICloudDrive = [CloudStorageICloudDrive new];
     // The ubiquity-identity observer is installed in -setEventEmitterCallback:
     // rather than here, so it can only fire after the codegen event emitter's
     // std::function has been bound. Otherwise a notification posted by iOS
@@ -81,7 +81,7 @@
            resolve:(RCTPromiseResolveBlock)resolve
             reject:(RCTPromiseRejectBlock)reject
 {
-  [_cloudStorageCloudKit fileExists:path withScope:scope withResolver:resolve withRejecter:reject];
+  [_cloudStorageICloudDrive fileExists:path withScope:scope withResolver:resolve withRejecter:reject];
 }
 
 - (void)appendToFile:(NSString *)path
@@ -90,7 +90,7 @@
              resolve:(RCTPromiseResolveBlock)resolve
               reject:(RCTPromiseRejectBlock)reject
 {
-  [_cloudStorageCloudKit appendToFile:path withData:data withScope:scope withResolver:resolve withRejecter:reject];
+  [_cloudStorageICloudDrive appendToFile:path withData:data withScope:scope withResolver:resolve withRejecter:reject];
 }
 
 - (void)createFile:(NSString *)path
@@ -100,7 +100,7 @@
            resolve:(RCTPromiseResolveBlock)resolve
             reject:(RCTPromiseRejectBlock)reject
 {
-  [_cloudStorageCloudKit
+  [_cloudStorageICloudDrive
       createFile:path
          withData:data
         withScope:scope
@@ -114,7 +114,7 @@
                 resolve:(RCTPromiseResolveBlock)resolve
                  reject:(RCTPromiseRejectBlock)reject
 {
-  [_cloudStorageCloudKit createDirectory:path withScope:scope withResolver:resolve withRejecter:reject];
+  [_cloudStorageICloudDrive createDirectory:path withScope:scope withResolver:resolve withRejecter:reject];
 }
 
 - (void)listFiles:(NSString *)path
@@ -122,7 +122,7 @@
           resolve:(RCTPromiseResolveBlock)resolve
            reject:(RCTPromiseRejectBlock)reject
 {
-  [_cloudStorageCloudKit listFiles:path withScope:scope withResolver:resolve withRejecter:reject];
+  [_cloudStorageICloudDrive listFiles:path withScope:scope withResolver:resolve withRejecter:reject];
 }
 
 - (void)readFile:(NSString *)path
@@ -130,7 +130,7 @@
          resolve:(RCTPromiseResolveBlock)resolve
           reject:(RCTPromiseRejectBlock)reject
 {
-  [_cloudStorageCloudKit readFile:path withScope:scope withResolver:resolve withRejecter:reject];
+  [_cloudStorageICloudDrive readFile:path withScope:scope withResolver:resolve withRejecter:reject];
 }
 
 - (void)triggerSync:(NSString *)path
@@ -138,7 +138,7 @@
             resolve:(RCTPromiseResolveBlock)resolve
              reject:(RCTPromiseRejectBlock)reject
 {
-  [_cloudStorageCloudKit triggerSync:path withScope:scope withResolver:resolve withRejecter:reject];
+  [_cloudStorageICloudDrive triggerSync:path withScope:scope withResolver:resolve withRejecter:reject];
 }
 
 - (void)deleteFile:(NSString *)path
@@ -146,7 +146,7 @@
            resolve:(RCTPromiseResolveBlock)resolve
             reject:(RCTPromiseRejectBlock)reject
 {
-  [_cloudStorageCloudKit deleteFile:path withScope:scope withResolver:resolve withRejecter:reject];
+  [_cloudStorageICloudDrive deleteFile:path withScope:scope withResolver:resolve withRejecter:reject];
 }
 
 - (void)deleteDirectory:(NSString *)path
@@ -155,7 +155,7 @@
                 resolve:(RCTPromiseResolveBlock)resolve
                  reject:(RCTPromiseRejectBlock)reject
 {
-  [_cloudStorageCloudKit
+  [_cloudStorageICloudDrive
       deleteDirectory:path
          withRecursive:recursive
              withScope:scope
@@ -168,7 +168,7 @@
          resolve:(RCTPromiseResolveBlock)resolve
           reject:(RCTPromiseRejectBlock)reject
 {
-  [_cloudStorageCloudKit statFile:path withScope:scope withResolver:resolve withRejecter:reject];
+  [_cloudStorageICloudDrive statFile:path withScope:scope withResolver:resolve withRejecter:reject];
 }
 
 - (void)downloadFile:(NSString *)remotePath
@@ -177,7 +177,7 @@
              resolve:(RCTPromiseResolveBlock)resolve
               reject:(RCTPromiseRejectBlock)reject
 {
-  [_cloudStorageCloudKit
+  [_cloudStorageICloudDrive
       downloadFile:remotePath
      withLocalPath:localPath
          withScope:scope
@@ -193,7 +193,7 @@
            resolve:(RCTPromiseResolveBlock)resolve
             reject:(RCTPromiseRejectBlock)reject
 {
-  [_cloudStorageCloudKit
+  [_cloudStorageICloudDrive
       uploadFile:remotePath
        withLocalPath:localPath
        withMimeType:mimeType
@@ -206,13 +206,13 @@
 - (void)isCloudAvailable:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject
 {
-  [_cloudStorageCloudKit isCloudAvailable:resolve withRejecter:reject];
+  [_cloudStorageICloudDrive isCloudAvailable:resolve withRejecter:reject];
 }
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
     (const facebook::react::ObjCTurboModule::InitParams &)params
 {
-  return std::make_shared<facebook::react::NativeCloudStorageCloudKitIOSSpecJSI>(params);
+  return std::make_shared<facebook::react::NativeCloudStorageICloudDriveIOSSpecJSI>(params);
 }
 
 @end

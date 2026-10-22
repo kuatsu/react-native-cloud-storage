@@ -25,7 +25,7 @@ let package = Package(
       dependencies: reactHeaders,
       path: "ios",
       sources: [
-        "CloudStorageCloudKit.swift",
+        "CloudStorageICloudDrive.swift",
         "CloudStorageKVStore.swift",
         "CloudStorageLocalFileSystem.swift",
         "Utils",
@@ -39,7 +39,7 @@ let package = Package(
       ],
       path: "ios",
       sources: [
-        "RCTCloudStorageCloudKit.mm",
+        "RCTCloudStorageICloudDrive.mm",
         "RCTCloudStorageKVStore.mm",
         "RCTCloudStorageLocalFileSystem.mm",
       ],

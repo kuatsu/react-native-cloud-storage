@@ -106,12 +106,12 @@ let metadataURLs = [
   directory.appendingPathComponent("Documents/public.txt"),
   directory.appendingPathComponent("../another-container/ignored.zip"),
 ]
-let entries = CloudKitUtils.directoryEntries(at: directory, localNames: [".remote.zip.icloud", "local.txt", ".literal.icloud"], metadataURLs: metadataURLs)
+let entries = ICloudDriveUtils.directoryEntries(at: directory, localNames: [".remote.zip.icloud", "local.txt", ".literal.icloud"], metadataURLs: metadataURLs)
 assert(entries == [".literal.icloud", "Documents", "local.txt", "nested", "remote.zip"])
-assert(CloudKitUtils.contains(directory.appendingPathComponent("nested"), in: metadataURLs))
-assert(!CloudKitUtils.contains(directory.appendingPathComponent("nest"), in: metadataURLs))
+assert(ICloudDriveUtils.contains(directory.appendingPathComponent("nested"), in: metadataURLs))
+assert(!ICloudDriveUtils.contains(directory.appendingPathComponent("nest"), in: metadataURLs))
 let hiddenFile = directory.appendingPathComponent(".remote.zip.icloud")
-let hiddenEntries = CloudKitUtils.directoryEntries(at: directory, localNames: [hiddenFile.lastPathComponent], metadataURLs: metadataURLs + [hiddenFile])
+let hiddenEntries = ICloudDriveUtils.directoryEntries(at: directory, localNames: [hiddenFile.lastPathComponent], metadataURLs: metadataURLs + [hiddenFile])
 assert(hiddenEntries.contains(hiddenFile.lastPathComponent))
 
 // MARK: - TestMetadataQuery

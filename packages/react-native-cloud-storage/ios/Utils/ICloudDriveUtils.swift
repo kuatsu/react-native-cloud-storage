@@ -1,5 +1,5 @@
 //
-//  CloudKitUtils.swift
+//  ICloudDriveUtils.swift
 //  CloudStorage
 //
 //  Created by Maximilian Krause on 27.09.24.
@@ -8,17 +8,17 @@
 
 import Foundation
 
-// MARK: - CloudKitUtils
+// MARK: - ICloudDriveUtils
 
-enum CloudKitUtils {
+enum ICloudDriveUtils {
   private static let fileManager = FileManager.default
 
   /**
-     Checks if the CloudKit service is available.
+     Checks if iCloud Drive is available.
 
-     - Returns: True if the CloudKit service is available, false otherwise.
+     - Returns: True if iCloud Drive is available, false otherwise.
    */
-  static func isCloudKitAvailable() -> Bool {
+  static func isICloudDriveAvailable() -> Bool {
     fileManager.ubiquityIdentityToken != nil
   }
 
