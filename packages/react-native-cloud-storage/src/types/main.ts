@@ -106,7 +106,7 @@ export interface CloudStorageProviderOptions {
      */
     accessToken?: string | null;
     /**
-     * Whether or not to throw an error if multiple files with the same filename are found. Defaults to false.
+     * Whether to throw if a path component matches multiple files or directories. Defaults to false.
      */
     strictFilenames?: boolean;
     /**

@@ -85,17 +85,6 @@ export default class GoogleDrive implements NativeStorage {
     return this.getRootDirectoryId(scope);
   }
 
-  private async findDirectoryByNameAndParent(
-    name: string,
-    parentId: string,
-    scope: NativeStorageScope
-  ): Promise<GoogleDriveFile[]> {
-    const escapedName = this.escapeDriveQueryValue(name);
-    const escapedParentId = this.escapeDriveQueryValue(parentId);
-    const query = `name = '${escapedName}' and '${escapedParentId}' in parents and mimeType = '${MimeTypes.FOLDER}' and trashed = false`;
-    return this.drive.listFiles(this.getRootDirectory(scope), query);
-  }
-
   private async findFilesByNameAndParent(
     name: string,
     parentId: string,
@@ -115,14 +104,18 @@ export default class GoogleDrive implements NativeStorage {
 
   private async findParentDirectoryId(directoryTree: string[], scope: NativeStorageScope): Promise<string | null> {
     let parentDirectoryId = await this.getQueryRootParentId(scope);
+    let directoryPath = '';
 
     for (const directoryName of directoryTree) {
-      const directories = await this.findDirectoryByNameAndParent(directoryName, parentDirectoryId, scope);
-      if (directories.length === 0) {
+      directoryPath += `/${directoryName}`;
+      const files = await this.findFilesByNameAndParent(directoryName, parentDirectoryId, scope);
+      this.checkIfMultipleFilesWithSameName(directoryPath, files);
+      const directory = files.find((file) => file.mimeType === MimeTypes.FOLDER);
+      if (!directory) {
         return null;
       }
 
-      parentDirectoryId = directories[0]!.id;
+      parentDirectoryId = directory.id;
     }
 
     return parentDirectoryId;
