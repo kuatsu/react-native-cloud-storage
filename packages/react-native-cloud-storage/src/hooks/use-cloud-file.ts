@@ -1,6 +1,6 @@
 import type { CloudStorageScope } from '../types/main';
 import RNCloudStorage from '../cloud-storage';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * A utility hook for reading and writing to a single file in the cloud.
@@ -11,32 +11,36 @@ import { useCallback, useEffect, useState } from 'react';
  */
 export const useCloudFile = (path: string, scope?: CloudStorageScope, cloudStorageInstance?: RNCloudStorage) => {
   const [content, setContent] = useState<string | null>(null);
+  const readSequence = useRef(0);
   const instance = cloudStorageInstance ?? RNCloudStorage;
 
   const read = useCallback(async () => {
+    const sequence = ++readSequence.current;
     const exists = await instance.exists(path, scope);
-    if (!exists) {
-      setContent(null);
-      return;
-    }
-    instance.readFile(path, scope).then(setContent);
+    const nextContent = exists ? await instance.readFile(path, scope) : null;
+    if (sequence === readSequence.current) setContent(nextContent);
   }, [path, scope, instance]);
 
   useEffect(() => {
-    read();
+    void read();
+    return () => {
+      readSequence.current += 1;
+    };
   }, [read]);
 
   const write = useCallback(
     async (newContent: string) => {
+      const sequence = ++readSequence.current;
       await instance.writeFile(path, newContent, scope);
-      read();
+      if (sequence === readSequence.current) await read();
     },
     [path, scope, read, instance]
   );
 
   const remove = useCallback(async () => {
+    const sequence = ++readSequence.current;
     await instance.unlink(path, scope);
-    setContent(null);
+    if (sequence === readSequence.current) setContent(null);
   }, [path, scope, instance]);
 
   const sync = useCallback(async () => {
