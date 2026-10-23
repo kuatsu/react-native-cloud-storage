@@ -84,7 +84,7 @@ export default class GoogleDriveKV implements NativeKVStorage {
   }
 
   private mergeEntries(...sources: KVEntries[]): KVEntries {
-    const result: KVEntries = {};
+    const result: KVEntries = Object.create(null);
     for (const source of sources) {
       for (const [key, entry] of Object.entries(source)) {
         if (!result[key] || entry.t >= result[key].t) result[key] = entry;
