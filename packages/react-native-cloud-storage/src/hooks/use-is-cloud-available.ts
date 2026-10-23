@@ -15,10 +15,6 @@ export const useIsCloudAvailable = (cloudStorageInstance?: RNCloudStorage) => {
   }, []);
 
   useEffect(() => {
-    // Set the initial availability state
-    instance.isCloudAvailable().then(setIsAvailable);
-
-    // Listen for changes to the cloud availability using the native event emitter
     instance.subscribeToCloudAvailability(handleAvailabilityChange);
 
     return () => {

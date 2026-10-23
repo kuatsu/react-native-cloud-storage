@@ -21,6 +21,28 @@ export default class GoogleDriveApiClient {
     this.options = options;
   }
 
+  public async getAccessToken(): Promise<string> {
+    let token;
+    try {
+      const { accessToken } = this.options;
+      token = typeof accessToken === 'function' ? await accessToken() : accessToken;
+    } catch (error) {
+      if (error instanceof CloudStorageError) throw error;
+      throw new CloudStorageError(
+        'Could not obtain a Google Drive access token',
+        NativeCloudStorageErrorCode.AUTHENTICATION_FAILED,
+        error
+      );
+    }
+    if (!token?.length) {
+      throw new CloudStorageError(
+        'Google Drive access token is not set',
+        NativeCloudStorageErrorCode.ACCESS_TOKEN_MISSING
+      );
+    }
+    return token;
+  }
+
   private buildQueryString(query: object): string {
     let result = Object.entries(query)
       .filter(([, value]) => value !== undefined)
@@ -49,13 +71,8 @@ export default class GoogleDriveApiClient {
       errorCode?: NativeCloudStorageErrorCode;
     } = {}
   ): Promise<T> {
-    const { timeout, accessToken } = this.options;
-    if (!accessToken?.length) {
-      throw new CloudStorageError(
-        'Google Drive access token is not set',
-        NativeCloudStorageErrorCode.ACCESS_TOKEN_MISSING
-      );
-    }
+    const { timeout } = this.options;
+    const accessToken = await this.getAccessToken();
 
     const failureCode =
       errorCode ??
@@ -220,7 +237,7 @@ export default class GoogleDriveApiClient {
         method: 'PATCH',
         uploadType: 'binary',
         headers: {
-          'Authorization': `Bearer ${this.options.accessToken}`,
+          'Authorization': `Bearer ${await this.getAccessToken()}`,
           'Content-Type': media.mimeType,
         },
       });
@@ -258,7 +275,7 @@ export default class GoogleDriveApiClient {
         method: 'PATCH',
         uploadType: 'binary',
         headers: {
-          'Authorization': `Bearer ${this.options.accessToken}`,
+          'Authorization': `Bearer ${await this.getAccessToken()}`,
           'Content-Type': media.mimeType,
         },
       });
@@ -269,7 +286,7 @@ export default class GoogleDriveApiClient {
     const remoteUri = `${BASE_URL}/files/${fileId}?alt=media`;
     await localFileSystem.downloadFile(remoteUri, localPath, {
       headers: {
-        Authorization: `Bearer ${this.options.accessToken}`,
+        Authorization: `Bearer ${await this.getAccessToken()}`,
       },
     });
   }

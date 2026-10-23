@@ -28,6 +28,7 @@ export default class RNCloudStorage {
   };
   private cloudAvailabilityListeners: ((available: boolean) => void)[] = [];
   private cloudAvailabilitySubscription: EventSubscription | null = null;
+  private cloudAvailabilitySequence = 0;
 
   //#region Constructor and configuration
   /**
@@ -109,10 +110,13 @@ export default class RNCloudStorage {
   }
 
   private refreshCloudAvailability(): void {
+    const sequence = ++this.cloudAvailabilitySequence;
     this.nativeStorage
       .isCloudAvailable()
       .then((available) => {
-        this.notifyCloudAvailabilityListeners(available);
+        if (this.cloudAvailabilitySequence === sequence) {
+          this.notifyCloudAvailabilityListeners(available);
+        }
       })
       .catch(() => {
         // ignore errors when refreshing availability after provider changes
@@ -183,10 +187,7 @@ export default class RNCloudStorage {
     };
 
     if (this.provider.provider === CloudStorageProvider.GoogleDrive && 'accessToken' in newOptions) {
-      // Emit an event to notify useIsCloudAvailable() hook consumers of the new cloud availability status
-      this.notifyCloudAvailabilityListeners(
-        !!(newOptions as Required<CloudStorageProviderOptions[CloudStorageProvider.GoogleDrive]>).accessToken?.length
-      );
+      this.refreshCloudAvailability();
     }
   }
 
@@ -195,8 +196,8 @@ export default class RNCloudStorage {
 
     if (this.cloudAvailabilityListeners.length === 1) {
       this.configureCloudAvailabilitySubscription();
-      this.refreshCloudAvailability();
     }
+    this.refreshCloudAvailability();
   }
 
   unsubscribeFromCloudAvailability(listener: (available: boolean) => void): void {
@@ -227,7 +228,7 @@ export default class RNCloudStorage {
 
   //#region File system operations
   /**
-   * Checks for an iCloud identity or a configured Google Drive access token.
+   * Checks for an iCloud identity or a Google Drive access token.
    * iCloud may be unavailable right after app launch or if the user is not signed in.
    * @returns A promise that resolves to true if an identity or token is present, false otherwise.
    */
@@ -442,7 +443,7 @@ export default class RNCloudStorage {
   }
 
   /**
-   * Checks for an iCloud identity or a configured Google Drive access token on the default instance.
+   * Checks for an iCloud identity or a Google Drive access token on the default instance.
    * iCloud may be unavailable right after app launch or if the user is not signed in.
    * @returns A promise that resolves to true if an identity or token is present, false otherwise.
    */

@@ -28,6 +28,16 @@ if (CloudStorage.getProvider() === CloudStorageProvider.GoogleDrive) {
   The default [`CloudStorage`](/docs/api/classes/CloudStorage) and [`CloudKVStorage`](/docs/api/classes/CloudKVStorage) APIs share provider options. Set the access token through either API and both defaults will use it. The `drive.appdata` scope is sufficient for key-value storage.
 </Callout>
 
+You can also provide a function that returns the current token (synchronously or asynchronously):
+
+```ts
+import { getCurrentAccessToken } from './auth';
+
+CloudStorage.setProviderOptions({ accessToken: () => getCurrentAccessToken() });
+```
+
+Here, `getCurrentAccessToken` gets called before each Google Drive request. This allows you, for example, to automatically refresh or invalidate the access token on demand, without explicitly setting it.
+
 Below is a more practical example of how this could look in action using the Expo AuthSession API:
 
 ```tsx

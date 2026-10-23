@@ -102,9 +102,10 @@ export interface CloudStorageProviderOptions {
      */
     scope?: CloudStorageScope;
     /**
-     * The access token to use for Google Drive operations.
+     * The Google Drive access token, or a function that returns it synchronously or asynchronously.
+     * The function is called before each request and when checking cloud availability.
      */
-    accessToken?: string | null;
+    accessToken?: string | null | (() => string | null | Promise<string | null>);
     /**
      * Whether to throw if a path component matches multiple files or directories. Defaults to false.
      */

@@ -22,8 +22,12 @@ export default class GoogleDrive implements NativeStorage {
   }
 
   public isCloudAvailable: () => Promise<boolean> = async () => {
-    const { accessToken } = this.options;
-    return !!accessToken?.length;
+    try {
+      await this.drive.getAccessToken();
+      return true;
+    } catch {
+      return false;
+    }
   };
 
   private getRootDirectory(scope: NativeStorageScope): GoogleDriveFileSpace {
