@@ -138,20 +138,34 @@ export default class GoogleDriveKV implements NativeKVStorage {
   }
 
   kvSetItem(key: string, value: string): Promise<void> {
-    assertValidKVKey(key);
+    return this.kvMultiSet([[key, value]]);
+  }
+
+  kvMultiSet(items: Array<[string, string]>): Promise<void> {
+    for (const [key] of items) assertValidKVKey(key);
+    if (items.length === 0) return Promise.resolve();
+
     return this.enqueueMutation(async () => {
       const remoteDocument = await this.fetchDocument();
-      const entries = this.mergeEntries(remoteDocument.entries, { [key]: { v: value, t: Date.now() } });
+      const timestamp = Date.now();
+      const updates = Object.fromEntries(items.map(([key, value]) => [key, { v: value, t: timestamp }]));
+      const entries = this.mergeEntries(remoteDocument.entries, updates);
       await this.writeDocument({ version: 1, entries });
     });
   }
 
   kvRemoveItem(key: string): Promise<void> {
-    assertValidKVKey(key);
+    return this.kvMultiRemove([key]);
+  }
+
+  kvMultiRemove(keys: string[]): Promise<void> {
+    for (const key of keys) assertValidKVKey(key);
+    if (keys.length === 0) return Promise.resolve();
+
     return this.enqueueMutation(async () => {
       const remoteDocument = await this.fetchDocument();
       const entries = { ...remoteDocument.entries };
-      delete entries[key];
+      for (const key of keys) delete entries[key];
       await this.writeDocument({ version: 1, entries });
     });
   }

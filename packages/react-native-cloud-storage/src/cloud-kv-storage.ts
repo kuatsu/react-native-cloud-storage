@@ -413,8 +413,8 @@ export default class RNCloudKVStorage {
 
     const provider = this.getProvider();
     const storage = this.nativeStorage;
-    if (provider !== CloudStorageProvider.ICloud) {
-      for (const [key, value] of entries) await storage.kvSetItem(key, value);
+    if (provider === CloudStorageProvider.GoogleDrive) {
+      await (storage as GoogleDriveKV).kvMultiSet(entries);
       return;
     }
 
@@ -436,10 +436,12 @@ export default class RNCloudKVStorage {
    */
   async multiRemove(keys: string[]): Promise<void> {
     for (const key of keys) assertValidKVKey(key);
+    if (keys.length === 0) return;
+
     const provider = this.getProvider();
     const storage = this.nativeStorage;
-    if (provider !== CloudStorageProvider.ICloud) {
-      for (const key of keys) await storage.kvRemoveItem(key);
+    if (provider === CloudStorageProvider.GoogleDrive) {
+      await (storage as GoogleDriveKV).kvMultiRemove(keys);
       return;
     }
 
