@@ -36,7 +36,7 @@ const HomeFileOperationsCard: React.FC<HomeFileOperationsCardProps> = ({
   const [appendInput, setAppendInput] = useState('');
   const [useBytes, setUseBytes] = useState(Platform.OS === 'web');
   const [transferResult, setTransferResult] = useState('');
-  const filePath = `${parentDirectory}/${filename}`;
+  const filePath = `${parentDirectory.replace(/\/+$/, '')}/${filename}`;
 
   useEffect(() => {
     setStats(null);
