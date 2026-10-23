@@ -17,7 +17,7 @@ export const useCloudFile = (path: string, scope?: CloudStorageScope, cloudStora
   const read = useCallback(async () => {
     const sequence = ++readSequence.current;
     const exists = await instance.exists(path, scope);
-    const nextContent = exists ? await instance.readFile(path, scope) : null;
+    const nextContent = exists ? await instance.readFile(path, { scope }) : null;
     if (sequence === readSequence.current) setContent(nextContent);
   }, [path, scope, instance]);
 
@@ -31,7 +31,7 @@ export const useCloudFile = (path: string, scope?: CloudStorageScope, cloudStora
   const write = useCallback(
     async (newContent: string) => {
       const sequence = ++readSequence.current;
-      await instance.writeFile(path, newContent, scope);
+      await instance.writeFile(path, newContent, { scope });
       if (sequence === readSequence.current) await read();
     },
     [path, scope, read, instance]

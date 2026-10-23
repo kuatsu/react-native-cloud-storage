@@ -265,12 +265,14 @@ export default class RNCloudStorage {
    * Writes to the file at the given path, creating it if it doesn't exist or overwriting it if it does.
    * @param path The file to write to.
    * @param data The data to write.
-   * @param scopeOrOptions The directory scope or write options. Uses the provider's default scope if omitted.
+   * @param options The write options. Uses the provider's default scope if omitted.
    * @returns A promise that resolves when the file has been written.
    */
-  writeFile(path: string, data: string, scopeOrOptions?: CloudStorageScope | WriteFileOptions): Promise<void>;
+  writeFile(path: string, data: string, options?: WriteFileOptions): Promise<void>;
   /** Writes bytes to a file. Requires a MIME type and holds the full file in memory. */
   writeFile(path: string, data: Uint8Array, options: WriteFileOptions & { mimeType: string }): Promise<void>;
+  /** @deprecated Pass the scope in an options object: `{ scope }`. */
+  writeFile(path: string, data: string, scope?: CloudStorageScope): Promise<void>;
   async writeFile(
     path: string,
     data: string | Uint8Array,
@@ -309,14 +311,16 @@ export default class RNCloudStorage {
   /**
    * Reads the contents of the file at the given path.
    * @param path The file to read.
-   * @param scopeOrOptions The directory scope or read options. Reads text in the provider's default scope if omitted.
+   * @param options The read options. Reads text in the provider's default scope if omitted.
    * @returns A promise that resolves to the contents of the file.
    */
-  readFile(path: string, scopeOrOptions?: CloudStorageScope | ReadTextOptions): Promise<string>;
+  readFile(path: string, options?: ReadTextOptions): Promise<string>;
   /** Reads bytes from a file. Holds the full file in memory. */
   readFile(path: string, options: ReadBytesOptions): Promise<Uint8Array>;
   /** Reads text or bytes according to the format option. */
   readFile(path: string, options?: ReadFileOptions): Promise<string | Uint8Array>;
+  /** @deprecated Pass the scope in an options object: `{ scope }`. */
+  readFile(path: string, scope?: CloudStorageScope): Promise<string>;
   readFile(path: string, scopeOrOptions?: CloudStorageScope | ReadFileOptions): Promise<string | Uint8Array> {
     const options = typeof scopeOrOptions === 'object' ? scopeOrOptions : { scope: scopeOrOptions };
     return this.nativeStorage.readFile(path, this.resolveNativeScope(options.scope), options.format);
@@ -490,12 +494,14 @@ export default class RNCloudStorage {
    * Writes to the file at the given path in the provider of the default static instance, creating it if it doesn't exist or overwriting it if it does.
    * @param path The file to write to.
    * @param data The data to write.
-   * @param scopeOrOptions The directory scope or write options. Uses the provider's default scope if omitted.
+   * @param options The write options. Uses the provider's default scope if omitted.
    * @returns A promise that resolves when the file has been written.
    */
-  static writeFile(path: string, data: string, scopeOrOptions?: CloudStorageScope | WriteFileOptions): Promise<void>;
+  static writeFile(path: string, data: string, options?: WriteFileOptions): Promise<void>;
   /** Writes bytes to a file. Requires a MIME type and holds the full file in memory. */
   static writeFile(path: string, data: Uint8Array, options: WriteFileOptions & { mimeType: string }): Promise<void>;
+  /** @deprecated Pass the scope in an options object: `{ scope }`. */
+  static writeFile(path: string, data: string, scope?: CloudStorageScope): Promise<void>;
   static writeFile(
     path: string,
     data: string | Uint8Array,
@@ -531,14 +537,16 @@ export default class RNCloudStorage {
   /**
    * Reads the contents of the file at the given path in the provider of the default static instance.
    * @param path The file to read.
-   * @param scopeOrOptions The directory scope or read options. Uses the provider's default scope if omitted.
+   * @param options The read options. Uses the provider's default scope if omitted.
    * @returns A promise that resolves to the contents of the file.
    */
-  static readFile(path: string, scopeOrOptions?: CloudStorageScope | ReadTextOptions): Promise<string>;
+  static readFile(path: string, options?: ReadTextOptions): Promise<string>;
   /** Reads bytes from a file. Holds the full file in memory. */
   static readFile(path: string, options: ReadBytesOptions): Promise<Uint8Array>;
   /** Reads text or bytes according to the format option. */
   static readFile(path: string, options?: ReadFileOptions): Promise<string | Uint8Array>;
+  /** @deprecated Pass the scope in an options object: `{ scope }`. */
+  static readFile(path: string, scope?: CloudStorageScope): Promise<string>;
   static readFile(path: string, scopeOrOptions?: CloudStorageScope | ReadFileOptions): Promise<string | Uint8Array> {
     const options = typeof scopeOrOptions === 'object' ? scopeOrOptions : { scope: scopeOrOptions };
     return RNCloudStorage.getDefaultInstance().readFile(path, options);
