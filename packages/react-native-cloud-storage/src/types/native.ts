@@ -18,6 +18,16 @@ export enum NativeCloudStorageErrorCode {
   FILE_ALREADY_EXISTS = 'ERR_FILE_EXISTS',
   MULTIPLE_FILES_SAME_NAME = 'ERR_MULTIPLE_FILES_SAME_NAME',
   AUTHENTICATION_FAILED = 'ERR_AUTHENTICATION_FAILED',
+  /**
+   * Google Drive rejected the request because of a rate limit.
+   * @provider googledrive
+   */
+  RATE_LIMITED = 'ERR_RATE_LIMITED',
+  /**
+   * Google Drive storage or daily API quota was exceeded.
+   * @provider googledrive
+   */
+  QUOTA_EXCEEDED = 'ERR_QUOTA_EXCEEDED',
   WRITE_ERROR = 'ERR_WRITE_ERROR',
   READ_ERROR = 'ERR_READ_ERROR',
   DELETE_ERROR = 'ERR_DELETE_ERROR',

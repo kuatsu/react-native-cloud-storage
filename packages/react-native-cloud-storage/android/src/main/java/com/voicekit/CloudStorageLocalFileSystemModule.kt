@@ -1,5 +1,6 @@
 package com.cloudstorage
 
+import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableMap
@@ -14,6 +15,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.Response
 import okio.buffer
 import okio.sink
+import org.json.JSONObject
 import java.io.File
 import java.io.IOException
 import java.net.URLConnection
@@ -92,9 +94,7 @@ class CloudStorageLocalFileSystemModule(reactContext: ReactApplicationContext) :
 
       override fun onResponse(call: Call, response: Response) {
         if (!response.isSuccessful) {
-          val errorMessage = "Download error for path $remoteUri: HTTP ${response.code}: ${response.message}"
-          val error = CloudStorageError.NetworkError(errorMessage)
-          promise.reject(error.code, error.message)
+          response.use { rejectHttpError(it, promise, CloudStorageError.ReadError(remoteUri)) }
           return
         }
 
@@ -215,15 +215,39 @@ class CloudStorageLocalFileSystemModule(reactContext: ReactApplicationContext) :
 
       override fun onResponse(call: Call, response: Response) {
         if (!response.isSuccessful) {
-          val errorMessage = "Upload error for path $sanitizedPath: HTTP ${response.code}: ${response.message}"
-          val error = CloudStorageError.NetworkError(errorMessage)
-          promise.reject(error.code, error.message)
+          rejectHttpError(response, promise, CloudStorageError.WriteError(remoteUri))
         } else {
           promise.resolve(null)
         }
         response.body?.close()
       }
     })
+  }
+
+  private fun rejectHttpError(response: Response, promise: Promise, fallback: CloudStorageError) {
+    val body = try {
+      response.body?.string().orEmpty()
+    } catch (_: IOException) {
+      ""
+    }
+    val error = runCatching { JSONObject(body).optJSONObject("error") }.getOrNull()
+    val reason = error?.optJSONArray("errors")?.optJSONObject(0)?.optString("reason")
+    val code = when {
+      response.code == 401 -> CloudStorageError.AuthenticationFailed.code
+      response.code == 404 -> CloudStorageError.FileNotFound(response.request.url.toString()).code
+      response.code == 429 || reason in listOf("rateLimitExceeded", "userRateLimitExceeded") -> CloudStorageError.RateLimited.code
+      reason in listOf("storageQuotaExceeded", "dailyLimitExceeded") -> CloudStorageError.QuotaExceeded.code
+      reason == "fileNotDownloadable" -> CloudStorageError.FileNotDownloadable(response.request.url.toString()).code
+      else -> fallback.code
+    }
+    val details = Arguments.createMap().apply {
+      putInt("status", response.code)
+      putString("body", body)
+      putString("retryAfter", response.header("Retry-After"))
+    }
+    val message = error?.optString("message")?.takeIf { it.isNotEmpty() }
+      ?: "Request failed with status ${response.code}"
+    promise.reject(code, message, details)
   }
 
   companion object {

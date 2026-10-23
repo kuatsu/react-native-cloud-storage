@@ -143,7 +143,7 @@ final class FileUtilsTests {
       try FileUtils.saveDownloadedFile(temporaryUrl: temporary, response: response, destinationUrl: destination)
     }
 
-    #expect(error?.code == "ERR_NETWORK_ERROR")
+    #expect(error?.code == (status == 401 ? "ERR_AUTHENTICATION_FAILED" : status == 404 ? "ERR_FILE_NOT_FOUND" : "ERR_READ_ERROR"))
     #expect(try String(contentsOf: destination, encoding: .utf8) == "kept")
   }
 

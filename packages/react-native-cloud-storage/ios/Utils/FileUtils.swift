@@ -120,9 +120,12 @@ enum FileUtils {
   }
 
   static func saveDownloadedFile(temporaryUrl: URL?, response: URLResponse?, destinationUrl: URL) throws {
-    guard let response = response as? HTTPURLResponse, (200 ... 299).contains(response.statusCode) else {
-      let status = (response as? HTTPURLResponse)?.statusCode ?? -1
-      throw CloudStorageError.networkError(message: "Download failed with status code: \(status)")
+    guard let response = response as? HTTPURLResponse else {
+      throw CloudStorageError.networkError(message: "Download failed: HTTP response is missing.")
+    }
+    if !(200 ... 299).contains(response.statusCode) {
+      let data = temporaryUrl.flatMap { try? Data(contentsOf: $0) }
+      throw CloudStorageError.httpError(response: response, data: data, fallback: .readError(path: response.url?.path ?? ""))
     }
     guard let temporaryUrl else {
       throw CloudStorageError.unknown(message: "Download failed: temporary file location is missing.")

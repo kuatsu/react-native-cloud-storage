@@ -7,26 +7,14 @@ import {
   type GoogleDriveListOperationResponse,
 } from './types';
 import { localFileSystem } from '../../utils/local-fs';
+import { NativeCloudStorageErrorCode } from '../../types/native';
+import CloudStorageError from '../../utils/cloud-storage-error';
 
 const BASE_URL = 'https://www.googleapis.com/drive/v3';
 const BASE_UPLOAD_URL = 'https://www.googleapis.com/upload/drive/v3';
 const MULTIPART_BOUNDARY = 'foo_bar_baz';
 
-export class GoogleDriveHttpError extends Error {
-  public status: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public json: any;
-
-  constructor(message: string, status: number, json: unknown) {
-    super(message);
-    this.status = status;
-    this.json = json;
-  }
-}
-
-// TODO: properly handle errors
 export default class GoogleDriveApiClient {
-  private _fetchTimeout: NodeJS.Timeout | null = null;
   private options: DeepRequired<CloudStorageProviderOptions['googledrive']>;
 
   constructor(options: DeepRequired<CloudStorageProviderOptions['googledrive']>) {
@@ -50,55 +38,86 @@ export default class GoogleDriveApiClient {
 
   private async request<T extends object | string | void = void>(
     operation: `/${string}`,
-    { queryParameters, baseUrl, ...options }: RequestInit & { queryParameters?: object; baseUrl?: string } = {}
+    {
+      queryParameters,
+      baseUrl,
+      errorCode,
+      ...options
+    }: RequestInit & {
+      queryParameters?: object;
+      baseUrl?: string;
+      errorCode?: NativeCloudStorageErrorCode;
+    } = {}
   ): Promise<T> {
     const { timeout, accessToken } = this.options;
-
-    let path = `${baseUrl ?? BASE_URL}${operation}`;
-    if (queryParameters) {
-      path += this.buildQueryString(queryParameters);
+    if (!accessToken?.length) {
+      throw new CloudStorageError(
+        'Google Drive access token is not set',
+        NativeCloudStorageErrorCode.ACCESS_TOKEN_MISSING
+      );
     }
-    if (this._fetchTimeout !== null) clearTimeout(this._fetchTimeout);
-    const abortController: AbortController = new AbortController();
-    this._fetchTimeout = setTimeout(() => {
-      abortController.abort();
-    }, timeout);
-    const response = await fetch(path, {
-      ...options,
-      headers: {
-        ...options.headers,
-        Authorization: `Bearer ${accessToken}`,
-      },
-      signal: abortController.signal,
-    });
-    if (!response.ok) {
-      let errorMessage: string;
-      let json: unknown = null;
-      try {
-        json = await response.json();
-        errorMessage =
-          typeof json === 'object' &&
-          json !== null &&
-          'error' in json &&
-          typeof json.error === 'object' &&
-          json.error !== null &&
-          'message' in json.error &&
-          typeof json.error.message === 'string'
-            ? json.error.message
-            : `Request failed with status ${response.status}`;
-      } catch {
-        errorMessage = `Request failed with status ${response.status}`;
+
+    const failureCode =
+      errorCode ??
+      (options.method === 'DELETE'
+        ? NativeCloudStorageErrorCode.DELETE_ERROR
+        : options.method === 'POST' || options.method === 'PATCH'
+          ? NativeCloudStorageErrorCode.WRITE_ERROR
+          : NativeCloudStorageErrorCode.READ_ERROR);
+    const abortController = new AbortController();
+    const timer = setTimeout(() => abortController.abort(), timeout);
+    try {
+      let path = `${baseUrl ?? BASE_URL}${operation}`;
+      if (queryParameters) path += this.buildQueryString(queryParameters);
+      const response = await fetch(path, {
+        ...options,
+        headers: { ...options.headers, Authorization: `Bearer ${accessToken}` },
+        signal: abortController.signal,
+      });
+      if (!response.ok) {
+        const text = await response.text();
+        let body;
+        try {
+          body = JSON.parse(text);
+        } catch {
+          body = text;
+        }
+        const reason = body?.error?.errors?.[0]?.reason;
+        let code = failureCode;
+        if (response.status === 401) code = NativeCloudStorageErrorCode.AUTHENTICATION_FAILED;
+        else if (response.status === 404) code = NativeCloudStorageErrorCode.FILE_NOT_FOUND;
+        else if (response.status === 429 || ['rateLimitExceeded', 'userRateLimitExceeded'].includes(reason)) {
+          code = NativeCloudStorageErrorCode.RATE_LIMITED;
+        } else if (['storageQuotaExceeded', 'dailyLimitExceeded'].includes(reason)) {
+          code = NativeCloudStorageErrorCode.QUOTA_EXCEEDED;
+        } else if (reason === 'fileNotDownloadable') code = NativeCloudStorageErrorCode.FILE_NOT_DOWNLOADABLE;
+        throw new CloudStorageError(
+          typeof body?.error?.message === 'string'
+            ? body.error.message
+            : `Request failed with status ${response.status}`,
+          code,
+          { status: response.status, body, retryAfter: response.headers.get('Retry-After') }
+        );
       }
-      throw new GoogleDriveHttpError(errorMessage, response.status, json);
+      if (response.status === 204) return undefined as T;
+      if (options.headers && 'Accept' in options.headers && options.headers.Accept !== 'application/json') {
+        return (await response.text()) as T;
+      }
+      return await response.json();
+    } catch (error) {
+      if (error instanceof CloudStorageError) throw error;
+      throw new CloudStorageError(
+        abortController.signal.aborted
+          ? `Google Drive request timed out after ${timeout} ms`
+          : error instanceof Error
+            ? error.message
+            : 'Google Drive request failed',
+        error instanceof SyntaxError ? failureCode : NativeCloudStorageErrorCode.NETWORK_ERROR,
+        error
+      );
+    } finally {
+      clearTimeout(timer);
     }
-
-    if (response.status === 204) {
-      return undefined as unknown as T;
-    }
-    if (options?.headers && 'Accept' in options.headers && options.headers.Accept !== 'application/json') {
-      return response.text() as unknown as Promise<T>;
-    }
-    return response.json();
   }
 
   private buildMultiPartBody(metadata: object, media: { mimeType: string; body: string }): string {
@@ -144,6 +163,7 @@ export default class GoogleDriveApiClient {
     };
     return this.request<GoogleDriveFile>(`/files/${fileId}`, {
       queryParameters,
+      errorCode: NativeCloudStorageErrorCode.STAT_ERROR,
     });
   }
 

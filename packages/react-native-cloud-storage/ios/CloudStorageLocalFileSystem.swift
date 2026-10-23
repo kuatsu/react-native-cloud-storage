@@ -151,7 +151,7 @@ public class CloudStorageLocalFileSystem: NSObject {
         request.httpBody = body
       }
 
-      let task = URLSession.shared.dataTask(with: request) { _, response, error in
+      let task = URLSession.shared.dataTask(with: request) { data, response, error in
         if let error {
           let nsError = error as NSError
           let cloudError = CloudStorageError.networkError(message: "Upload error for path \(localPath): \(nsError.localizedDescription)")
@@ -159,11 +159,14 @@ public class CloudStorageLocalFileSystem: NSObject {
           return
         }
 
-        guard let httpResponse = response as? HTTPURLResponse, (200 ... 299).contains(httpResponse.statusCode) else {
-          let httpResponse = response as? HTTPURLResponse
-          let message = "Upload failed for path \(localPath) with status code: \(httpResponse?.statusCode ?? -1)"
-          let cloudError = CloudStorageError.networkError(message: message)
+        guard let httpResponse = response as? HTTPURLResponse else {
+          let cloudError = CloudStorageError.networkError(message: "Upload failed: HTTP response is missing.")
           reject(cloudError.code, cloudError.message, nil)
+          return
+        }
+        if !(200 ... 299).contains(httpResponse.statusCode) {
+          let cloudError = CloudStorageError.httpError(response: httpResponse, data: data, fallback: .writeError(path: remoteUri))
+          reject(cloudError.code, cloudError.message, cloudError.cause)
           return
         }
 

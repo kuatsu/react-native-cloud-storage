@@ -6,7 +6,7 @@ import {
 } from '../../types/native';
 import CloudStorageError from '../../utils/cloud-storage-error';
 import { MimeTypes, type GoogleDriveFile, type GoogleDriveFileSpace } from './types';
-import GoogleDriveApiClient, { GoogleDriveHttpError } from './client';
+import GoogleDriveApiClient from './client';
 import { type CloudStorageProviderOptions, type DeepRequired } from '../../types/main';
 
 /**
@@ -19,24 +19,6 @@ export default class GoogleDrive implements NativeStorage {
   constructor(options: DeepRequired<CloudStorageProviderOptions['googledrive']>) {
     this.options = options;
     this.drive = new GoogleDriveApiClient(options);
-
-    return new Proxy(this, {
-      // before calling any function, check if the access token is set
-      get(target: GoogleDrive, property: keyof GoogleDrive) {
-        const allowedFunctions = ['isCloudAvailable'];
-        if (typeof target[property] === 'function' && !allowedFunctions.includes(property.toString())) {
-          const { accessToken } = options;
-          if (!accessToken?.length) {
-            throw new CloudStorageError(
-              `Google Drive access token is not set, cannot call function ${property.toString()}`,
-              NativeCloudStorageErrorCode.ACCESS_TOKEN_MISSING
-            );
-          }
-        }
-
-        return target[property];
-      },
-    });
   }
 
   public isCloudAvailable: () => Promise<boolean> = async () => {
@@ -160,53 +142,36 @@ export default class GoogleDrive implements NativeStorage {
     scope: NativeStorageScope,
     throwIf: 'directory' | 'file' | false = false
   ): Promise<string> {
-    try {
-      if (this.isRootPath(path)) {
-        if (throwIf === 'directory') {
-          throw new CloudStorageError(`Path ${path} is a directory`, NativeCloudStorageErrorCode.PATH_IS_DIRECTORY);
-        }
-
-        const rootDirectoryId = await this.getRootDirectoryId(scope);
-        if (scope !== 'app_data') {
-          await this.drive.getFile(rootDirectoryId);
-        }
-
-        return rootDirectoryId;
-      }
-
-      const { directories, filename } = this.resolvePathToDirectories(path);
-      const parentDirectoryId = await this.findParentDirectoryId(directories, scope);
-      if (parentDirectoryId === null) {
-        throw new CloudStorageError(`File not found`, NativeCloudStorageErrorCode.FILE_NOT_FOUND);
-      }
-
-      const files = await this.findFilesByNameAndParent(filename, parentDirectoryId, scope);
-      this.checkIfMultipleFilesWithSameName(path, files);
-
-      const file = files[0];
-      if (!file) throw new CloudStorageError(`File not found`, NativeCloudStorageErrorCode.FILE_NOT_FOUND);
-      if (file.mimeType === MimeTypes.FOLDER && throwIf === 'directory') {
+    if (this.isRootPath(path)) {
+      if (throwIf === 'directory') {
         throw new CloudStorageError(`Path ${path} is a directory`, NativeCloudStorageErrorCode.PATH_IS_DIRECTORY);
-      } else if (file.mimeType !== MimeTypes.FOLDER && throwIf === 'file') {
-        throw new CloudStorageError(`Path ${path} is a file`, NativeCloudStorageErrorCode.FILE_NOT_FOUND);
       }
-      return file.id;
-    } catch (error: unknown) {
-      if (error instanceof GoogleDriveHttpError && error.json?.error?.status === 'UNAUTHENTICATED') {
-        throw new CloudStorageError(
-          `Could not authenticate with Google Drive`,
-          NativeCloudStorageErrorCode.AUTHENTICATION_FAILED,
-          error.json
-        );
-      } else {
-        if (error instanceof CloudStorageError) throw error;
-        throw new CloudStorageError(
-          `Could not get file id for path ${path}`,
-          NativeCloudStorageErrorCode.UNKNOWN,
-          error
-        );
+
+      const rootDirectoryId = await this.getRootDirectoryId(scope);
+      if (scope !== 'app_data') {
+        await this.drive.getFile(rootDirectoryId);
       }
+
+      return rootDirectoryId;
     }
+
+    const { directories, filename } = this.resolvePathToDirectories(path);
+    const parentDirectoryId = await this.findParentDirectoryId(directories, scope);
+    if (parentDirectoryId === null) {
+      throw new CloudStorageError(`File not found`, NativeCloudStorageErrorCode.FILE_NOT_FOUND);
+    }
+
+    const files = await this.findFilesByNameAndParent(filename, parentDirectoryId, scope);
+    this.checkIfMultipleFilesWithSameName(path, files);
+
+    const file = files[0];
+    if (!file) throw new CloudStorageError(`File not found`, NativeCloudStorageErrorCode.FILE_NOT_FOUND);
+    if (file.mimeType === MimeTypes.FOLDER && throwIf === 'directory') {
+      throw new CloudStorageError(`Path ${path} is a directory`, NativeCloudStorageErrorCode.PATH_IS_DIRECTORY);
+    } else if (file.mimeType !== MimeTypes.FOLDER && throwIf === 'file') {
+      throw new CloudStorageError(`Path ${path} is a file`, NativeCloudStorageErrorCode.PATH_IS_FILE);
+    }
+    return file.id;
   }
 
   async fileExists(path: string, scope: NativeStorageScope): Promise<boolean> {
@@ -311,7 +276,7 @@ export default class GoogleDrive implements NativeStorage {
   async listFiles(path: string, scope: NativeStorageScope): Promise<string[]> {
     const parentDirectoryId = this.isRootPath(path)
       ? await this.getQueryRootParentId(scope)
-      : await this.getFileId(path, scope);
+      : await this.getFileId(path, scope, 'file');
 
     const files = await this.findFilesByParent(parentDirectoryId, scope);
     return [...new Set(files.map((f) => f.name))];
@@ -377,7 +342,7 @@ export default class GoogleDrive implements NativeStorage {
       if (filesInDirectory.length > 0) {
         throw new CloudStorageError(
           `Directory ${path} is not empty`,
-          NativeCloudStorageErrorCode.DELETE_ERROR,
+          NativeCloudStorageErrorCode.DIRECTORY_NOT_EMPTY,
           filesInDirectory
         );
       }
@@ -402,17 +367,7 @@ export default class GoogleDrive implements NativeStorage {
   async downloadFile(remotePath: string, localPath: string, scope: NativeStorageScope): Promise<void> {
     const fileId = await this.getFileId(remotePath, scope, 'directory');
 
-    try {
-      await this.drive.downloadFile(fileId, localPath);
-    } catch (error: unknown) {
-      if (error instanceof CloudStorageError) throw error;
-
-      throw new CloudStorageError(
-        `Could not download file ${remotePath} to ${localPath}`,
-        NativeCloudStorageErrorCode.UNKNOWN,
-        error
-      );
-    }
+    await this.drive.downloadFile(fileId, localPath);
   }
 
   async uploadFile(

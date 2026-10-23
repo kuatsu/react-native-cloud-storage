@@ -17,6 +17,8 @@ enum CloudStorageError: Error {
   case directoryNotEmpty(path: String)
   case fileAlreadyExists(path: String)
   case authenticationFailed
+  case rateLimited
+  case quotaExceeded
   case writeError(path: String)
   case readError(path: String)
   case deleteError(path: String)
@@ -38,6 +40,30 @@ enum CloudStorageError: Error {
     .native(code: code, message: "\(message): \((error as NSError).localizedDescription)", cause: error as NSError)
   }
 
+  static func httpError(response: HTTPURLResponse, data: Data?, fallback: CloudStorageError) -> CloudStorageError {
+    let body = data.flatMap { String(data: $0, encoding: .utf8) } ?? ""
+    let json = data.flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any]
+    let error = json?["error"] as? [String: Any]
+    let reason = (error?["errors"] as? [[String: Any]])?.first?["reason"] as? String
+    let code = switch response.statusCode {
+    case 401: CloudStorageError.authenticationFailed.code
+    case 404: CloudStorageError.fileNotFound(path: response.url?.path ?? "").code
+    case 429: CloudStorageError.rateLimited.code
+    default:
+      switch reason {
+      case "rateLimitExceeded", "userRateLimitExceeded": CloudStorageError.rateLimited.code
+      case "storageQuotaExceeded", "dailyLimitExceeded": CloudStorageError.quotaExceeded.code
+      case "fileNotDownloadable": CloudStorageError.fileNotDownloadable(path: response.url?.path ?? "").code
+      default: fallback.code
+      }
+    }
+    let message = error?["message"] as? String ?? "Request failed with status \(response.statusCode)"
+    var details: [String: Any] = [NSLocalizedDescriptionKey: message, "status": response.statusCode, "body": body]
+    details["retryAfter"] = response.value(forHTTPHeaderField: "Retry-After")
+    let cause = NSError(domain: "CloudStorageHTTPError", code: response.statusCode, userInfo: details)
+    return .native(code: code, message: message, cause: cause)
+  }
+
   var code: String {
     switch self {
     case .invalidScope: "ERR_INVALID_SCOPE"
@@ -48,6 +74,8 @@ enum CloudStorageError: Error {
     case .directoryNotEmpty: "ERR_DIRECTORY_NOT_EMPTY"
     case .fileAlreadyExists: "ERR_FILE_EXISTS"
     case .authenticationFailed: "ERR_AUTHENTICATION_FAILED"
+    case .rateLimited: "ERR_RATE_LIMITED"
+    case .quotaExceeded: "ERR_QUOTA_EXCEEDED"
     case .writeError: "ERR_WRITE_ERROR"
     case .readError: "ERR_READ_ERROR"
     case .deleteError: "ERR_DELETE_ERROR"
@@ -78,6 +106,10 @@ enum CloudStorageError: Error {
       "File already exists at path \(path)"
     case .authenticationFailed:
       "Authentication failed"
+    case .rateLimited:
+      "Rate limit exceeded"
+    case .quotaExceeded:
+      "Cloud quota exceeded"
     case let .writeError(path):
       "Write error for path \(path)"
     case let .readError(path):

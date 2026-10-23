@@ -44,6 +44,16 @@ sealed class CloudStorageError(
         message = "Authentication failed"
     )
 
+    object RateLimited : CloudStorageError(
+        code = "ERR_RATE_LIMITED",
+        message = "Rate limit exceeded"
+    )
+
+    object QuotaExceeded : CloudStorageError(
+        code = "ERR_QUOTA_EXCEEDED",
+        message = "Cloud quota exceeded"
+    )
+
     data class WriteError(val path: String) : CloudStorageError(
         code = "ERR_WRITE_ERROR",
         message = "Write error for path $path"

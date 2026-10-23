@@ -3,7 +3,7 @@ import { NativeCloudStorageErrorCode, type NativeKVStorage } from '../../types/n
 import CloudStorageError from '../../utils/cloud-storage-error';
 import { KV_LIMITS } from '../../utils/constants';
 import { assertValidKVKey, getKVItemsByteLength } from '../../utils/kv';
-import GoogleDriveApiClient, { GoogleDriveHttpError } from './client';
+import GoogleDriveApiClient from './client';
 import { MimeTypes } from './types';
 
 const DOCUMENT_NAME = '.rncs-kv.json';
@@ -25,15 +25,6 @@ export default class GoogleDriveKV implements NativeKVStorage {
   constructor(options: DeepRequired<CloudStorageProviderOptions['googledrive']>) {
     this.options = options;
     this.drive = new GoogleDriveApiClient(options);
-  }
-
-  private assertAccessToken(): void {
-    if (!this.options.accessToken?.length) {
-      throw new CloudStorageError(
-        'Google Drive access token is not set',
-        NativeCloudStorageErrorCode.ACCESS_TOKEN_MISSING
-      );
-    }
   }
 
   private async resolveFileId(): Promise<string | null> {
@@ -77,13 +68,13 @@ export default class GoogleDriveKV implements NativeKVStorage {
   }
 
   private async fetchDocument(): Promise<KVDocument> {
-    this.assertAccessToken();
     let fileId = await this.resolveFileId();
     if (!fileId) return { version: 1, entries: {} };
     try {
       return this.parseDocument(await this.drive.getFileText(fileId));
     } catch (error) {
-      if (!(error instanceof GoogleDriveHttpError) || error.status !== 404) throw error;
+      if (!(error instanceof CloudStorageError) || error.code !== NativeCloudStorageErrorCode.FILE_NOT_FOUND)
+        throw error;
       this.fileId = null;
       fileId = await this.resolveFileId();
       if (!fileId) return { version: 1, entries: {} };

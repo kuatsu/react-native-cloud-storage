@@ -21,7 +21,7 @@ export const localFileSystem =
             NativeCloudStorageErrorCode.UNSUPPORTED_PLATFORM
           );
         }
-        throw new Error(LINKING_ERROR);
+        throw new CloudStorageError(LINKING_ERROR, NativeCloudStorageErrorCode.UNKNOWN);
       },
     }
   ) as TNativeLocalFileSystem);
