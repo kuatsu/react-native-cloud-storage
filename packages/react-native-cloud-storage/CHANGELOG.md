@@ -1,5 +1,30 @@
 # Changelog
 
+## [3.3.0](https://github.com/kuatsu/react-native-cloud-storage/compare/v3.2.0...v3.3.0) (2026-10-23)
+
+### ✨ Features
+
+* **example:** add file and byte transfer controls ([a88e672](https://github.com/kuatsu/react-native-cloud-storage/commit/a88e67276a1237cc8ea00d50b891c469af851a16))
+* **google-drive:** support access token callbacks ([3f0f28f](https://github.com/kuatsu/react-native-cloud-storage/commit/3f0f28f53dc4e2062f96c6b3fc09a5ba3611f0c7))
+* support in-memory binary file operations ([d992500](https://github.com/kuatsu/react-native-cloud-storage/commit/d99250066ea698e0faac2455e1dce5b03858fdb7))
+
+### ⚡ Performance Improvements
+
+* **google-drive:** batch KV writes and removals into one document update ([5f14028](https://github.com/kuatsu/react-native-cloud-storage/commit/5f14028ffc861fdcf4788bf8eddc1f523b7dc1d1))
+
+### 🐛 Bug Fixes
+
+* **example:** join file paths without duplicate slashes ([6ad79d3](https://github.com/kuatsu/react-native-cloud-storage/commit/6ad79d39eee901944bf346cf51ba940b4c354e86))
+* **google-drive:** detect duplicates in parent directories ([696527c](https://github.com/kuatsu/react-native-cloud-storage/commit/696527cb0fc4e794d71ca0ccbe930485ba309f74))
+* **google-drive:** improve error handling and report rate/quota limits ([152e731](https://github.com/kuatsu/react-native-cloud-storage/commit/152e73115e59d75e1713128ab03ce3eca80d210b))
+* **google-drive:** normalize repeated path separators ([f5c1426](https://github.com/kuatsu/react-native-cloud-storage/commit/f5c1426a8b69b99662d74799cb1d6f0ac70a4c76))
+* **google-drive:** preserve all keys in KV storage ([84131cc](https://github.com/kuatsu/react-native-cloud-storage/commit/84131cc7c2672975295613ce0e240121ac100fee))
+* **google-drive:** rediscover missing and replaced KV documents ([abe81d5](https://github.com/kuatsu/react-native-cloud-storage/commit/abe81d5896d736ef1fede21ea40a28bc1d750cab))
+* **google-drive:** select duplicates in file ID order ([b9e923f](https://github.com/kuatsu/react-native-cloud-storage/commit/b9e923fa2c2816916e1d83b71d26d261fc7f5393))
+* **hooks:** prevent stale operations from replacing current file content ([5402ce5](https://github.com/kuatsu/react-native-cloud-storage/commit/5402ce5bbae0a051d52e0dbd3a1867cb6938bf89))
+* **icloud:** enforce file and directory deletion rules ([cee285f](https://github.com/kuatsu/react-native-cloud-storage/commit/cee285f595bf8d9cdbbf995f27239d70c5a65eff))
+* **ios:** preserve local files when downloads fail ([bd6da10](https://github.com/kuatsu/react-native-cloud-storage/commit/bd6da1098ec7bece3bb866f08f3e13e70fc825f0))
+
 ## [3.2.0](https://github.com/kuatsu/react-native-cloud-storage/compare/v3.1.1...v3.2.0) (2026-10-08)
 
 ### ✨ Features
