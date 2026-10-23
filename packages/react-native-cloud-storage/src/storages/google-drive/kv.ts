@@ -3,7 +3,7 @@ import { NativeCloudStorageErrorCode, type NativeKVStorage } from '../../types/n
 import CloudStorageError from '../../utils/cloud-storage-error';
 import { KV_LIMITS } from '../../utils/constants';
 import { assertValidKVKey, getKVItemsByteLength } from '../../utils/kv';
-import GoogleDriveApiClient from './client';
+import GoogleDriveApiClient, { GoogleDriveHttpError } from './client';
 import { MimeTypes } from './types';
 
 const DOCUMENT_NAME = '.rncs-kv.json';
@@ -19,7 +19,7 @@ type KVDocument = { version: 1; entries: KVEntries };
 export default class GoogleDriveKV implements NativeKVStorage {
   private readonly drive: GoogleDriveApiClient;
   private readonly options: DeepRequired<CloudStorageProviderOptions['googledrive']>;
-  private fileId: string | null | undefined;
+  private fileId: string | null = null;
   private mutationQueue: Promise<void> = Promise.resolve();
 
   constructor(options: DeepRequired<CloudStorageProviderOptions['googledrive']>) {
@@ -37,7 +37,7 @@ export default class GoogleDriveKV implements NativeKVStorage {
   }
 
   private async resolveFileId(): Promise<string | null> {
-    if (this.fileId !== undefined) return this.fileId;
+    if (this.fileId) return this.fileId;
 
     const files = await this.drive.listFiles(
       'appDataFolder',
@@ -78,9 +78,17 @@ export default class GoogleDriveKV implements NativeKVStorage {
 
   private async fetchDocument(): Promise<KVDocument> {
     this.assertAccessToken();
-    const fileId = await this.resolveFileId();
+    let fileId = await this.resolveFileId();
     if (!fileId) return { version: 1, entries: {} };
-    return this.parseDocument(await this.drive.getFileText(fileId));
+    try {
+      return this.parseDocument(await this.drive.getFileText(fileId));
+    } catch (error) {
+      if (!(error instanceof GoogleDriveHttpError) || error.status !== 404) throw error;
+      this.fileId = null;
+      fileId = await this.resolveFileId();
+      if (!fileId) return { version: 1, entries: {} };
+      return this.parseDocument(await this.drive.getFileText(fileId));
+    }
   }
 
   private mergeEntries(...sources: KVEntries[]): KVEntries {
@@ -109,7 +117,7 @@ export default class GoogleDriveKV implements NativeKVStorage {
   private async writeDocument(document: KVDocument): Promise<void> {
     this.assertLimits(document);
     const body = JSON.stringify(document);
-    const fileId = await this.resolveFileId();
+    const fileId = this.fileId;
 
     if (fileId) {
       await this.drive.updateFile(fileId, { body, mimeType: MimeTypes.JSON });
