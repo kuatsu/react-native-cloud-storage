@@ -36,10 +36,10 @@ Prefer hooks? [`useCloudFile`](/docs/api/functions/useCloudFile) and [`useCloudK
 
 ## Provider & platform support
 
-| Provider     | iOS | Android | Notes                                                          |
-| ------------ | :-: | :-----: | ------------------------------------------------------------- |
-| iCloud       | ✅  |    —    | Uses iCloud Documents; requires native setup and an iCloud account. |
-| Google Drive | ✅  |   ✅    | Backed by the Drive REST API; you provide an access token.    |
+| Provider     | iOS | Android | Web | Notes                                                             |
+| ------------ | :-: | :-----: | :-: | ----------------------------------------------------------------- |
+| iCloud       | ✅  |    —    |  —  | Uses iCloud Documents; requires native setup and an iCloud account. |
+| Google Drive | ✅  |   ✅    | ✅  | Backed by the Drive REST API; you provide an access token.          |
 
 By default, the library picks the right provider for each platform: iCloud on iOS, Google Drive everywhere else. You can override this or even use both providers at once.
 

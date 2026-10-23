@@ -17,8 +17,8 @@ React Native Cloud Storage gives your app a unified and developer-friendly API f
 - 💾 Read and write files to the cloud
 - 🔑 Store key-value pairs on the cloud
 - 🧪 Fully compatible with Expo
-- 📱 iOS & Android support, plus Web support for text-based Google Drive operations
-- 🏎️ Lightning fast iCloud performance using native iOS APIs
+- 🍎 Native iCloud implementation for iOS and other Apple platforms
+- ⚡️ JSI-powered binary file transports
 - 🌐 Google Drive REST API implementation for all platforms
 - 🧬 Easy to use React Hooks API, or use the imperative `fs`-style API
 - 👌 Zero dependencies, small bundle size

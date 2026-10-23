@@ -11,6 +11,27 @@ export enum CloudStorageScope {
   AppData = 'app_data',
 }
 
+/** Options for reading a file as UTF-8 text. */
+export interface ReadTextOptions {
+  format?: 'text';
+  scope?: CloudStorageScope;
+}
+
+/** Options for reading a file as bytes. */
+export interface ReadBytesOptions {
+  format: 'bytes';
+  scope?: CloudStorageScope;
+}
+
+/** Options for reading text or bytes. Reads text by default. */
+export type ReadFileOptions = ReadTextOptions | ReadBytesOptions;
+
+/** Options for writing a file. Binary writes require a MIME type. */
+export interface WriteFileOptions {
+  mimeType?: string;
+  scope?: CloudStorageScope;
+}
+
 /** Describes why a cloud key-value store changed externally. */
 export enum CloudKVChangeReason {
   /** The provider received values that changed on another device. */

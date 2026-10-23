@@ -58,4 +58,16 @@ export interface NativeKVStorage {
 
 export type NativeLocalFileSystem = NativeCloudStorageLocalFileSystemSpec;
 
-export type NativeStorage = Omit<NativeCloudStorageICloudDriveSpec, 'onCloudAvailabilityChanged'>;
+export type NativeStorage = Omit<
+  NativeCloudStorageICloudDriveSpec,
+  'onCloudAvailabilityChanged' | 'createFile' | 'readFile'
+> & {
+  createFile(
+    path: string,
+    data: string | Uint8Array,
+    scope: NativeStorageScope,
+    overwrite: boolean,
+    mimeType?: string
+  ): Promise<void>;
+  readFile(path: string, scope: NativeStorageScope, format?: 'text' | 'bytes'): Promise<string | Uint8Array>;
+};

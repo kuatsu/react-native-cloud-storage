@@ -227,7 +227,13 @@ export default class GoogleDrive implements NativeStorage {
     }
   }
 
-  async createFile(path: string, data: string, scope: NativeStorageScope, overwrite: boolean): Promise<void> {
+  async createFile(
+    path: string,
+    data: string | Uint8Array,
+    scope: NativeStorageScope,
+    overwrite: boolean,
+    mimeType: string = MimeTypes.TEXT
+  ): Promise<void> {
     let fileId: string | undefined;
     if (overwrite) {
       try {
@@ -255,7 +261,7 @@ export default class GoogleDrive implements NativeStorage {
     if (fileId) {
       await this.drive.updateFile(fileId, {
         body: data,
-        mimeType: MimeTypes.TEXT,
+        mimeType,
       });
     } else {
       const { directories, filename } = this.resolvePathToDirectories(path);
@@ -271,7 +277,7 @@ export default class GoogleDrive implements NativeStorage {
         },
         {
           body: data,
-          mimeType: MimeTypes.TEXT,
+          mimeType,
         }
       );
     }
@@ -319,10 +325,9 @@ export default class GoogleDrive implements NativeStorage {
     });
   }
 
-  async readFile(path: string, scope: NativeStorageScope): Promise<string> {
+  async readFile(path: string, scope: NativeStorageScope, format?: 'text' | 'bytes'): Promise<string | Uint8Array> {
     const fileId = await this.getFileId(path, scope, 'directory');
-    const content = await this.drive.getFileText(fileId);
-    return content;
+    return format === 'bytes' ? this.drive.getFileBytes(fileId) : this.drive.getFileText(fileId);
   }
 
   async triggerSync(_path: string, _scope: NativeStorageScope): Promise<void> {

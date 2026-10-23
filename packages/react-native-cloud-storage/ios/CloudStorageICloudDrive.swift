@@ -60,6 +60,23 @@ public class CloudStorageICloudDrive: NSObject {
     }
   }
 
+  @objc(readBytes:withScope:withResolver:withRejecter:)
+  public func readBytes(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    withBackgroundPromise(resolve: resolve, reject: reject) {
+      let fileUrl = try ICloudDriveUtils.getFileURL(path: path, scope: scope, true)
+      return try FileUtils.readBytes(fileUrl: fileUrl)
+    }
+  }
+
+  @objc(writeBytes:withData:withScope:withOverwrite:withResolver:withRejecter:)
+  public func writeBytes(path: String, data: NSData, scope: String, overwrite: Bool, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    withBackgroundPromise(resolve: resolve, reject: reject) {
+      let fileUrl = try ICloudDriveUtils.getFileURL(path: path, scope: scope)
+      try FileUtils.writeFile(fileUrl: fileUrl, data: data, overwrite: overwrite)
+      return nil
+    }
+  }
+
   @objc(triggerSync:withScope:withResolver:withRejecter:)
   public func triggerSync(path: String, scope: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     withBackgroundPromise(resolve: resolve, reject: reject) {

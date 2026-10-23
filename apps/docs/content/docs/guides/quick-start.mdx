@@ -36,7 +36,7 @@ if (CloudStorage.getProvider() === CloudStorageProvider.GoogleDrive) {
   [Configure Google Drive API](/docs/installation/configure-google-drive) for details on how to acquire a token.
 </Callout>
 
-## Write and read a file
+## Read and write plain-text files
 
 The core API mirrors Node's `fs`, so reading and writing is just `writeFile` / `readFile`:
 
@@ -54,8 +54,51 @@ if (await CloudStorage.exists('/user.json', CloudStorageScope.AppData)) {
 ```
 
 <Callout type="info">
-  `CloudStorageScope.AppData` is a hidden, app-private container — ideal for app state and backups. Use
+  `CloudStorageScope.AppData` is a hidden, app-private container ideal for app state and backups. Use
   `CloudStorageScope.Documents` for files the user should see in iCloud Drive or Google Drive.
+</Callout>
+
+## Read and write binary files and data
+
+Binary data can be read and written using two different ways, based on the platform.
+
+### File-based binary support
+
+On native platforms, you can directly download and upload files to and from the local filesystem:
+
+```ts
+await CloudStorage.downloadFile('/data.bin', '/local/data.bin', CloudStorageScope.AppData);
+
+await CloudStorage.uploadFile(
+  '/data.bin',
+  '/local/data.bin',
+  { mimeType: 'application/octet-stream' },
+  CloudStorageScope.AppData
+);
+```
+
+Lacking access to the user's local filesystem, this is not supported on Web and will throw when trying to use it on the Web.
+
+### Bytes-based binary support
+
+On all supported platforms, you can alternatively supply and receive an `Uint8Array` to `writeFile` and from `readFile`:
+
+```ts
+await CloudStorage.writeFile('/data.bin', new Uint8Array([0, 128, 255]), {
+  mimeType: 'application/octet-stream',
+  scope: CloudStorageScope.AppData,
+});
+
+const bytes = await CloudStorage.readFile('/data.bin', {
+  format: 'bytes',
+  scope: CloudStorageScope.AppData,
+});
+```
+
+This is also supported on the Web. The return type of `readFile` is determined by the `format` option (defaults to `text`). `writeFile` accepts both a string or a `Uint8Array`.
+
+<Callout type="info">
+  Under the hood, the iCloud adapter uses a custom JSI `ArrayBuffer` adapter for maximum performance.
 </Callout>
 
 ## Use the React hook

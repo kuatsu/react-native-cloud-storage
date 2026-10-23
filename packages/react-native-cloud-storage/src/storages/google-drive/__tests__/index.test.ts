@@ -2,6 +2,8 @@ import { afterEach, expect, it, vi } from 'vitest';
 import GoogleDrive from '../index';
 import { MimeTypes } from '../types';
 import { DEFAULT_PROVIDER_OPTIONS } from '../../../utils/constants';
+import CloudStorage from '../../../cloud-storage';
+import { CloudStorageProvider } from '../../../types/main';
 
 const options = { ...DEFAULT_PROVIDER_OPTIONS.googledrive, accessToken: 'token' };
 const response = (body: unknown): Response =>
@@ -10,6 +12,21 @@ const response = (body: unknown): Response =>
 afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
+});
+
+it('creates and reads binary content on web through the public API', async () => {
+  const bytes = Uint8Array.from({ length: 256 }, (_, index) => index);
+  const fetchMock = vi
+    .fn()
+    .mockResolvedValueOnce(response({ files: [] }))
+    .mockResolvedValueOnce(response({ id: 'binary' }))
+    .mockResolvedValueOnce(response({ files: [{ id: 'binary', mimeType: 'application/octet-stream' }] }))
+    .mockResolvedValueOnce({ ok: true, status: 200, arrayBuffer: async () => bytes.buffer });
+  vi.stubGlobal('fetch', fetchMock);
+  const storage = new CloudStorage(CloudStorageProvider.GoogleDrive, options);
+
+  await storage.writeFile('/data.bin', bytes, { mimeType: 'application/octet-stream' });
+  await expect(storage.readFile('/data.bin', { format: 'bytes' })).resolves.toEqual(bytes);
 });
 
 it('selects the lowest file ID across all result pages', async () => {

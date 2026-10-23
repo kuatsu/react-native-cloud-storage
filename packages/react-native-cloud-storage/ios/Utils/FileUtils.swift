@@ -63,12 +63,25 @@ enum FileUtils {
     }
   }
 
+  static func readBytes(fileUrl: URL) throws -> NSMutableData {
+    try coordinateReading(at: fileUrl, error: .readError(path: fileUrl.path)) { url in
+      guard fileManager.fileExists(atPath: url.path) else {
+        throw CloudStorageError.fileNotFound(path: url.path)
+      }
+      return try NSMutableData(contentsOf: url, options: [])
+    }
+  }
+
   static func writeFile(fileUrl: URL, content: String, overwrite: Bool = true) throws {
+    try writeFile(fileUrl: fileUrl, data: Data(content.utf8) as NSData, overwrite: overwrite)
+  }
+
+  static func writeFile(fileUrl: URL, data: NSData, overwrite: Bool = true) throws {
     try coordinateWriting(at: fileUrl, options: .forReplacing, error: .writeError(path: fileUrl.path)) { url in
       if !overwrite, fileManager.fileExists(atPath: url.path) || fileManager.isUbiquitousItem(at: url) {
         throw CloudStorageError.fileAlreadyExists(path: url.path)
       }
-      try content.write(to: url, atomically: true, encoding: .utf8)
+      try data.write(to: url, options: .atomic)
     }
   }
 

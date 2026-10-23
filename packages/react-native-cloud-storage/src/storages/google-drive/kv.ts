@@ -113,7 +113,7 @@ export default class GoogleDriveKV implements NativeKVStorage {
     if (fileId) {
       await this.drive.updateFile(fileId, { body, mimeType: MimeTypes.JSON });
     } else {
-      this.fileId = await this.drive.createTextFile(
+      this.fileId = await this.drive.createContentFile(
         { name: DOCUMENT_NAME, parents: ['appDataFolder'] },
         { body, mimeType: MimeTypes.JSON }
       );

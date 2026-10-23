@@ -1,6 +1,9 @@
 #import <Foundation/Foundation.h>
 
 #import <CloudStorageSpec/CloudStorageSpec.h>
+#import <React/RCTUtils.h>
+#include <react/bridging/Function.h>
+#include <cmath>
 
 #if __has_include("react_native_cloud_storage-Swift.h")
 #import "react_native_cloud_storage-Swift.h"
@@ -9,6 +12,114 @@
 #else
 #error "Unable to locate Swift compatibility header for react-native-cloud-storage."
 #endif
+
+namespace {
+namespace jsi = facebook::jsi;
+namespace react = facebook::react;
+
+class FileBuffer final : public jsi::MutableBuffer {
+ public:
+  explicit FileBuffer(NSMutableData *data) : data_(data) {}
+  size_t size() const override { return data_.length; }
+  uint8_t *data() override { return static_cast<uint8_t *>(data_.mutableBytes); }
+
+ private:
+  NSMutableData *data_;
+};
+
+static NSString *stringArgument(jsi::Runtime &runtime, const jsi::Value &value)
+{
+  auto string = value.asString(runtime).utf8(runtime);
+  return [[NSString alloc] initWithBytes:string.data() length:string.size() encoding:NSUTF8StringEncoding];
+}
+
+static jsi::Value binaryPromise(
+    jsi::Runtime &runtime,
+    const std::shared_ptr<react::CallInvoker> &invoker,
+    void (^operation)(RCTPromiseResolveBlock, RCTPromiseRejectBlock))
+{
+  auto executor = jsi::Function::createFromHostFunction(
+      runtime, jsi::PropNameID::forAscii(runtime, "executor"), 2,
+      [invoker, operation](jsi::Runtime &runtime, const jsi::Value &, const jsi::Value *arguments, size_t) {
+        react::AsyncCallback<> resolve(runtime, arguments[0].asObject(runtime).asFunction(runtime), invoker);
+        react::AsyncCallback<> reject(runtime, arguments[1].asObject(runtime).asFunction(runtime), invoker);
+        operation(
+            ^(id result) {
+              resolve.call([result](jsi::Runtime &runtime, jsi::Function &callback) {
+                if (result) {
+                  auto buffer = std::make_shared<FileBuffer>((NSMutableData *)result);
+                  callback.call(runtime, jsi::ArrayBuffer(runtime, std::move(buffer)));
+                } else {
+                  callback.call(runtime);
+                }
+              });
+            },
+            ^(NSString *code, NSString *message, NSError *cause) {
+              NSDictionary *error = RCTJSErrorFromCodeMessageAndNSError(code, message, cause);
+              reject.call([error](jsi::Runtime &runtime, jsi::Function &callback) {
+                callback.call(runtime, react::TurboModuleConvertUtils::convertObjCObjectToJSIValue(runtime, error));
+              });
+            });
+        return jsi::Value::undefined();
+      });
+  return runtime.global().getPropertyAsFunction(runtime, "Promise").callAsConstructor(runtime, executor);
+}
+
+class ICloudDriveTurboModule final : public react::NativeCloudStorageICloudDriveIOSSpecJSI {
+ public:
+  ICloudDriveTurboModule(const react::ObjCTurboModule::InitParams &params, CloudStorageICloudDrive *storage)
+      : NativeCloudStorageICloudDriveIOSSpecJSI(params), storage_(storage)
+  {
+    methodMap_["readBytes"] = {2, [](jsi::Runtime &runtime, react::TurboModule &module, const jsi::Value *arguments, size_t count) {
+      return static_cast<ICloudDriveTurboModule &>(module).readBytes(runtime, arguments, count);
+    }};
+    methodMap_["writeBytes"] = {6, [](jsi::Runtime &runtime, react::TurboModule &module, const jsi::Value *arguments, size_t count) {
+      return static_cast<ICloudDriveTurboModule &>(module).writeBytes(runtime, arguments, count);
+    }};
+  }
+
+ private:
+  CloudStorageICloudDrive *storage_;
+
+  jsi::Value readBytes(jsi::Runtime &runtime, const jsi::Value *arguments, size_t count)
+  {
+    if (count != 2) throw jsi::JSError(runtime, "readBytes expects a path and scope.");
+    NSString *path = stringArgument(runtime, arguments[0]);
+    NSString *scope = stringArgument(runtime, arguments[1]);
+    CloudStorageICloudDrive *storage = storage_;
+    return binaryPromise(runtime, jsInvoker_, ^(RCTPromiseResolveBlock resolve, RCTPromiseRejectBlock reject) {
+      [storage readBytes:path withScope:scope withResolver:resolve withRejecter:reject];
+    });
+  }
+
+  jsi::Value writeBytes(jsi::Runtime &runtime, const jsi::Value *arguments, size_t count)
+  {
+    if (count != 6 || !arguments[2].isNumber() || !arguments[3].isNumber() || !arguments[5].isBool()) {
+      throw jsi::JSError(runtime, "writeBytes expects a path, ArrayBuffer, offset, length, scope, and overwrite flag.");
+    }
+    NSString *path = stringArgument(runtime, arguments[0]);
+    NSString *scope = stringArgument(runtime, arguments[4]);
+    auto object = arguments[1].asObject(runtime);
+    if (!object.isArrayBuffer(runtime)) throw jsi::JSError(runtime, "File data must be an ArrayBuffer.");
+    auto buffer = object.getArrayBuffer(runtime);
+    double offset = arguments[2].getNumber();
+    double length = arguments[3].getNumber();
+    size_t size = buffer.size(runtime);
+    if (!(offset >= 0 && length >= 0 && offset <= size && length <= size - offset &&
+          std::floor(offset) == offset && std::floor(length) == length)) {
+      throw jsi::JSError(runtime, "File data is outside the ArrayBuffer bounds.");
+    }
+    // Snapshot before dispatch so JavaScript cannot change bytes during the write.
+    const void *bytes = length ? buffer.data(runtime) + static_cast<size_t>(offset) : nullptr;
+    NSData *data = [NSData dataWithBytes:bytes length:static_cast<NSUInteger>(length)];
+    BOOL overwrite = arguments[5].getBool();
+    CloudStorageICloudDrive *storage = storage_;
+    return binaryPromise(runtime, jsInvoker_, ^(RCTPromiseResolveBlock resolve, RCTPromiseRejectBlock reject) {
+      [storage writeBytes:path withData:data withScope:scope withOverwrite:overwrite withResolver:resolve withRejecter:reject];
+    });
+  }
+};
+}
 
 @interface RCTCloudStorageICloudDrive : NativeCloudStorageICloudDriveIOSSpecBase <NativeCloudStorageICloudDriveIOSSpec>
 @end
@@ -212,7 +323,7 @@
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
     (const facebook::react::ObjCTurboModule::InitParams &)params
 {
-  return std::make_shared<facebook::react::NativeCloudStorageICloudDriveIOSSpecJSI>(params);
+  return std::make_shared<ICloudDriveTurboModule>(params, _cloudStorageICloudDrive);
 }
 
 @end

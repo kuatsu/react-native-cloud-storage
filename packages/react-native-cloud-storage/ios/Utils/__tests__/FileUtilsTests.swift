@@ -73,6 +73,17 @@ final class FileUtilsTests {
     #expect(try String(contentsOf: file, encoding: .utf8) == "kept")
   }
 
+  @Test(arguments: [0, 256])
+  func preservesBinaryFiles(length: Int) throws {
+    let file = directory.appendingPathComponent("bytes.bin")
+    let data = Data((0 ..< length).map { UInt8($0) })
+    try "old".write(to: file, atomically: true, encoding: .utf8)
+
+    try FileUtils.writeFile(fileUrl: file, data: data as NSData)
+    #expect(try Data(contentsOf: file) == data)
+    #expect(try FileUtils.readBytes(fileUrl: file) as Data == data)
+  }
+
   @Test func copyRespectsOverwriteAndPreservesExistingData() throws {
     let source = directory.appendingPathComponent("source.txt")
     let destination = directory.appendingPathComponent("destination.txt")
@@ -154,6 +165,10 @@ final class FileUtilsTests {
       try FileUtils.readFile(fileUrl: file)
     }
     #expect(readError?.code == "ERR_FILE_NOT_FOUND")
+    let bytesError = #expect(throws: CloudStorageError.self) {
+      try FileUtils.readBytes(fileUrl: file)
+    }
+    #expect(bytesError?.code == "ERR_FILE_NOT_FOUND")
     let statError = #expect(throws: CloudStorageError.self) {
       try FileUtils.statFile(fileUrl: file)
     }
