@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, StyleSheet, Text, TextInput } from 'react-native';
+import { Alert, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import {
   CloudStorage,
   CloudStorageError,
@@ -11,6 +11,7 @@ import {
 import * as Crypto from 'expo-crypto';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
+import { File } from 'expo-file-system';
 import Button from '../../components/button';
 import Card from '../../components/card';
 
@@ -33,11 +34,14 @@ const HomeFileOperationsCard: React.FC<HomeFileOperationsCardProps> = ({
   const [stats, setStats] = useState<CloudStorageFileStat | null>(null);
   const [input, setInput] = useState('');
   const [appendInput, setAppendInput] = useState('');
+  const [useBytes, setUseBytes] = useState(Platform.OS === 'web');
+  const [transferResult, setTransferResult] = useState('');
   const filePath = `${parentDirectory}/${filename}`;
 
   useEffect(() => {
     setStats(null);
     setInput('');
+    setTransferResult('');
   }, [cloudStorage, directoryRevision, filePath, scope]);
 
   const readFile = async () => {
@@ -95,31 +99,48 @@ const HomeFileOperationsCard: React.FC<HomeFileOperationsCardProps> = ({
       copyToCacheDirectory: true,
     });
     if (result.canceled || !result.assets[0]) return;
+    const file = result.assets[0];
 
     onLoadingChange(true);
+    setTransferResult('');
     try {
-      const file = result.assets[0];
-      await cloudStorage.uploadFile(filePath, decodeURIComponent(file.uri.replace(/^file:\/\//, '')), {
-        mimeType: file.mimeType ?? 'application/octet-stream',
-      });
+      const options = { mimeType: file.mimeType || 'application/octet-stream' };
+      if (useBytes) {
+        const bytes = file.file ? new Uint8Array(await file.file.arrayBuffer()) : await new File(file.uri).bytes();
+        await cloudStorage.writeFile(filePath, bytes, options);
+      } else {
+        await cloudStorage.uploadFile(filePath, decodeURIComponent(file.uri.replace(/^file:\/\//, '')), options);
+      }
       setStats(await cloudStorage.stat(filePath));
+      setTransferResult('File saved.');
       Alert.alert('File saved', 'File saved. On iCloud, iOS uploads the local container copy asynchronously.');
     } catch (error) {
+      setTransferResult(String(error));
       console.warn(error);
     } finally {
+      if (Platform.OS === 'web') URL.revokeObjectURL(file.uri);
       onLoadingChange(false);
     }
   };
 
   const downloadFile = async () => {
     onLoadingChange(true);
+    setTransferResult('');
     try {
+      if (useBytes) {
+        const bytes = await cloudStorage.readFile(filePath, { format: 'bytes' });
+        const preview = Array.from(bytes.subarray(0, 16), (byte) => byte.toString(16).padStart(2, '0')).join(' ');
+        setTransferResult(`Read ${bytes.byteLength} bytes${preview ? `\n${preview}` : ''}`);
+        return;
+      }
       const directory = FileSystem.cacheDirectory;
       if (!directory) throw new Error('Could not get cache directory');
       const newFilename = decodeURIComponent(directory.replace(/^file:\/\//, '')) + Crypto.randomUUID();
       await cloudStorage.downloadFile(filePath, newFilename);
+      setTransferResult(`File downloaded to ${newFilename}`);
       Alert.alert('File downloaded', `File downloaded to ${newFilename}`);
     } catch (error) {
+      setTransferResult(String(error));
       console.warn(error);
     } finally {
       onLoadingChange(false);
@@ -181,8 +202,39 @@ const HomeFileOperationsCard: React.FC<HomeFileOperationsCardProps> = ({
         style={styles.input}
       />
       <Button title="Append to file" onPress={() => void appendToFile()} />
+      <Text style={styles.label}>Binary transfers</Text>
+      <View accessibilityRole="radiogroup" accessibilityLabel="Binary transfer mode" style={styles.transferModes}>
+        {[false, true].map((byteMode) => {
+          const selected = useBytes === byteMode;
+          const disabled = !byteMode && Platform.OS === 'web';
+          return (
+            <TouchableOpacity
+              key={byteMode ? 'bytes' : 'files'}
+              accessibilityRole="radio"
+              accessibilityState={{ checked: selected, disabled }}
+              disabled={disabled}
+              onPress={() => {
+                setUseBytes(byteMode);
+                setTransferResult('');
+              }}
+              style={[
+                styles.transferMode,
+                selected && styles.selectedTransferMode,
+                disabled && styles.disabledTransferMode,
+              ]}>
+              <Text style={[styles.transferModeText, selected && styles.selectedTransferModeText]}>
+                {byteMode ? 'Bytes' : 'Files'}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
       <Button title="Choose file to upload" onPress={() => void uploadFile()} />
-      <Button title="Download file to cache directory" onPress={() => void downloadFile()} />
+      <Button
+        title={useBytes ? 'Read file as bytes' : 'Download file to cache directory'}
+        onPress={() => void downloadFile()}
+      />
+      {transferResult !== '' && <Text>{transferResult}</Text>}
       <Text style={styles.smallText}>
         The filename will be prefixed with the parent directory. If the file does not exist, it will be created. If it
         does exist, it will be overwritten.
@@ -196,6 +248,9 @@ const HomeFileOperationsCard: React.FC<HomeFileOperationsCardProps> = ({
 };
 
 const styles = StyleSheet.create({
+  disabledTransferMode: {
+    opacity: 0.4,
+  },
   existsText: {
     alignSelf: 'flex-end',
   },
@@ -211,8 +266,35 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: 'bold',
   },
+  selectedTransferMode: {
+    backgroundColor: '#3e86d3',
+  },
+  selectedTransferModeText: {
+    color: 'white',
+  },
   smallText: {
     fontSize: 10,
+  },
+  transferMode: {
+    borderRadius: 999,
+    flex: 1,
+    justifyContent: 'center',
+    minHeight: 44,
+    paddingHorizontal: 10,
+  },
+  transferModes: {
+    backgroundColor: '#edf3f9',
+    borderRadius: 999,
+    flexDirection: 'row',
+    marginVertical: 5,
+    padding: 4,
+    width: '100%',
+  },
+  transferModeText: {
+    color: '#29435a',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 
