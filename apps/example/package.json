@@ -11,27 +11,28 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "expo": "^55.0.2",
-    "expo-crypto": "~55.0.8",
-    "expo-document-picker": "~55.0.8",
-    "expo-file-system": "~55.0.9",
-    "expo-status-bar": "~55.0.4",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
-    "react-native": "0.83.2",
+    "expo": "^58.0.17",
+    "expo-crypto": "~58.0.7",
+    "expo-document-picker": "~58.0.4",
+    "expo-file-system": "~58.0.10",
+    "expo-splash-screen": "~58.0.11",
+    "expo-status-bar": "~58.0.4",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-native": "0.88.0",
     "react-native-cloud-storage": "workspace:*",
-    "react-native-safe-area-context": "5.6.2"
+    "react-native-safe-area-context": "~5.10.1"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
     "@react-native-harness/platform-android": "1.6.0",
     "@react-native-harness/platform-apple": "1.6.0",
-    "@react-native/metro-config": "0.83.2",
-    "@types/react": "~19.2.14",
+    "@react-native/metro-config": "0.88.0",
+    "@types/react": "~19.3.0",
     "jest": "30.5.2",
     "pod-install": "^1.2.1",
     "react-native-harness": "1.6.0",
-    "typescript": "~5.9.3"
+    "typescript": "~6.0.3"
   },
   "private": true
 }

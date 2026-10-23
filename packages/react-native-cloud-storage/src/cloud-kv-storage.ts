@@ -194,7 +194,7 @@ export default class RNCloudKVStorage {
     }
   }
 
-  private getNativeModule(): NativeKVStoreTurboModule | null {
+  private getNativeModule(): NativeKVStoreTurboModule | null | undefined {
     return this.provider.provider === CloudStorageProvider.ICloud ? NativeKVStoreModule : null;
   }
 

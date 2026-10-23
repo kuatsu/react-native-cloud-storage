@@ -119,7 +119,7 @@ export default class RNCloudStorage {
       });
   }
 
-  private getNativeICloudDriveModule(): NativeCloudStorageICloudDriveTurboModule | null {
+  private getNativeICloudDriveModule(): NativeCloudStorageICloudDriveTurboModule | null | undefined {
     return this.provider.provider === CloudStorageProvider.ICloud ? NativeICloudDriveModule : null;
   }
 
