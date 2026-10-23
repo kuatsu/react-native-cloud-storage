@@ -13,6 +13,7 @@ const config = {
   plugin: [
     'typedoc-plugin-markdown',
     'typedoc-plugin-frontmatter',
+    fileURLToPath(new URL('scripts/typedoc-theme.mts', import.meta.url)),
     fileURLToPath(new URL('scripts/typedoc-frontmatter.mts', import.meta.url)),
   ],
   blockTags: [...OptionDefaults.blockTags, '@platform', '@provider'],
@@ -22,6 +23,7 @@ const config = {
       kind_type_literal: 'Object',
     },
   },
+  theme: 'api-reference',
   readme: 'none',
   fileExtension: '.md',
   entryFileName: 'index',
