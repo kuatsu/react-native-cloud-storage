@@ -1,4 +1,4 @@
-name: Build iOS
+name: Run iOS RN Harness tests
 on:
   push:
     branches:
@@ -21,8 +21,8 @@ on:
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
 jobs:
-  build:
-    name: Build iOS example app
+  test:
+    name: Run iOS harness tests
     runs-on: macOS-26
     timeout-minutes: 45
     steps:

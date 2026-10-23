@@ -1,4 +1,4 @@
-name: Build Android
+name: Run Android RN Harness tests
 on:
   push:
     branches:
@@ -21,8 +21,8 @@ on:
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
 jobs:
-  build:
-    name: Build Android example app
+  test:
+    name: Run Android harness tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
