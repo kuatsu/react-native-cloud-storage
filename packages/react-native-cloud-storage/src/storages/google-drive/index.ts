@@ -45,16 +45,14 @@ export default class GoogleDrive implements NativeStorage {
   }
 
   private isRootPath(path: string): boolean {
-    return path === '' || path === '/';
+    return /^\/*$/.test(path);
   }
 
   private resolvePathToDirectories(path: string): {
     directories: string[];
     filename: string;
   } {
-    if (path.startsWith('/')) path = path.slice(1);
-    if (path.endsWith('/')) path = path.slice(0, -1);
-    const directories = path.split('/');
+    const directories = path.split('/').filter(Boolean);
     const actualFilename = directories.pop() ?? '';
     return { directories, filename: actualFilename };
   }

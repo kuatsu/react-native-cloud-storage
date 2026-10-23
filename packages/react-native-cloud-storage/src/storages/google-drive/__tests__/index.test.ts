@@ -25,8 +25,32 @@ it('creates and reads binary content on web through the public API', async () =>
   vi.stubGlobal('fetch', fetchMock);
   const storage = new CloudStorage(CloudStorageProvider.GoogleDrive, options);
 
-  await storage.writeFile('/data.bin', bytes, { mimeType: 'application/octet-stream' });
+  await storage.writeFile('//data.bin', bytes, { mimeType: 'application/octet-stream' });
   await expect(storage.readFile('/data.bin', { format: 'bytes' })).resolves.toEqual(bytes);
+});
+
+it('resolves repeated separators when reading and deleting nested files', async () => {
+  const folder = response({ files: [{ id: 'folder', mimeType: MimeTypes.FOLDER }] });
+  const file = response({ files: [{ id: 'binary', mimeType: MimeTypes.BINARY }] });
+  const bytes = new Uint8Array([0, 128, 255]);
+  const fetchMock = vi
+    .fn()
+    .mockResolvedValueOnce(folder)
+    .mockResolvedValueOnce(file)
+    .mockResolvedValueOnce({ ok: true, status: 200, arrayBuffer: async () => bytes.buffer })
+    .mockResolvedValueOnce(folder)
+    .mockResolvedValueOnce(file)
+    .mockResolvedValueOnce({ ok: true, status: 204 });
+  vi.stubGlobal('fetch', fetchMock);
+  const storage = new CloudStorage(CloudStorageProvider.GoogleDrive, options);
+  const path = '///reports//data.bin///';
+
+  await expect(storage.readFile(path, { format: 'bytes' })).resolves.toEqual(bytes);
+  await storage.unlink(path);
+  expect(fetchMock).toHaveBeenLastCalledWith(
+    'https://www.googleapis.com/drive/v3/files/binary',
+    expect.objectContaining({ method: 'DELETE' })
+  );
 });
 
 it('selects the lowest file ID across all result pages', async () => {
