@@ -43,10 +43,10 @@ jobs:
           cd android
           ./gradlew :app:assembleDebug -PreactNativeArchitectures=x86_64 --no-daemon
         working-directory: apps/example
+      - name: Enable KVM
+        run: sudo chmod a+rw /dev/kvm
       - name: Test native modules
-        uses: callstackincubator/react-native-harness@v1.6.0
-        with:
-          projectRoot: apps/example
-          runner: android
-          app: android/app/build/outputs/apk/debug/app-debug.apk
-          packageManager: pnpm
+        timeout-minutes: 10
+        run: pnpm example test:harness:android
+        env:
+          HARNESS_APP_PATH: android/app/build/outputs/apk/debug/app-debug.apk

@@ -61,9 +61,6 @@ jobs:
         working-directory: apps/example
       - name: Test native modules
         timeout-minutes: 10
-        uses: callstackincubator/react-native-harness@v1.6.0
-        with:
-          projectRoot: apps/example
-          runner: ios
-          app: ios/build/Build/Products/Debug-iphonesimulator/RNCloudStorage.app
-          packageManager: pnpm
+        run: pnpm example test:harness:ios
+        env:
+          HARNESS_APP_PATH: ios/build/Build/Products/Debug-iphonesimulator/RNCloudStorage.app
