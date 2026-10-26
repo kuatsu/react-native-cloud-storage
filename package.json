@@ -15,13 +15,13 @@
   },
   "packageManager": "pnpm@12.14.0",
   "devDependencies": {
-    "@commitlint/cli": "^21.2.3",
-    "@commitlint/config-conventional": "^21.2.3",
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
     "del-cli": "^8.0.1",
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
-    "oxlint": "^1.88.0",
-    "oxfmt": "^0.73.0",
+    "oxlint": "^1.89.0",
+    "oxfmt": "^0.74.0",
     "typescript": "~5.9.3"
   }
 }
