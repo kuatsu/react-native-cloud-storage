@@ -27,7 +27,7 @@
     "@types/node": "^25.9.9",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "oxfmt": "^0.74.0",
+    "oxfmt": "^0.75.0",
     "postcss": "8.5.32",
     "react-native-cloud-storage": "workspace:*",
     "tailwindcss": "4.3.3",
