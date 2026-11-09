@@ -77,9 +77,9 @@
     "react-native": "0.88.0",
     "react-native-builder-bob": "^0.44.1",
     "react-native-web": "^0.21.2",
-    "release-it": "^21.1.1",
+    "release-it": "^21.1.2",
     "typescript": "~5.9.3",
-    "vitest": "^5.0.5"
+    "vitest": "^5.1.0"
   },
   "peerDependencies": {
     "expo": ">=48.0.0",
