@@ -12,14 +12,14 @@
     "clean": "rm -rf .next .source content/docs/api"
   },
   "dependencies": {
-    "fumadocs-core": "16.18.0",
-    "fumadocs-mdx": "15.5.0",
-    "fumadocs-ui": "16.18.0",
-    "lucide-react": "^1.72.0",
+    "fumadocs-core": "16.19.5",
+    "fumadocs-mdx": "15.6.4",
+    "fumadocs-ui": "16.19.5",
+    "lucide-react": "^1.76.0",
     "next": "16.4.6",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "tailwind-merge": "^3.7.0"
+    "tailwind-merge": "^3.7.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.3.4",
